@@ -1,113 +1,199 @@
+import 'package:flame/components.dart';
+import 'package:flame/extensions.dart';
+import 'package:flame/flame.dart';
+import 'package:flame/game.dart';
+import 'package:flame/gestures.dart';
+import 'package:flame/keyboard.dart';
+import 'package:flame/palette.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
+import 'package:flame_audio/bgm.dart';
+import 'package:flutter/services.dart';
+import 'Runner.dart';
 
-void main() {
-  runApp(MyApp());
+const COLOR = const Color(0xFFDDC0A3);
+const SIZE = 52.0;
+const GRAVITY = 400.0;
+const BOOST = -380.0;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Flame.device.fullScreen();
+  await Flame.device.setLandscape();
+  final myGame = MyGame();
+  runApp(GameWidget(game: myGame));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
+  TextPaint textPaint = TextPaint(
+    config: TextPaintConfig(fontSize: 48.0),
+  );
+
+  late Sprite background1;
+  late Sprite background2;
+  late Runner runner;
+  late var background;
+  late var platform1;
+  late var platform2;
+  late var platform3;
+  late var wire;
+  late var bug;
+  late var coin;
+
+  var runnerPosition = Vector2(0, 0);
+  var runnerSize;
+  var backgroundSize;
+  var background1Position;
+  var background2Position;
+  late double blockSize;
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+  Future<void> onLoad() async {
+    print("load");
+    FlameAudio.bgm.initialize();
+    background = await Flame.images.load('bg.png');
+    background1 = Sprite(background);
+    background2 = Sprite(background);
+    platform1 = await Flame.images.load('platform1.png');
+    platform2 = await Flame.images.load('platform2.png');
+    platform3 = await Flame.images.load('platform3.png');
+    wire = await Flame.images.load('wire.png');
+    bug = await Flame.images.load('bug.png');
+    coin = await Flame.images.load('coin.png');
+
+    runner = Runner();
+    await runner.load(loadSpriteAnimation);
+    runner.setSize(runnerSize, blockSize);
+    runnerPosition = Vector2(blockSize, blockSize * 7);
+    runner.setPosition(runnerPosition);
+    add(runner);
+
+    FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
+  }
+
+  @override
+  void render(Canvas canvas) {
+    background1.render(
+      canvas,
+      position: Vector2(0, 0),
+      size: backgroundSize,
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+    super.render(canvas);
+    final fpsCount = fps(1);
+    // textPaint.render(
+    //   canvas,
+    //   fpsCount.toString(),
+    //   Vector2(0, 0),
+    // );
   }
 
   @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+  void update(double dt) {
+    super.update(dt);
+  }
+
+  @override
+  void onResize(Vector2 size) {
+    super.onResize(size);
+    blockSize = size.y / 9;
+    print(blockSize);
+    runnerSize = Vector2(
+      size.y / 9,
+      size.y / 9,
     );
+
+    backgroundSize = Vector2(size.x * 2, size.y);
   }
+
+  // Mobile controls
+  late List<double> xdeltas;
+  late List<double> ydeltas;
+  @override
+  void onPanStart(DragStartInfo info) {
+    xdeltas = List.empty(growable: true);
+    ydeltas = List.empty(growable: true);
+  }
+
+  @override
+  void onPanUpdate(DragUpdateInfo info) {
+    xdeltas.add(info.delta.game.x);
+    ydeltas.add(info.delta.game.y);
+  }
+
+  @override
+  void onPanEnd(DragEndInfo info) {
+    double xdelta = xdeltas.isEmpty
+        ? 0
+        : xdeltas.reduce((value, element) => value + element);
+    double ydelta = ydeltas.isEmpty
+        ? 0
+        : ydeltas.reduce((value, element) => value + element);
+    if (xdelta.abs() > ydelta.abs()) {
+      if (xdelta > 0) {
+        runner.control("right");
+      } else {
+        runner.control("left");
+      }
+    } else if (xdelta.abs() < ydelta.abs()) {
+      if (ydelta > 0) {
+        runner.control("down");
+      } else {
+        runner.control("up");
+      }
+    }
+  }
+
+  @override
+  void onTap() {
+    runner.control("center");
+  }
+
+  // Keyboard controls.
+  var keyboardKey;
+  @override
+  void onKeyEvent(RawKeyEvent event) {
+    if (event is RawKeyUpEvent) {
+      keyboardKey = null;
+      switch (event.data.keyLabel) {
+        case "w":
+          runner.control("up");
+          break;
+        case "a":
+          runner.control("left");
+          break;
+        case "s":
+          runner.control("down");
+          break;
+        case "d":
+          runner.control("right");
+          break;
+        default:
+          if (event.data.logicalKey.keyId == 32) {
+            runner.control("down");
+          }
+          break;
+      }
+    }
+    if (event is RawKeyDownEvent && event.data.logicalKey.keyId == 32) {
+      if (keyboardKey == null) {
+        runner.control("center");
+      }
+      keyboardKey = "spacebar";
+    }
+  }
+}
+
+class Background extends Component {
+  static final Paint _paint = Paint()..color = COLOR;
+  final size;
+
+  Background(this.size);
+
+  @override
+  void render(Canvas c) {
+    c.drawRect(Rect.fromLTWH(0.0, 0.0, size.x, size.y), _paint);
+  }
+
+  @override
+  void update(double t);
 }
