@@ -1,3 +1,7 @@
+import 'package:firo_runner/GameState.dart';
+import 'package:firo_runner/MovingObject.dart';
+import 'package:firo_runner/Platform.dart';
+import 'package:firo_runner/PlatformLoader.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
@@ -29,10 +33,13 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     config: TextPaintConfig(fontSize: 48.0),
   );
 
+  late PlatformHolder platformHolder;
+
   late Sprite background1;
   late Sprite background2;
   late Runner runner;
-  late var background;
+  late GameState gameState;
+  var background;
   late var platform1;
   late var platform2;
   late var platform3;
@@ -47,12 +54,16 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   var background2Position;
   late double blockSize;
 
+  bool loaded = false;
+
   @override
   Future<void> onLoad() async {
+    debugMode = true;
     print("load");
     FlameAudio.bgm.initialize();
     background = await Flame.images.load('bg.png');
     background1 = Sprite(background);
+    print(background.height.toString() + " " + background.width.toString());
     background2 = Sprite(background);
     platform1 = await Flame.images.load('platform1.png');
     platform2 = await Flame.images.load('platform2.png');
@@ -61,6 +72,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     bug = await Flame.images.load('bug.png');
     coin = await Flame.images.load('coin.png');
 
+    platformHolder = PlatformHolder();
+    await platformHolder.loadPlatforms();
+
+    gameState = GameState();
+    await gameState.load(size);
+
     runner = Runner();
     await runner.load(loadSpriteAnimation);
     runner.setSize(runnerSize, blockSize);
@@ -68,28 +85,48 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner.setPosition(runnerPosition);
     add(runner);
 
+    // Generate the first 4 Platforms that will always be there at the start.
+    for (int i = 0; i < 4; i++) {
+      platformHolder.generatePlatform(this, 8, true);
+    }
+    fillScreen();
+
     FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
+    loaded = true;
+  }
+
+  void fillScreen() {
+    for (int i = 2; i < 9; i = i + 3) {
+      while (!platformHolder.generatePlatform(this, i, false));
+    }
   }
 
   @override
   void render(Canvas canvas) {
+    gameState.render(canvas);
     background1.render(
       canvas,
       position: Vector2(0, 0),
-      size: backgroundSize,
+      size: Vector2(size.y * (background!.width / background!.height), size.y),
     );
     super.render(canvas);
+    platformHolder.render(canvas);
     final fpsCount = fps(1);
-    // textPaint.render(
-    //   canvas,
-    //   fpsCount.toString(),
-    //   Vector2(0, 0),
-    // );
+    textPaint.render(
+      canvas,
+      fpsCount.toString(),
+      Vector2(0, 0),
+    );
   }
 
   @override
   void update(double dt) {
+    platformHolder.removePast(this);
+    fillScreen();
     super.update(dt);
+    gameState.update(dt);
+    platformHolder.update(dt);
+    // print(gameState.distance);
   }
 
   @override
@@ -102,7 +139,11 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       size.y / 9,
     );
 
-    backgroundSize = Vector2(size.x * 2, size.y);
+    if (loaded) {
+      backgroundSize =
+          Vector2(size.y * (background!.width / background!.height), size.y);
+      gameState.setSize(size);
+    }
   }
 
   // Mobile controls

@@ -70,10 +70,10 @@ class Runner extends Component with HasGameRef<MyGame> {
         sprite.addEffect(MoveEffect(
           path: [
             sprite.position,
-            Vector2(sprite.x, (level - 2) * gameRef.blockSize),
+            Vector2(sprite.x, (level - 3) * gameRef.blockSize),
           ],
           speed: 50,
-          curve: Curves.bounceIn,
+          curve: Curves.ease,
           onComplete: () {
             updateLevel();
             runnerState = "run";
@@ -245,7 +245,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       'death-normal-frames.png',
       SpriteAnimationData.sequenced(
         amount: 20,
-        stepTime: 0.1,
+        stepTime: 0.05,
         textureSize: Vector2(512, 512),
         loop: false,
       ),
