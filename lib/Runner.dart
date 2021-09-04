@@ -1,6 +1,7 @@
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
+import 'Platform.dart';
 
 import 'package:flame/components.dart';
 
@@ -17,13 +18,13 @@ enum RunnerState {
 
 class Runner extends Component with HasGameRef<MyGame> {
   late SpriteAnimationGroupComponent sprite;
+  String runnerState = "run";
 
   void setPosition(Vector2 position) {
     sprite.position = position;
   }
 
   void setSize(Vector2 size, double ySize) {
-    // runnerSize = size;
     sprite.size = size;
   }
 
@@ -37,15 +38,16 @@ class Runner extends Component with HasGameRef<MyGame> {
     getSprite().render(c, position: sprite.position, size: sprite.size);
   }
 
-  int level = 7;
+  int level = 1;
 
   void updateLevel() {
     level = (sprite.position.y / gameRef.blockSize).round();
   }
 
-  String runnerState = "run";
+  String previousState = "run";
 
   void event(String event) {
+    previousState = runnerState;
     print(event);
     switch (event) {
       case "jump":
@@ -60,17 +62,20 @@ class Runner extends Component with HasGameRef<MyGame> {
           curve: Curves.bounceIn,
           onComplete: () {
             updateLevel();
-            runnerState = "run";
+            this.event("float");
           },
         ));
         break;
       case "doublejump":
+        if (level - 1 < 0) {
+          break;
+        }
         runnerState = event;
         sprite.current = RunnerState.jump;
         sprite.addEffect(MoveEffect(
           path: [
             sprite.position,
-            Vector2(sprite.x, (level - 3) * gameRef.blockSize),
+            Vector2(sprite.x, (level - 2) * gameRef.blockSize),
           ],
           speed: 50,
           curve: Curves.ease,
@@ -83,15 +88,21 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "fall":
         runnerState = event;
         sprite.current = RunnerState.fall;
-        // TODO calculate distance to next platform.
         sprite.addEffect(MoveEffect(
           path: [
-            // sprite.position,
             Vector2(sprite.x, (level + 1) * gameRef.blockSize),
           ],
-          speed: 50,
+          speed: 100,
           curve: Curves.ease,
-          onComplete: updateLevel,
+          onComplete: () {
+            if (runnerState == "fall") {
+              updateLevel();
+              sprite.position = Vector2(sprite.x, level * gameRef.blockSize);
+              this.event("run");
+            } else {
+              this.event("float");
+            }
+          },
         ));
         break;
       case "kick":
@@ -106,10 +117,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         runnerState = event;
         sprite.current = RunnerState.float;
         sprite.addEffect(MoveEffect(
-          path: [
-            sprite.position,
-            Vector2(sprite.x, (level - 1) * gameRef.blockSize),
-          ],
+          path: [sprite.position],
           speed: 50,
           curve: Curves.ease,
           onComplete: () {
@@ -137,13 +145,12 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   void control(String input) {
-    print(runnerState + " " + input);
-    print(sprite.position);
+    print(input);
     switch (input) {
       case "up":
         if (runnerState == "run") {
           event("jump");
-        } else if (runnerState == "jump") {
+        } else if (runnerState == "float" && previousState == "jump") {
           event("doublejump");
         } else if (runnerState == "duck") {
           event("run");
@@ -152,6 +159,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "down":
         if (runnerState == "run") {
           event("duck");
+        } else if (runnerState == "float" && onTopOfPlatform()) {
+          event("run");
         } else if (runnerState == "float") {
           event("fall");
         }
@@ -162,7 +171,8 @@ class Runner extends Component with HasGameRef<MyGame> {
         }
         break;
       case "center":
-        if (runnerState == "jump") {
+        if (runnerState == "fall") {
+          updateLevel();
           event("float");
         }
         break;
@@ -181,7 +191,53 @@ class Runner extends Component with HasGameRef<MyGame> {
       sprite.current = RunnerState.run;
     }
 
+    intersecting();
     sprite.update(dt);
+  }
+
+  bool onTopOfPlatform() {
+    Rect runnerRect = sprite.toRect();
+    bool onTopOfPlatform = false;
+    for (List<Platform> platformLevel in gameRef.platformHolder.platforms) {
+      for (Platform p in platformLevel) {
+        String side = p.intersect(runnerRect);
+        if (side == "none") {
+          Rect belowRunner = Rect.fromLTRB(runnerRect.left, runnerRect.top,
+              runnerRect.right, runnerRect.bottom + 1);
+          if (p.intersect(belowRunner) != "none") {
+            onTopOfPlatform = true;
+          }
+        }
+      }
+    }
+    return onTopOfPlatform;
+  }
+
+  void intersecting() {
+    Rect runnerRect = sprite.toRect();
+    bool onTopOfPlatform = false;
+    for (List<Platform> platformLevel in gameRef.platformHolder.platforms) {
+      for (Platform p in platformLevel) {
+        String side = p.intersect(runnerRect);
+        if (side == "none") {
+          Rect belowRunner = Rect.fromLTRB(runnerRect.left, runnerRect.top,
+              runnerRect.right, runnerRect.bottom + 1);
+          if (p.intersect(belowRunner) != "none") {
+            onTopOfPlatform = true;
+          }
+        } else if (side == "bottom") {
+          // The runner has hit his head on the ceiling and should die.
+          event("die");
+        }
+      }
+    }
+
+    if (!onTopOfPlatform &&
+        (runnerState == "run" ||
+            runnerState == "kick" ||
+            runnerState == "duck")) {
+      event("fall");
+    }
   }
 
   Future load(loadSpriteAnimation) async {

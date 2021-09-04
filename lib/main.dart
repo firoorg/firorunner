@@ -59,11 +59,9 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   @override
   Future<void> onLoad() async {
     debugMode = true;
-    print("load");
     FlameAudio.bgm.initialize();
     background = await Flame.images.load('bg.png');
     background1 = Sprite(background);
-    print(background.height.toString() + " " + background.width.toString());
     background2 = Sprite(background);
     platform1 = await Flame.images.load('platform1.png');
     platform2 = await Flame.images.load('platform2.png');
@@ -81,7 +79,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner = Runner();
     await runner.load(loadSpriteAnimation);
     runner.setSize(runnerSize, blockSize);
-    runnerPosition = Vector2(blockSize, blockSize * 7);
+    runnerPosition = Vector2(blockSize, blockSize * 1);
     runner.setPosition(runnerPosition);
     add(runner);
 
@@ -126,14 +124,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     super.update(dt);
     gameState.update(dt);
     platformHolder.update(dt);
-    // print(gameState.distance);
   }
 
   @override
   void onResize(Vector2 size) {
     super.onResize(size);
     blockSize = size.y / 9;
-    print(blockSize);
     runnerSize = Vector2(
       size.y / 9,
       size.y / 9,

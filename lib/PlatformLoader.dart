@@ -44,7 +44,6 @@ class PlatformHolder {
       Platform platform = Platform(gameRef);
       platform.setPosition(xCordinate, gameRef.blockSize * level);
       platforms[level].add(platform);
-      print(platforms[0].length);
       return false;
     }
   }
@@ -78,7 +77,7 @@ class PlatformHolder {
           platformLevel.length > 3 &&
           random.nextInt(100) > 65 &&
           removed > 0) {
-        int secondToLast = platformLevel.length - 3;
+        int secondToLast = platformLevel.length - 4;
         double secondToLastPosition =
             platformLevel.elementAt(secondToLast).sprite.x;
         if (secondToLastPosition > gameRef.size.x) {

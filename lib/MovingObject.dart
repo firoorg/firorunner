@@ -34,8 +34,26 @@ class MovingObject extends Component {
     sprite.position = sprite.position - Vector2(velocity * dt, 0);
   }
 
-  @override
-  void remove() {
-    super.remove();
+  String intersect(Rect other) {
+    final collision = sprite.toRect().intersect(other);
+    if (!collision.isEmpty) {
+      // print(collision);
+      double ydistance = other.top - sprite.toRect().top;
+      double xdistance = other.left - sprite.toRect().left;
+      if (ydistance.abs() > xdistance.abs()) {
+        if (ydistance > 0) {
+          return "bottom";
+        } else {
+          return "top";
+        }
+      } else {
+        if (xdistance > 0) {
+          return "right";
+        } else {
+          return "left";
+        }
+      }
+    }
+    return "none";
   }
 }
