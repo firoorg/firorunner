@@ -1,7 +1,10 @@
+import 'dart:math';
+
+import 'package:firo_runner/CoinHolder.dart';
 import 'package:firo_runner/GameState.dart';
 import 'package:firo_runner/MovingObject.dart';
 import 'package:firo_runner/Platform.dart';
-import 'package:firo_runner/PlatformLoader.dart';
+import 'package:firo_runner/PlatformHolder.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
@@ -34,6 +37,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   );
 
   late PlatformHolder platformHolder;
+  late Coinholder coinHolder;
+  Random random = Random();
 
   late Sprite background1;
   late Sprite background2;
@@ -72,6 +77,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
     platformHolder = PlatformHolder();
     await platformHolder.loadPlatforms();
+    coinHolder = Coinholder();
+    await coinHolder.loadCoins();
 
     gameState = GameState();
     await gameState.load(size);
@@ -97,6 +104,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     for (int i = 2; i < 9; i = i + 3) {
       while (!platformHolder.generatePlatform(this, i, false));
     }
+    int choseCoinLevel = random.nextInt(9);
+    if (choseCoinLevel % 3 != 2) {
+      coinHolder.generateCoin(this, choseCoinLevel, false);
+    }
   }
 
   @override
@@ -109,6 +120,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     );
     super.render(canvas);
     platformHolder.render(canvas);
+    coinHolder.render(canvas);
     final fpsCount = fps(1);
     textPaint.render(
       canvas,
@@ -120,10 +132,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   @override
   void update(double dt) {
     platformHolder.removePast(this);
+    coinHolder.removePast(this);
     fillScreen();
     super.update(dt);
     gameState.update(dt);
     platformHolder.update(dt);
+    coinHolder.update(dt);
   }
 
   @override

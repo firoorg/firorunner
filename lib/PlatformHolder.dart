@@ -87,4 +87,15 @@ class PlatformHolder {
       }
     }
   }
+
+  double getFlushX() {
+    Platform platform =
+        platforms[2].firstWhere((element) => element.sprite.x > 0, orElse: () {
+      return platforms[5].firstWhere((element) => element.sprite.x > 0,
+          orElse: () {
+        return platforms[8].firstWhere((element) => element.sprite.x > 0);
+      });
+    });
+    return platform.sprite.x;
+  }
 }

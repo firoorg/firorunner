@@ -1,3 +1,4 @@
+import 'package:firo_runner/Coin.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
@@ -229,6 +230,18 @@ class Runner extends Component with HasGameRef<MyGame> {
           // The runner has hit his head on the ceiling and should die.
           event("die");
         }
+      }
+    }
+
+    for (List<Coin> coinLevel in gameRef.coinHolder.coins) {
+      for (int i = 0; i < coinLevel.length;) {
+        if (coinLevel[i].intersect(runnerRect) != "none") {
+          gameRef.gameState.numCoins++;
+          coinLevel.removeAt(i);
+          print(gameRef.gameState.numCoins);
+          continue;
+        }
+        i++;
       }
     }
 
