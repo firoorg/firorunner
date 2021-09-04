@@ -3,11 +3,12 @@ import 'dart:math';
 import 'package:firo_runner/MovingObject.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 
 enum PlatformState { normal }
 
 class Platform extends MovingObject {
+  var removeChildren = null;
+
   Platform(MyGame gameRef) : super(gameRef) {
     var random = Random();
     int version = random.nextInt(3) + 1;
@@ -28,6 +29,8 @@ class Platform extends MovingObject {
       current: PlatformState.normal,
     );
 
+    sprite.changePriorityWithoutResorting(PLATFORM_PRIORITY);
+
     setSize(
       gameRef.blockSize * (platform!.width / platform!.height / 7),
       gameRef.blockSize,
@@ -38,8 +41,9 @@ class Platform extends MovingObject {
     return sprite.position.x + sprite.width;
   }
 
-  @override
-  void render(Canvas c) {
-    getSprite().render(c, position: sprite.position, size: sprite.size);
+  void remove() {
+    if (removeChildren != null) {
+      removeChildren();
+    }
   }
 }

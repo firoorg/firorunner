@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:firo_runner/main.dart';
 import 'package:flame/flame.dart';
-import 'package:flutter/material.dart';
 import 'Platform.dart';
 
 class PlatformHolder {
@@ -33,26 +32,19 @@ class PlatformHolder {
   }
 
   bool generatePlatform(MyGame gameRef, int level, bool force) {
-    double xCordinate = 0;
+    double xCoordinate = 0;
     if (platforms[level].isNotEmpty) {
-      xCordinate = platforms[level].last.getRightEnd();
+      xCoordinate = platforms[level].last.getRightEnd();
     }
 
-    if (xCordinate > gameRef.size.x + 1000) {
+    if (xCoordinate > gameRef.size.x + 1000) {
       return true;
     } else {
       Platform platform = Platform(gameRef);
-      platform.setPosition(xCordinate, gameRef.blockSize * level);
+      platform.setPosition(xCoordinate, gameRef.blockSize * level);
+      gameRef.add(platform.sprite);
       platforms[level].add(platform);
       return false;
-    }
-  }
-
-  void render(Canvas canvas) {
-    for (List<Platform> platformLevel in platforms) {
-      for (Platform p in platformLevel) {
-        p.render(canvas);
-      }
     }
   }
 
@@ -70,6 +62,7 @@ class PlatformHolder {
       while (platformLevel.isNotEmpty &&
           platformLevel[0].sprite.position.x + platformLevel[0].sprite.width <
               0) {
+        platformLevel[0].sprite.remove();
         platformLevel.removeAt(0);
         removed++;
       }
@@ -81,7 +74,12 @@ class PlatformHolder {
         double secondToLastPosition =
             platformLevel.elementAt(secondToLast).sprite.x;
         if (secondToLastPosition > gameRef.size.x) {
+          platformLevel[secondToLast].remove();
+          platformLevel[secondToLast].sprite.remove();
           platformLevel.removeAt(secondToLast);
+
+          platformLevel[secondToLast + 1].remove();
+          platformLevel[secondToLast + 1].sprite.remove();
           platformLevel.removeAt(secondToLast + 1);
         }
       }
@@ -97,5 +95,16 @@ class PlatformHolder {
       });
     });
     return platform.sprite.x;
+  }
+
+  Platform? getPlatformOffScreen(int level) {
+    for (int i = 0; i < platforms[level].length; i++) {
+      Platform p = platforms[level][i];
+      if (p.sprite.x > p.gameRef.size.x) {
+        int chosenIndex = random.nextInt(platforms[level].length - i) + i;
+        return platforms[level][chosenIndex];
+      }
+    }
+    return null;
   }
 }

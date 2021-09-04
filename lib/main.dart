@@ -2,26 +2,27 @@ import 'dart:math';
 
 import 'package:firo_runner/CoinHolder.dart';
 import 'package:firo_runner/GameState.dart';
-import 'package:firo_runner/MovingObject.dart';
-import 'package:firo_runner/Platform.dart';
 import 'package:firo_runner/PlatformHolder.dart';
+import 'package:firo_runner/Wire.dart';
+import 'package:firo_runner/WireHolder.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/gestures.dart';
 import 'package:flame/keyboard.dart';
-import 'package:flame/palette.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
-import 'package:flame_audio/bgm.dart';
 import 'package:flutter/services.dart';
 import 'Runner.dart';
 
 const COLOR = const Color(0xFFDDC0A3);
-const SIZE = 52.0;
-const GRAVITY = 400.0;
-const BOOST = -380.0;
+
+const RUNNER_PRIORITY = 100;
+const PLATFORM_PRIORITY = 50;
+const WIRE_PRIORITY = 25;
+const COIN_PRIORITY = 70;
+const BUG_PRIORITY = 75;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +38,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   );
 
   late PlatformHolder platformHolder;
-  late Coinholder coinHolder;
+  late CoinHolder coinHolder;
+  late WireHolder wireHolder;
   Random random = Random();
 
   late Sprite background1;
@@ -45,12 +47,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late Runner runner;
   late GameState gameState;
   var background;
-  late var platform1;
-  late var platform2;
-  late var platform3;
-  late var wire;
-  late var bug;
-  late var coin;
 
   var runnerPosition = Vector2(0, 0);
   var runnerSize;
@@ -60,25 +56,22 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late double blockSize;
 
   bool loaded = false;
+  late Wire wire;
 
   @override
   Future<void> onLoad() async {
-    debugMode = true;
+    // debugMode = true;
     FlameAudio.bgm.initialize();
     background = await Flame.images.load('bg.png');
     background1 = Sprite(background);
     background2 = Sprite(background);
-    platform1 = await Flame.images.load('platform1.png');
-    platform2 = await Flame.images.load('platform2.png');
-    platform3 = await Flame.images.load('platform3.png');
-    wire = await Flame.images.load('wire.png');
-    bug = await Flame.images.load('bug.png');
-    coin = await Flame.images.load('coin.png');
 
     platformHolder = PlatformHolder();
     await platformHolder.loadPlatforms();
-    coinHolder = Coinholder();
+    coinHolder = CoinHolder();
     await coinHolder.loadCoins();
+    wireHolder = WireHolder();
+    await wireHolder.loadWires();
 
     gameState = GameState();
     await gameState.load(size);
@@ -102,9 +95,14 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   void fillScreen() {
     for (int i = 2; i < 9; i = i + 3) {
-      while (!platformHolder.generatePlatform(this, i, false));
+      while (!platformHolder.generatePlatform(this, i, false)) {}
     }
-    int choseCoinLevel = random.nextInt(9);
+    int wireChosenRegion = random.nextInt(8) + 1;
+    if (wireChosenRegion % 3 != 2) {
+      wireHolder.generateWire(this, wireChosenRegion, false);
+    }
+
+    int choseCoinLevel = random.nextInt(8) + 1;
     if (choseCoinLevel % 3 != 2) {
       coinHolder.generateCoin(this, choseCoinLevel, false);
     }
@@ -119,8 +117,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       size: Vector2(size.y * (background!.width / background!.height), size.y),
     );
     super.render(canvas);
-    platformHolder.render(canvas);
-    coinHolder.render(canvas);
     final fpsCount = fps(1);
     textPaint.render(
       canvas,
@@ -133,11 +129,13 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   void update(double dt) {
     platformHolder.removePast(this);
     coinHolder.removePast(this);
+    wireHolder.removePast(this);
     fillScreen();
     super.update(dt);
     gameState.update(dt);
     platformHolder.update(dt);
     coinHolder.update(dt);
+    wireHolder.update(dt);
   }
 
   @override
@@ -157,36 +155,36 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   }
 
   // Mobile controls
-  late List<double> xdeltas;
-  late List<double> ydeltas;
+  late List<double> xDeltas;
+  late List<double> yDeltas;
   @override
   void onPanStart(DragStartInfo info) {
-    xdeltas = List.empty(growable: true);
-    ydeltas = List.empty(growable: true);
+    xDeltas = List.empty(growable: true);
+    yDeltas = List.empty(growable: true);
   }
 
   @override
   void onPanUpdate(DragUpdateInfo info) {
-    xdeltas.add(info.delta.game.x);
-    ydeltas.add(info.delta.game.y);
+    xDeltas.add(info.delta.game.x);
+    yDeltas.add(info.delta.game.y);
   }
 
   @override
   void onPanEnd(DragEndInfo info) {
-    double xdelta = xdeltas.isEmpty
+    double xDelta = xDeltas.isEmpty
         ? 0
-        : xdeltas.reduce((value, element) => value + element);
-    double ydelta = ydeltas.isEmpty
+        : xDeltas.reduce((value, element) => value + element);
+    double yDelta = yDeltas.isEmpty
         ? 0
-        : ydeltas.reduce((value, element) => value + element);
-    if (xdelta.abs() > ydelta.abs()) {
-      if (xdelta > 0) {
+        : yDeltas.reduce((value, element) => value + element);
+    if (xDelta.abs() > yDelta.abs()) {
+      if (xDelta > 0) {
         runner.control("right");
       } else {
         runner.control("left");
       }
-    } else if (xdelta.abs() < ydelta.abs()) {
-      if (ydelta > 0) {
+    } else if (xDelta.abs() < yDelta.abs()) {
+      if (yDelta > 0) {
         runner.control("down");
       } else {
         runner.control("up");

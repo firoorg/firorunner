@@ -1,4 +1,5 @@
 import 'package:firo_runner/Coin.dart';
+import 'package:firo_runner/Wire.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
@@ -72,17 +73,16 @@ class Runner extends Component with HasGameRef<MyGame> {
           break;
         }
         runnerState = event;
-        sprite.current = RunnerState.jump;
+        sprite.current = RunnerState.float;
         sprite.addEffect(MoveEffect(
           path: [
-            sprite.position,
             Vector2(sprite.x, (level - 2) * gameRef.blockSize),
           ],
-          speed: 50,
+          speed: 100,
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
-            runnerState = "run";
+            this.event("float");
           },
         ));
         break;
@@ -96,13 +96,8 @@ class Runner extends Component with HasGameRef<MyGame> {
           speed: 100,
           curve: Curves.ease,
           onComplete: () {
-            if (runnerState == "fall") {
-              updateLevel();
-              sprite.position = Vector2(sprite.x, level * gameRef.blockSize);
-              this.event("run");
-            } else {
-              this.event("float");
-            }
+            updateLevel();
+            this.event("float");
           },
         ));
         break;
@@ -119,7 +114,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         sprite.current = RunnerState.float;
         sprite.addEffect(MoveEffect(
           path: [sprite.position],
-          speed: 50,
+          speed: 500,
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
@@ -227,8 +222,8 @@ class Runner extends Component with HasGameRef<MyGame> {
             onTopOfPlatform = true;
           }
         } else if (side == "bottom") {
-          // The runner has hit his head on the ceiling and should die.
           event("die");
+          return;
         }
       }
     }
@@ -237,11 +232,20 @@ class Runner extends Component with HasGameRef<MyGame> {
       for (int i = 0; i < coinLevel.length;) {
         if (coinLevel[i].intersect(runnerRect) != "none") {
           gameRef.gameState.numCoins++;
+          coinLevel[i].remove();
           coinLevel.removeAt(i);
           print(gameRef.gameState.numCoins);
           continue;
         }
         i++;
+      }
+    }
+
+    for (List<Wire> wireLevel in gameRef.wireHolder.wires) {
+      for (int i = 0; i < wireLevel.length; i++) {
+        if (wireLevel[i].intersect(runnerRect) != "none") {
+          event("electro");
+        }
       }
     }
 
@@ -293,24 +297,24 @@ class Runner extends Component with HasGameRef<MyGame> {
     );
 
     SpriteAnimation floating = await loadSpriteAnimation(
-      'run-frames.png',
+      'hover-frames.png',
       SpriteAnimationData.sequenced(
-        amount: 1,
+        amount: 3,
         stepTime: 0.1,
         textureSize: Vector2(512, 512),
       ),
     );
 
     SpriteAnimation falling = await loadSpriteAnimation(
-      'run-frames.png',
+      'hover-frames.png',
       SpriteAnimationData.sequenced(
-        amount: 1,
+        amount: 3,
         stepTime: 0.1,
         textureSize: Vector2(512, 512),
       ),
     );
 
-    SpriteAnimation dieing = await loadSpriteAnimation(
+    SpriteAnimation dying = await loadSpriteAnimation(
       'death-normal-frames.png',
       SpriteAnimationData.sequenced(
         amount: 20,
@@ -320,8 +324,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       ),
     );
 
-    SpriteAnimation dieingElectorcuted = await loadSpriteAnimation(
-      'electrecuted-frames.png',
+    SpriteAnimation dyingElectrocuted = await loadSpriteAnimation(
+      'electrocuted-frames.png',
       SpriteAnimationData.sequenced(
         amount: 2,
         stepTime: 0.1,
@@ -337,10 +341,12 @@ class Runner extends Component with HasGameRef<MyGame> {
         RunnerState.kick: kicking,
         RunnerState.float: floating,
         RunnerState.fall: falling,
-        RunnerState.die: dieing,
-        RunnerState.electro: dieingElectorcuted,
+        RunnerState.die: dying,
+        RunnerState.electro: dyingElectrocuted,
       },
       current: RunnerState.run,
     );
+
+    changePriorityWithoutResorting(RUNNER_PRIORITY);
   }
 }

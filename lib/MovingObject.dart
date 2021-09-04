@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
-class MovingObject extends Component {
+class MovingObject {
   late SpriteAnimationGroupComponent sprite;
   MyGame gameRef;
 
@@ -21,15 +21,7 @@ class MovingObject extends Component {
     return sprite.animation!.getSprite();
   }
 
-  @override
-  void render(Canvas c) {
-    super.render(c);
-  }
-
-  @override
   void update(double dt) {
-    super.update(dt);
-    sprite.update(dt);
     double velocity = gameRef.gameState.getVelocity();
     sprite.position = sprite.position - Vector2(velocity * dt, 0);
   }
@@ -37,17 +29,16 @@ class MovingObject extends Component {
   String intersect(Rect other) {
     final collision = sprite.toRect().intersect(other);
     if (!collision.isEmpty) {
-      // print(collision);
-      double ydistance = other.top - sprite.toRect().top;
-      double xdistance = other.left - sprite.toRect().left;
-      if (ydistance.abs() > xdistance.abs()) {
-        if (ydistance > 0) {
+      double yDistance = other.top - sprite.toRect().top;
+      double xDistance = other.left - sprite.toRect().left;
+      if (yDistance.abs() > xDistance.abs()) {
+        if (yDistance > 0) {
           return "bottom";
         } else {
           return "top";
         }
       } else {
-        if (xdistance > 0) {
+        if (xDistance > 0) {
           return "right";
         } else {
           return "left";

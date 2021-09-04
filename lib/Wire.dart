@@ -2,15 +2,15 @@ import 'package:firo_runner/MovingObject.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
-enum CoinState { normal }
+enum WireState { normal }
 
-class Coin extends MovingObject {
-  Coin(MyGame gameRef) : super(gameRef) {
-    var coin = gameRef.coinHolder.getCoin();
+class Wire extends MovingObject {
+  Wire(MyGame gameRef) : super(gameRef) {
+    var wire = gameRef.wireHolder.getWire();
     SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      coin,
+      wire,
       SpriteAnimationData.sequenced(
-        amount: 10,
+        amount: 6,
         stepTime: 0.1,
         textureSize: Vector2(512, 512),
       ),
@@ -18,18 +18,16 @@ class Coin extends MovingObject {
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
-        CoinState.normal: normal,
+        WireState.normal: normal,
       },
-      current: CoinState.normal,
+      current: WireState.normal,
     );
 
-    sprite.changePriorityWithoutResorting(COIN_PRIORITY);
-
-    var platform = gameRef.platformHolder.getPlatform(0);
+    sprite.changePriorityWithoutResorting(WIRE_PRIORITY);
 
     setSize(
-      gameRef.blockSize * (platform!.width / platform!.height / 14),
-      gameRef.blockSize * (platform!.width / platform!.height / 14),
+      gameRef.blockSize,
+      gameRef.blockSize,
     );
   }
 
