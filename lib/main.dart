@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:firo_runner/BugHolder.dart';
+import 'package:firo_runner/CircuitBackground.dart';
 import 'package:firo_runner/CoinHolder.dart';
 import 'package:firo_runner/GameState.dart';
 import 'package:firo_runner/PlatformHolder.dart';
@@ -40,23 +41,24 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     config: TextPaintConfig(fontSize: 48.0),
   );
 
+  late CircuitBackground circuitBackground;
   late PlatformHolder platformHolder;
   late CoinHolder coinHolder;
   late WireHolder wireHolder;
   late BugHolder bugHolder;
   Random random = Random();
 
-  late Sprite background1;
-  late Sprite background2;
+  // late Sprite background1;
+  // late Sprite background2;
   late Runner runner;
   late GameState gameState;
-  var background;
+  // var background;
 
   var runnerPosition = Vector2(0, 0);
   var runnerSize;
-  var backgroundSize;
-  var background1Position;
-  var background2Position;
+  // var backgroundSize;
+  // var background1Position;
+  // var background2Position;
   late double blockSize;
 
   bool loaded = false;
@@ -66,10 +68,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   Future<void> onLoad() async {
     // debugMode = true;
     FlameAudio.bgm.initialize();
-    background = await Flame.images.load('bg.png');
-    background1 = Sprite(background);
-    background2 = Sprite(background);
+    // background = await Flame.images.load('bg.png');
+    // background1 = Sprite(background);
+    // background2 = Sprite(background);
 
+    circuitBackground = CircuitBackground(this);
+    await circuitBackground.load();
     platformHolder = PlatformHolder();
     await platformHolder.loadPlatforms();
     coinHolder = CoinHolder();
@@ -155,11 +159,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   @override
   void render(Canvas canvas) {
     gameState.render(canvas);
-    background1.render(
-      canvas,
-      position: Vector2(0, 0),
-      size: Vector2(size.y * (background!.width / background!.height), size.y),
-    );
+    circuitBackground.render(canvas);
+    // background1.render(
+    //   canvas,
+    //   position: Vector2(0, 0),
+    //   size: Vector2(size.y * (background!.width / background!.height), size.y),
+    // );
     super.render(canvas);
     final fpsCount = fps(1);
     textPaint.render(
@@ -177,6 +182,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     bugHolder.removePast(this);
     fillScreen();
     super.update(dt);
+    circuitBackground.update(dt);
     gameState.update(dt);
     platformHolder.update(dt);
     coinHolder.update(dt);
@@ -194,8 +200,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     );
 
     if (loaded) {
-      backgroundSize =
-          Vector2(size.y * (background!.width / background!.height), size.y);
+      // backgroundSize =
+      //     Vector2(size.y * (background!.width / background!.height), size.y);
       gameState.setSize(size);
     }
   }
@@ -276,19 +282,4 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       keyboardKey = "spacebar";
     }
   }
-}
-
-class Background extends Component {
-  static final Paint _paint = Paint()..color = COLOR;
-  final size;
-
-  Background(this.size);
-
-  @override
-  void render(Canvas c) {
-    c.drawRect(Rect.fromLTWH(0.0, 0.0, size.x, size.y), _paint);
-  }
-
-  @override
-  void update(double t);
 }
