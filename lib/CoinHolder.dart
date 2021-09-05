@@ -26,16 +26,16 @@ class CoinHolder {
     if (totalCoins() > 5) {
       return false;
     }
-    double xCordinate = gameRef.platformHolder.getFlushX();
-    xCordinate = xCordinate +
+    double xCoordinate = gameRef.platformHolder.getFlushX();
+    xCoordinate = xCoordinate +
         gameRef.blockSize * random.nextInt(5) +
         gameRef.blockSize * 20;
 
-    if (xCordinate < gameRef.size.x || random.nextInt(100) > 10) {
+    if (xCoordinate < gameRef.size.x || random.nextInt(100) > 25) {
       return true;
     } else {
       Coin coin = Coin(gameRef);
-      coin.setPosition(xCordinate, gameRef.blockSize * level);
+      coin.setPosition(xCoordinate, gameRef.blockSize * level);
       coins[level].add(coin);
       gameRef.add(coin.sprite);
       return false;

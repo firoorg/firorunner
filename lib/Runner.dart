@@ -1,3 +1,4 @@
+import 'package:firo_runner/Bug.dart';
 import 'package:firo_runner/Coin.dart';
 import 'package:firo_runner/Wire.dart';
 import 'package:firo_runner/main.dart';
@@ -189,6 +190,7 @@ class Runner extends Component with HasGameRef<MyGame> {
 
     intersecting();
     sprite.update(dt);
+    print(runnerState);
   }
 
   bool onTopOfPlatform() {
@@ -249,6 +251,32 @@ class Runner extends Component with HasGameRef<MyGame> {
       }
     }
 
+    for (List<Bug> bugLevel in gameRef.bugHolder.bugs) {
+      for (int i = 0; i < bugLevel.length; i++) {
+        String intersectState = bugLevel[i].intersect(runnerRect);
+        if (bugLevel[i].sprite.current == BugState.breaking) {
+          continue;
+        }
+        if (intersectState == "none") {
+          Rect above = Rect.fromLTRB(runnerRect.left, runnerRect.top - 1,
+              runnerRect.right, runnerRect.bottom);
+          String aboveIntersect = bugLevel[i].intersect(above);
+          if (aboveIntersect != "none" &&
+              (runnerState == "duck" || runnerState == "float")) {
+            continue;
+          } else if (aboveIntersect != "none") {
+            event("die");
+          }
+        } else if (intersectState == "left" && runnerState == "kick") {
+          bugLevel[i].sprite.current = BugState.breaking;
+          // bugLevel[i].remove();
+          // bugLevel.removeAt(i);
+        } else {
+          event("die");
+        }
+      }
+    }
+
     if (!onTopOfPlatform &&
         (runnerState == "run" ||
             runnerState == "kick" ||
@@ -290,7 +318,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       'kick-frames.png',
       SpriteAnimationData.sequenced(
         amount: 13,
-        stepTime: 0.03,
+        stepTime: 0.05,
         textureSize: Vector2(512, 512),
         loop: false,
       ),

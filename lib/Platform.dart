@@ -7,7 +7,7 @@ import 'package:flame/components.dart';
 enum PlatformState { normal }
 
 class Platform extends MovingObject {
-  var removeChildren = null;
+  List<Function> removeChildren = [];
 
   Platform(MyGame gameRef) : super(gameRef) {
     var random = Random();
@@ -42,8 +42,10 @@ class Platform extends MovingObject {
   }
 
   void remove() {
-    if (removeChildren != null) {
-      removeChildren();
+    if (removeChildren.isNotEmpty) {
+      for (Function removeChild in removeChildren) {
+        removeChild();
+      }
     }
   }
 }

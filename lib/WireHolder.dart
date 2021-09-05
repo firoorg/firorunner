@@ -63,10 +63,10 @@ class WireHolder {
       wires[level].add(wire);
       gameRef.add(wire.sprite);
       if (platform != null) {
-        platform.removeChildren = () {
+        platform.removeChildren.add(() {
           wires[level].remove(wire);
           wire.remove();
-        };
+        });
       }
       return false;
     }

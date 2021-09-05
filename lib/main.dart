@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firo_runner/BugHolder.dart';
 import 'package:firo_runner/CoinHolder.dart';
 import 'package:firo_runner/GameState.dart';
 import 'package:firo_runner/PlatformHolder.dart';
@@ -40,6 +41,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late PlatformHolder platformHolder;
   late CoinHolder coinHolder;
   late WireHolder wireHolder;
+  late BugHolder bugHolder;
   Random random = Random();
 
   late Sprite background1;
@@ -72,6 +74,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     await coinHolder.loadCoins();
     wireHolder = WireHolder();
     await wireHolder.loadWires();
+    bugHolder = BugHolder();
+    await bugHolder.loadBugs();
 
     gameState = GameState();
     await gameState.load(size);
@@ -102,6 +106,11 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       wireHolder.generateWire(this, wireChosenRegion, false);
     }
 
+    int bugChosenRegion = random.nextInt(8) + 1;
+    if (bugChosenRegion % 3 != 2) {
+      bugHolder.generateBug(this, bugChosenRegion, false);
+    }
+
     int choseCoinLevel = random.nextInt(8) + 1;
     if (choseCoinLevel % 3 != 2) {
       coinHolder.generateCoin(this, choseCoinLevel, false);
@@ -130,12 +139,14 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     platformHolder.removePast(this);
     coinHolder.removePast(this);
     wireHolder.removePast(this);
+    bugHolder.removePast(this);
     fillScreen();
     super.update(dt);
     gameState.update(dt);
     platformHolder.update(dt);
     coinHolder.update(dt);
     wireHolder.update(dt);
+    bugHolder.update(dt);
   }
 
   @override
