@@ -36,6 +36,11 @@ class CoinHolder {
     } else {
       Coin coin = Coin(gameRef);
       coin.setPosition(xCoordinate, gameRef.blockSize * level);
+
+      if (gameRef.isTooNearOtherObstacles(coin.sprite.toRect())) {
+        return false;
+      }
+
       coins[level].add(coin);
       gameRef.add(coin.sprite);
       return false;

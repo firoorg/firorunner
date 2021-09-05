@@ -15,6 +15,8 @@ import 'package:flame/keyboard.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'Bug.dart';
+import 'Coin.dart';
 import 'Runner.dart';
 
 const COLOR = const Color(0xFFDDC0A3);
@@ -115,6 +117,39 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (choseCoinLevel % 3 != 2) {
       coinHolder.generateCoin(this, choseCoinLevel, false);
     }
+  }
+
+  bool isTooNearOtherObstacles(Rect rect) {
+    Rect obstacleBounds = Rect.fromLTRB(
+        2 * rect.left - rect.right - 1,
+        2 * rect.top - rect.bottom - 1,
+        2 * rect.right - rect.left + 1,
+        2 * rect.bottom - rect.top + 1);
+    for (List<Wire> wireLevel in wireHolder.wires) {
+      for (Wire wire in wireLevel) {
+        if (wire.intersect(obstacleBounds) != "none") {
+          return true;
+        }
+      }
+    }
+
+    for (List<Coin> coinLevel in coinHolder.coins) {
+      for (Coin coin in coinLevel) {
+        if (coin.intersect(obstacleBounds) != "none") {
+          return true;
+        }
+      }
+    }
+
+    for (List<Bug> bugLevel in bugHolder.bugs) {
+      for (Bug bug in bugLevel) {
+        if (bug.intersect(obstacleBounds) != "none") {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   @override

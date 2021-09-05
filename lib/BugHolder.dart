@@ -60,6 +60,11 @@ class BugHolder {
 
       Bug bug = Bug(gameRef);
       bug.setPosition(xCoordinate, gameRef.blockSize * level);
+
+      if (gameRef.isTooNearOtherObstacles(bug.sprite.toRect())) {
+        return false;
+      }
+
       bugs[level].add(bug);
       gameRef.add(bug.sprite);
       if (platform != null) {

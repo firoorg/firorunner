@@ -60,6 +60,11 @@ class WireHolder {
         wire.setPosition(
             xCoordinate, gameRef.blockSize * level + gameRef.blockSize / 10);
       }
+
+      if (gameRef.isTooNearOtherObstacles(wire.sprite.toRect())) {
+        return false;
+      }
+
       wires[level].add(wire);
       gameRef.add(wire.sprite);
       if (platform != null) {
