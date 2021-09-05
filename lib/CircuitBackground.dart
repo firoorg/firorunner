@@ -23,6 +23,8 @@ class CircuitBackground extends MovingObject {
     background1Size = Vector2(
         gameRef.size.y * (background!.width / background!.height),
         gameRef.size.y);
+    background2Position =
+        Vector2(background1Position.x + background1Size.x - 1, 0);
     background2Size = Vector2(
         gameRef.size.y * (background!.width / background!.height),
         gameRef.size.y);
