@@ -14,6 +14,15 @@ class WireHolder {
 
   Future loadWires() async {
     wire = await Flame.images.load("wire-frames.png");
+  }
+
+  void setUp() {
+    for (int i = 0; i < wires.length; i++) {
+      for (int j = 0; j < wires[i].length; j++) {
+        remove(wires[i], j);
+      }
+    }
+    wires = [];
     for (int i = 0; i < 9; i++) {
       wires.add([]);
     }
@@ -52,6 +61,7 @@ class WireHolder {
       }
 
       Wire wire = Wire(gameRef);
+      wire.sprite.renderFlipX = true;
       if (level % 3 == 0) {
         wire.sprite.renderFlipY = true;
         wire.setPosition(
@@ -93,12 +103,17 @@ class WireHolder {
     }
   }
 
+  void remove(List<Wire> levelHolder, int j) {
+    levelHolder[j].remove();
+    levelHolder[j].sprite.remove();
+    levelHolder.removeAt(j);
+  }
+
   void removePast(MyGame gameRef) {
     for (List<Wire> wireLevel in wires) {
       for (int i = 0; i < wireLevel.length;) {
         if (wireLevel[i].sprite.x + wireLevel[i].sprite.width < 0) {
-          wireLevel[i].sprite.remove();
-          wireLevel.removeAt(i);
+          remove(wireLevel, i);
           continue;
         }
         i++;

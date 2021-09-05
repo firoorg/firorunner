@@ -48,17 +48,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late BugHolder bugHolder;
   Random random = Random();
 
-  // late Sprite background1;
-  // late Sprite background2;
   late Runner runner;
   late GameState gameState;
-  // var background;
-
-  var runnerPosition = Vector2(0, 0);
-  var runnerSize;
-  // var backgroundSize;
-  // var background1Position;
-  // var background2Position;
   late double blockSize;
 
   bool loaded = false;
@@ -68,9 +59,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   Future<void> onLoad() async {
     // debugMode = true;
     FlameAudio.bgm.initialize();
-    // background = await Flame.images.load('bg.png');
-    // background1 = Sprite(background);
-    // background2 = Sprite(background);
 
     circuitBackground = CircuitBackground(this);
     await circuitBackground.load();
@@ -88,22 +76,16 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
     runner = Runner();
     await runner.load(loadSpriteAnimation);
-    runner.setSize(runnerSize, blockSize);
-    runnerPosition = Vector2(blockSize, blockSize * 1);
-    runner.setPosition(runnerPosition);
-    add(runner);
-
-    // Generate the first 4 Platforms that will always be there at the start.
-    for (int i = 0; i < 4; i++) {
-      platformHolder.generatePlatform(this, 8, true);
-    }
-    fillScreen();
 
     FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
     loaded = true;
+    setUp();
   }
 
   void fillScreen() {
+    if (shouldReset) {
+      return;
+    }
     for (int i = 2; i < 9; i = i + 3) {
       while (!platformHolder.generatePlatform(this, i, false)) {}
     }
@@ -156,15 +138,48 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     return false;
   }
 
+  bool shouldReset = false;
+
+  void reset() {
+    if (!(runner.sprite.animation?.done() ?? false)) {
+      return;
+    }
+    runner.sprite.animation!.reset();
+    shouldReset = false;
+    this.components.clear();
+    setUp();
+  }
+
+  void die() {
+    gameState.setPaused();
+    shouldReset = true;
+  }
+
+  void setUp() {
+    add(runner);
+    runner.sprite.clearEffects();
+    runner.sprite.current = RunnerState.run;
+    circuitBackground.setUp();
+    platformHolder.setUp();
+    coinHolder.setUp();
+    wireHolder.setUp();
+    bugHolder.setUp();
+
+    gameState.setUp();
+
+    runner.setUp();
+
+    // Generate the first 4 Platforms that will always be there at the start.
+    for (int i = 0; i < 4; i++) {
+      platformHolder.generatePlatform(this, 8, true);
+    }
+    fillScreen();
+  }
+
   @override
   void render(Canvas canvas) {
     gameState.render(canvas);
     circuitBackground.render(canvas);
-    // background1.render(
-    //   canvas,
-    //   position: Vector2(0, 0),
-    //   size: Vector2(size.y * (background!.width / background!.height), size.y),
-    // );
     super.render(canvas);
     final fpsCount = fps(1);
     textPaint.render(
@@ -188,20 +203,18 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     coinHolder.update(dt);
     wireHolder.update(dt);
     bugHolder.update(dt);
+    if (shouldReset) {
+      print("should reset");
+      reset();
+    }
   }
 
   @override
   void onResize(Vector2 size) {
     super.onResize(size);
     blockSize = size.y / 9;
-    runnerSize = Vector2(
-      size.y / 9,
-      size.y / 9,
-    );
 
     if (loaded) {
-      // backgroundSize =
-      //     Vector2(size.y * (background!.width / background!.height), size.y);
       gameState.setSize(size);
     }
   }

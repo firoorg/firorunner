@@ -22,6 +22,27 @@ enum RunnerState {
 class Runner extends Component with HasGameRef<MyGame> {
   late SpriteAnimationGroupComponent sprite;
   String runnerState = "run";
+  int level = 4;
+  String previousState = "run";
+  var runnerPosition = Vector2(0, 0);
+  var runnerSize;
+  bool dead = false;
+
+  void setUp() {
+    dead = false;
+    runnerState = "run";
+    previousState = "run";
+    level = 4;
+
+    runnerSize = Vector2(
+      gameRef.size.y / 9,
+      gameRef.size.y / 9,
+    );
+
+    setSize(runnerSize, gameRef.blockSize);
+    runnerPosition = Vector2(gameRef.blockSize, gameRef.blockSize * 4);
+    setPosition(runnerPosition);
+  }
 
   void setPosition(Vector2 position) {
     sprite.position = position;
@@ -41,15 +62,14 @@ class Runner extends Component with HasGameRef<MyGame> {
     getSprite().render(c, position: sprite.position, size: sprite.size);
   }
 
-  int level = 1;
-
   void updateLevel() {
     level = (sprite.position.y / gameRef.blockSize).round();
   }
 
-  String previousState = "run";
-
   void event(String event) {
+    if (gameRef.gameState.isPaused) {
+      return;
+    }
     previousState = runnerState;
     print(event);
     switch (event) {
@@ -129,12 +149,20 @@ class Runner extends Component with HasGameRef<MyGame> {
         sprite.current = RunnerState.duck;
         break;
       case "die":
+        if (dead) {
+          return;
+        }
         runnerState = event;
         sprite.current = RunnerState.die;
+        gameRef.die();
         break;
       case "electro":
+        if (dead) {
+          return;
+        }
         runnerState = event;
         sprite.current = RunnerState.electro;
+        gameRef.die();
         break;
       default:
         break;
@@ -142,6 +170,9 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   void control(String input) {
+    if (gameRef.gameState.isPaused) {
+      return;
+    }
     print(input);
     switch (input) {
       case "up":
@@ -190,7 +221,6 @@ class Runner extends Component with HasGameRef<MyGame> {
 
     intersecting();
     sprite.update(dt);
-    print(runnerState);
   }
 
   bool onTopOfPlatform() {
@@ -212,6 +242,9 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   void intersecting() {
+    if (gameRef.gameState.isPaused) {
+      return;
+    }
     Rect runnerRect = sprite.toRect();
     bool onTopOfPlatform = false;
     for (List<Platform> platformLevel in gameRef.platformHolder.platforms) {
@@ -234,8 +267,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       for (int i = 0; i < coinLevel.length;) {
         if (coinLevel[i].intersect(runnerRect) != "none") {
           gameRef.gameState.numCoins++;
-          coinLevel[i].remove();
-          coinLevel.removeAt(i);
+          gameRef.coinHolder.remove(coinLevel, i);
           print(gameRef.gameState.numCoins);
           continue;
         }
@@ -247,6 +279,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       for (int i = 0; i < wireLevel.length; i++) {
         if (wireLevel[i].intersect(runnerRect) != "none") {
           event("electro");
+          return;
         }
       }
     }
@@ -266,6 +299,7 @@ class Runner extends Component with HasGameRef<MyGame> {
             continue;
           } else if (aboveIntersect != "none") {
             event("die");
+            return;
           }
         } else if (intersectState == "left" && runnerState == "kick") {
           bugLevel[i].sprite.current = BugState.breaking;
@@ -273,6 +307,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           // bugLevel.removeAt(i);
         } else {
           event("die");
+          return;
         }
       }
     }
@@ -356,8 +391,9 @@ class Runner extends Component with HasGameRef<MyGame> {
       'electrocuted-frames.png',
       SpriteAnimationData.sequenced(
         amount: 2,
-        stepTime: 0.1,
+        stepTime: 0.25,
         textureSize: Vector2(512, 512),
+        loop: false,
       ),
     );
 

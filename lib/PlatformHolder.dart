@@ -15,6 +15,15 @@ class PlatformHolder {
     platform1 = await Flame.images.load('p1-frames.png');
     platform2 = await Flame.images.load('p2-frames.png');
     platform3 = await Flame.images.load('p3-frames.png');
+  }
+
+  void setUp() {
+    for (int i = 0; i < platforms.length; i++) {
+      for (int j = 0; j < platforms[i].length; j++) {
+        remove(platforms[i], j);
+      }
+    }
+    platforms = [];
     for (int i = 0; i < 9; i++) {
       platforms.add([]);
     }
@@ -56,14 +65,20 @@ class PlatformHolder {
     }
   }
 
+  void remove(List<Platform> levelHolder, int j) {
+    levelHolder[j].remove();
+    levelHolder[j].sprite.remove();
+    levelHolder.removeAt(j);
+    print("removed platform");
+  }
+
   void removePast(MyGame gameRef) {
     for (List<Platform> platformLevel in platforms) {
       int removed = 0;
       while (platformLevel.isNotEmpty &&
           platformLevel[0].sprite.position.x + platformLevel[0].sprite.width <
               0) {
-        platformLevel[0].sprite.remove();
-        platformLevel.removeAt(0);
+        remove(platformLevel, 0);
         removed++;
       }
       if (platformLevel.isNotEmpty &&
@@ -74,13 +89,8 @@ class PlatformHolder {
         double secondToLastPosition =
             platformLevel.elementAt(secondToLast).sprite.x;
         if (secondToLastPosition > gameRef.size.x) {
-          platformLevel[secondToLast].remove();
-          platformLevel[secondToLast].sprite.remove();
-          platformLevel.removeAt(secondToLast);
-
-          platformLevel[secondToLast + 1].remove();
-          platformLevel[secondToLast + 1].sprite.remove();
-          platformLevel.removeAt(secondToLast + 1);
+          remove(platformLevel, secondToLast + 1);
+          remove(platformLevel, secondToLast);
         }
       }
     }

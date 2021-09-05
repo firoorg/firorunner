@@ -19,7 +19,11 @@ class CircuitBackground extends MovingObject {
     background = await Flame.images.load("bg.png");
     background1 = Sprite(background);
     background2 = Sprite(background);
+    setUp();
+  }
 
+  void setUp() {
+    background1Position = Vector2(0, 0);
     background1Size = Vector2(
         gameRef.size.y * (background!.width / background!.height),
         gameRef.size.y);

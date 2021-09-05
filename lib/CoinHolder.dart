@@ -13,6 +13,15 @@ class CoinHolder {
 
   Future loadCoins() async {
     coin = await Flame.images.load("coin-frames.png");
+  }
+
+  void setUp() {
+    for (int i = 0; i < coins.length; i++) {
+      for (int j = 0; j < coins[i].length; j++) {
+        remove(coins[i], j);
+      }
+    }
+    coins = [];
     for (int i = 0; i < 9; i++) {
       coins.add([]);
     }
@@ -63,12 +72,17 @@ class CoinHolder {
     }
   }
 
+  void remove(List<Coin> levelHolder, int j) {
+    levelHolder[j].remove();
+    levelHolder[j].sprite.remove();
+    levelHolder.removeAt(j);
+  }
+
   void removePast(MyGame gameRef) {
     for (List<Coin> coinLevel in coins) {
       for (int i = 0; i < coinLevel.length;) {
         if (coinLevel[i].sprite.x + coinLevel[i].sprite.width < 0) {
-          coinLevel[i].sprite.remove();
-          coinLevel.removeAt(i);
+          remove(coinLevel, i);
           continue;
         }
         i++;

@@ -16,6 +16,15 @@ class BugHolder {
   Future loadBugs() async {
     bug = await Flame.images.load("bug-frames.png");
     breaking = await Flame.images.load("bug-break-frames.png");
+  }
+
+  void setUp() {
+    for (int i = 0; i < bugs.length; i++) {
+      for (int j = 0; j < bugs[i].length; j++) {
+        remove(bugs[i], j);
+      }
+    }
+    bugs = [];
     for (int i = 0; i < 9; i++) {
       bugs.add([]);
     }
@@ -93,12 +102,17 @@ class BugHolder {
     }
   }
 
+  void remove(List<Bug> levelHolder, int j) {
+    levelHolder[j].remove();
+    levelHolder[j].sprite.remove();
+    levelHolder.removeAt(j);
+  }
+
   void removePast(MyGame gameRef) {
     for (List<Bug> bugLevel in bugs) {
       for (int i = 0; i < bugLevel.length;) {
         if (bugLevel[i].sprite.x + bugLevel[i].sprite.width < 0) {
-          bugLevel[i].sprite.remove();
-          bugLevel.removeAt(i);
+          remove(bugLevel, i);
           continue;
         }
         i++;
