@@ -19,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'Bug.dart';
 import 'Coin.dart';
 import 'Runner.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 const COLOR = const Color(0xFFDDC0A3);
 
@@ -47,6 +48,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late WireHolder wireHolder;
   late BugHolder bugHolder;
   Random random = Random();
+  bool playingMusic = false;
 
   late Runner runner;
   late GameState gameState;
@@ -77,9 +79,16 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner = Runner();
     await runner.load(loadSpriteAnimation);
 
-    FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
+    if (!kIsWeb) {
+      playMusic();
+    }
     loaded = true;
     setUp();
+  }
+
+  void playMusic() {
+    FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
+    playingMusic = true;
   }
 
   void fillScreen() {
@@ -236,6 +245,9 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   void onPanEnd(DragEndInfo info) {
+    if (!playingMusic && kIsWeb) {
+      playMusic();
+    }
     double xDelta = xDeltas.isEmpty
         ? 0
         : xDeltas.reduce((value, element) => value + element);
@@ -259,6 +271,9 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   void onTap() {
+    if (!playingMusic && kIsWeb) {
+      playMusic();
+    }
     runner.control("center");
   }
 
@@ -266,6 +281,9 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   var keyboardKey;
   @override
   void onKeyEvent(RawKeyEvent event) {
+    if (!playingMusic && kIsWeb) {
+      playMusic();
+    }
     if (event is RawKeyUpEvent) {
       keyboardKey = null;
       switch (event.data.keyLabel) {

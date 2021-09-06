@@ -20,7 +20,7 @@ class Bug extends MovingObject {
     SpriteAnimation breaking = SpriteAnimation.fromFrameData(
       breakingImage,
       SpriteAnimationData.sequenced(
-        amount: 12,
+        amount: 13,
         stepTime: 0.01,
         textureSize: Vector2(512, 512),
         loop: false,
