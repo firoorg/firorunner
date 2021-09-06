@@ -116,10 +116,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   bool isTooNearOtherObstacles(Rect rect) {
     Rect obstacleBounds = Rect.fromLTRB(
-        2 * rect.left - rect.right - 1,
-        2 * rect.top - rect.bottom - 1,
-        2 * rect.right - rect.left + 1,
-        2 * rect.bottom - rect.top + 1);
+        3 * rect.left - 2 * rect.right - 1,
+        3 * rect.top - 2 * rect.bottom - 1,
+        3 * rect.right - 2 * rect.left + 1,
+        3 * rect.bottom - 2 * rect.top + 1);
     for (List<Wire> wireLevel in wireHolder.wires) {
       for (Wire wire in wireLevel) {
         if (wire.intersect(obstacleBounds) != "none") {

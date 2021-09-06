@@ -17,6 +17,7 @@ enum RunnerState {
   fall,
   die,
   electro,
+  glitch,
 }
 
 class Runner extends Component with HasGameRef<MyGame> {
@@ -81,7 +82,7 @@ class Runner extends Component with HasGameRef<MyGame> {
             // sprite.position,
             Vector2(sprite.x, (level - 1) * gameRef.blockSize),
           ],
-          speed: 50,
+          speed: 150,
           curve: Curves.bounceIn,
           onComplete: () {
             updateLevel();
@@ -99,7 +100,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           path: [
             Vector2(sprite.x, (level - 2) * gameRef.blockSize),
           ],
-          speed: 100,
+          speed: 150,
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
@@ -162,6 +163,14 @@ class Runner extends Component with HasGameRef<MyGame> {
         }
         runnerState = event;
         sprite.current = RunnerState.electro;
+        gameRef.die();
+        break;
+      case "glitch":
+        if (dead) {
+          return;
+        }
+        runnerState = event;
+        sprite.current = RunnerState.glitch;
         gameRef.die();
         break;
       default:
@@ -298,7 +307,7 @@ class Runner extends Component with HasGameRef<MyGame> {
               (runnerState == "duck" || runnerState == "float")) {
             continue;
           } else if (aboveIntersect != "none") {
-            event("die");
+            event("glitch");
             return;
           }
         } else if (intersectState == "left" && runnerState == "kick") {
@@ -306,7 +315,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           // bugLevel[i].remove();
           // bugLevel.removeAt(i);
         } else {
-          event("die");
+          event("glitch");
           return;
         }
       }
@@ -397,6 +406,16 @@ class Runner extends Component with HasGameRef<MyGame> {
       ),
     );
 
+    SpriteAnimation dyingGlitch = await loadSpriteAnimation(
+      'death-glitched-frames.png',
+      SpriteAnimationData.sequenced(
+        amount: 8,
+        stepTime: 0.1,
+        textureSize: Vector2(512, 512),
+        loop: false,
+      ),
+    );
+
     sprite = SpriteAnimationGroupComponent(
       animations: {
         RunnerState.run: running,
@@ -407,6 +426,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         RunnerState.fall: falling,
         RunnerState.die: dying,
         RunnerState.electro: dyingElectrocuted,
+        RunnerState.glitch: dyingGlitch,
       },
       current: RunnerState.run,
     );
