@@ -69,7 +69,6 @@ class PlatformHolder {
     levelHolder[j].remove();
     levelHolder[j].sprite.remove();
     levelHolder.removeAt(j);
-    print("removed platform");
   }
 
   void removePast(MyGame gameRef) {

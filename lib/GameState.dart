@@ -1,14 +1,7 @@
-import 'dart:math';
-
+import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 
 class GameState extends Component {
-  static const int CIRCUIT_PERIOD = 500000;
-  late Rect square;
-  late Color color = Colors.white;
-  late ColorTween tween;
-
   int start = 0;
   bool isPaused = false;
   int numCoins = 0;
@@ -19,7 +12,6 @@ class GameState extends Component {
     super.update(dt);
     if (!isPaused) {
       distance = DateTime.now().microsecondsSinceEpoch - start;
-      color = tween.lerp(sin(distance.toDouble() / CIRCUIT_PERIOD))!;
     }
   }
 
@@ -27,25 +19,10 @@ class GameState extends Component {
     numCoins++;
   }
 
-  @override
-  void render(Canvas c) {
-    super.render(c);
-    c.drawRect(square, Paint()..color = color);
-  }
-
-  Future load(Vector2 size) async {
-    square = Rect.fromLTWH(0, 0, size.x, size.y);
-  }
-
-  void setSize(Vector2 size) {
-    square = Rect.fromLTWH(0, 0, size.x, size.y);
-  }
-
   void setUp() {
     numCoins = 0;
     distance = 0;
     start = DateTime.now().microsecondsSinceEpoch;
-    tween = ColorTween(begin: Colors.yellow, end: Colors.yellowAccent);
     isPaused = false;
   }
 
@@ -53,14 +30,41 @@ class GameState extends Component {
     isPaused = true;
   }
 
+  int getLevel() {
+    if (distance > LEVEL7) {
+      return 7;
+    } else if (distance > LEVEL6) {
+      return 6;
+    } else if (distance > LEVEL5) {
+      return 5;
+    } else if (distance > LEVEL4) {
+      return 4;
+    } else if (distance > LEVEL3) {
+      return 3;
+    } else if (distance > LEVEL2) {
+      return 2;
+    } else {
+      return 1;
+    }
+  }
+
   double getVelocity() {
     if (!isPaused) {
-      if (distance > 50000000) {
-        return 250.0;
-      } else if (distance > 10000000)
-        return 175.0;
-      else {
-        return 100.0;
+      switch (getLevel()) {
+        case 7:
+          return 250.0;
+        case 6:
+          return 200.0;
+        case 5:
+          return 180.0;
+        case 4:
+          return 160.0;
+        case 3:
+          return 140.0;
+        case 2:
+          return 120.0;
+        default:
+          return 100.0;
       }
     } else {
       return 0;

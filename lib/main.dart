@@ -23,6 +23,13 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 const COLOR = const Color(0xFFDDC0A3);
 
+const LEVEL2 = 10000000;
+const LEVEL3 = 20000000;
+const LEVEL4 = 30000000;
+const LEVEL5 = 40000000;
+const LEVEL6 = 50000000;
+const LEVEL7 = 60000000;
+
 const RUNNER_PRIORITY = 100;
 const PLATFORM_PRIORITY = 50;
 const WIRE_PRIORITY = 25;
@@ -74,7 +81,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     await bugHolder.loadBugs();
 
     gameState = GameState();
-    await gameState.load(size);
 
     runner = Runner();
     await runner.load(loadSpriteAnimation);
@@ -187,7 +193,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   void render(Canvas canvas) {
-    gameState.render(canvas);
     circuitBackground.render(canvas);
     super.render(canvas);
     final fpsCount = fps(1);
@@ -222,10 +227,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   void onResize(Vector2 size) {
     super.onResize(size);
     blockSize = size.y / 9;
-
-    if (loaded) {
-      gameState.setSize(size);
-    }
   }
 
   // Mobile controls

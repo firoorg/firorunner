@@ -10,8 +10,8 @@ class Wire extends MovingObject {
     SpriteAnimation normal = SpriteAnimation.fromFrameData(
       wire,
       SpriteAnimationData.sequenced(
-        amount: 6,
-        stepTime: 0.1,
+        amount: 12,
+        stepTime: 0.05,
         textureSize: Vector2(512, 512),
       ),
     );
