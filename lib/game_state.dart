@@ -6,6 +6,7 @@ class GameState extends Component {
   bool isPaused = false;
   int numCoins = 0;
   int distance = 0;
+  late MyGame gameRef;
 
   @override
   void update(double dt) {
@@ -19,7 +20,8 @@ class GameState extends Component {
     numCoins++;
   }
 
-  void setUp() {
+  void setUp(MyGame gameRef) {
+    this.gameRef = gameRef;
     numCoins = 0;
     distance = 0;
     start = DateTime.now().microsecondsSinceEpoch;
@@ -52,19 +54,19 @@ class GameState extends Component {
     if (!isPaused) {
       switch (getLevel()) {
         case 7:
-          return 250.0;
+          return gameRef.viewport.canvasSize.x * 0.25;
         case 6:
-          return 200.0;
+          return gameRef.viewport.canvasSize.x * 0.20;
         case 5:
-          return 180.0;
+          return gameRef.viewport.canvasSize.x * 0.18;
         case 4:
-          return 160.0;
+          return gameRef.viewport.canvasSize.x * 0.16;
         case 3:
-          return 140.0;
+          return gameRef.viewport.canvasSize.x * 0.14;
         case 2:
-          return 120.0;
+          return gameRef.viewport.canvasSize.x * 0.12;
         default:
-          return 100.0;
+          return gameRef.viewport.canvasSize.x * 0.1;
       }
     } else {
       return 0;

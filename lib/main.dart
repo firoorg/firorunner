@@ -10,6 +10,7 @@ import 'package:firo_runner/wire_holder.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
+import 'package:flame/game.dart' as flame;
 import 'package:flame/game.dart';
 import 'package:flame/gestures.dart';
 import 'package:flame/keyboard.dart';
@@ -63,6 +64,13 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   bool loaded = false;
   late Wire wire;
+
+  MyGame() : super() {
+    viewport.resize(Vector2(1920, 1080));
+  }
+
+  // @override
+  // flame.Viewport viewport = FixedResolutionViewport(Vector2(1920, 1080));
 
   @override
   Future<void> onLoad() async {
@@ -180,7 +188,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     wireHolder.setUp();
     bugHolder.setUp();
 
-    gameState.setUp();
+    gameState.setUp(this);
 
     runner.setUp();
 
