@@ -1,8 +1,8 @@
-import 'package:firo_runner/MovingObject.dart';
+import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
-import 'package:flutter/material.dart';
+import 'package:flame/extensions.dart';
 
 enum WindowState {
   first,
@@ -15,14 +15,14 @@ enum WindowState {
 }
 
 class CircuitBackground extends MovingObject {
-  late var background;
-  late var windows0;
-  late var windows1;
-  late var windows2;
-  late var windows3;
-  late var windows4;
-  late var windows5;
-  late var windows6;
+  late Image background;
+  late Image windows0;
+  late Image windows1;
+  late Image windows2;
+  late Image windows3;
+  late Image windows4;
+  late Image windows5;
+  late Image windows6;
 
   late Sprite background1;
   late Sprite background2;
@@ -140,7 +140,7 @@ class CircuitBackground extends MovingObject {
     gameRef.add(windowB);
     background1Position = Vector2(0, 0);
     background1Size = Vector2(
-        gameRef.size.y * (background!.width / background!.height),
+        gameRef.size.y * (background.width / background.height),
         gameRef.size.y);
     windowA.position = background1Position;
     windowA.size = background1Size;
@@ -148,7 +148,7 @@ class CircuitBackground extends MovingObject {
     background2Position =
         Vector2(background1Position.x + background1Size.x - 1, 0);
     background2Size = Vector2(
-        gameRef.size.y * (background!.width / background!.height),
+        gameRef.size.y * (background.width / background.height),
         gameRef.size.y);
     windowB.position = background2Position;
     windowB.size = background2Size;

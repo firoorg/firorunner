@@ -1,13 +1,14 @@
 import 'dart:math';
 
-import 'package:firo_runner/Platform.dart';
+import 'package:firo_runner/platform.dart';
 import 'package:flame/flame.dart';
 
-import 'Wire.dart';
-import 'main.dart';
+import 'package:firo_runner/wire.dart';
+import 'package:firo_runner/main.dart';
+import 'package:flame/extensions.dart';
 
 class WireHolder {
-  var wire;
+  late Image wire;
   Random random = Random();
 
   late List<List<Wire>> wires = [];

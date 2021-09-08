@@ -1,10 +1,11 @@
-import 'package:firo_runner/Bug.dart';
-import 'package:firo_runner/Coin.dart';
-import 'package:firo_runner/Wire.dart';
+import 'package:firo_runner/bug.dart';
+import 'package:firo_runner/coin.dart';
+import 'package:firo_runner/wire.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
+import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
-import 'Platform.dart';
+import 'package:firo_runner/platform.dart';
 
 import 'package:flame/components.dart';
 
@@ -16,7 +17,7 @@ enum RunnerState {
   float,
   fall,
   die,
-  electro,
+  electrocute,
   glitch,
 }
 
@@ -26,7 +27,7 @@ class Runner extends Component with HasGameRef<MyGame> {
   int level = 4;
   String previousState = "run";
   var runnerPosition = Vector2(0, 0);
-  var runnerSize;
+  late Vector2 runnerSize;
   bool dead = false;
 
   void setUp() {
@@ -72,7 +73,6 @@ class Runner extends Component with HasGameRef<MyGame> {
       return;
     }
     previousState = runnerState;
-    print(event);
     switch (event) {
       case "jump":
         runnerState = event;
@@ -90,7 +90,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           },
         ));
         break;
-      case "doublejump":
+      case "double_jump":
         if (level - 1 < 0) {
           break;
         }
@@ -157,12 +157,12 @@ class Runner extends Component with HasGameRef<MyGame> {
         sprite.current = RunnerState.die;
         gameRef.die();
         break;
-      case "electro":
+      case "electrocute":
         if (dead) {
           return;
         }
         runnerState = event;
-        sprite.current = RunnerState.electro;
+        sprite.current = RunnerState.electrocute;
         gameRef.die();
         break;
       case "glitch":
@@ -182,13 +182,12 @@ class Runner extends Component with HasGameRef<MyGame> {
     if (gameRef.gameState.isPaused) {
       return;
     }
-    print(input);
     switch (input) {
       case "up":
         if (runnerState == "run") {
           event("jump");
         } else if (runnerState == "float" && previousState == "jump") {
-          event("doublejump");
+          event("double_jump");
         } else if (runnerState == "duck") {
           event("run");
         }
@@ -277,7 +276,6 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (coinLevel[i].intersect(runnerRect) != "none") {
           gameRef.gameState.numCoins++;
           gameRef.coinHolder.remove(coinLevel, i);
-          print(gameRef.gameState.numCoins);
           continue;
         }
         i++;
@@ -287,7 +285,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     for (List<Wire> wireLevel in gameRef.wireHolder.wires) {
       for (int i = 0; i < wireLevel.length; i++) {
         if (wireLevel[i].intersect(runnerRect) != "none") {
-          event("electro");
+          event("electrocute");
           return;
         }
       }
@@ -425,7 +423,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         RunnerState.float: floating,
         RunnerState.fall: falling,
         RunnerState.die: dying,
-        RunnerState.electro: dyingElectrocuted,
+        RunnerState.electrocute: dyingElectrocuted,
         RunnerState.glitch: dyingGlitch,
       },
       current: RunnerState.run,

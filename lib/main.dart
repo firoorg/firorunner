@@ -1,12 +1,12 @@
 import 'dart:math';
 
-import 'package:firo_runner/BugHolder.dart';
-import 'package:firo_runner/CircuitBackground.dart';
-import 'package:firo_runner/CoinHolder.dart';
-import 'package:firo_runner/GameState.dart';
-import 'package:firo_runner/PlatformHolder.dart';
-import 'package:firo_runner/Wire.dart';
-import 'package:firo_runner/WireHolder.dart';
+import 'package:firo_runner/bug_holder.dart';
+import 'package:firo_runner/circuit_background.dart';
+import 'package:firo_runner/coin_holder.dart';
+import 'package:firo_runner/game_state.dart';
+import 'package:firo_runner/platform_holder.dart';
+import 'package:firo_runner/wire.dart';
+import 'package:firo_runner/wire_holder.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
@@ -16,12 +16,12 @@ import 'package:flame/keyboard.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Bug.dart';
-import 'Coin.dart';
-import 'Runner.dart';
+import 'package:firo_runner/bug.dart';
+import 'package:firo_runner/coin.dart';
+import 'package:firo_runner/runner.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-const COLOR = const Color(0xFFDDC0A3);
+const COLOR = Color(0xFFDDC0A3);
 
 const LEVEL2 = 10000000;
 const LEVEL3 = 20000000;
@@ -46,7 +46,7 @@ void main() async {
 
 class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   TextPaint textPaint = TextPaint(
-    config: TextPaintConfig(fontSize: 48.0),
+    config: const TextPaintConfig(fontSize: 48.0),
   );
 
   late CircuitBackground circuitBackground;
@@ -161,7 +161,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     }
     runner.sprite.animation!.reset();
     shouldReset = false;
-    this.components.clear();
+    components.clear();
     setUp();
   }
 
@@ -218,15 +218,14 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     wireHolder.update(dt);
     bugHolder.update(dt);
     if (shouldReset) {
-      print("should reset");
       reset();
     }
   }
 
   @override
-  void onResize(Vector2 size) {
-    super.onResize(size);
-    blockSize = size.y / 9;
+  void onResize(Vector2 canvasSize) {
+    super.onResize(canvasSize);
+    blockSize = canvasSize.y / 9;
   }
 
   // Mobile controls

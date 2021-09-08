@@ -2,11 +2,12 @@ import 'dart:math';
 
 import 'package:flame/flame.dart';
 
-import 'Coin.dart';
-import 'main.dart';
+import 'package:firo_runner/coin.dart';
+import 'package:firo_runner/main.dart';
+import 'package:flame/extensions.dart';
 
 class CoinHolder {
-  var coin;
+  late Image coin;
   Random random = Random();
 
   late List<List<Coin>> coins = [];

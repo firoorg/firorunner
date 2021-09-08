@@ -2,17 +2,18 @@ import 'dart:math';
 
 import 'package:firo_runner/main.dart';
 import 'package:flame/flame.dart';
-import 'Platform.dart';
+import 'package:firo_runner/platform.dart';
+import 'package:flame/extensions.dart';
 
 class PlatformHolder {
-  var l1;
-  var l2;
-  var m1;
-  var m2;
-  var r1;
-  var r2;
-  var o1;
-  var o2;
+  late Image l1;
+  late Image l2;
+  late Image m1;
+  late Image m2;
+  late Image r1;
+  late Image r2;
+  late Image o1;
+  late Image o2;
   late List<List<Platform>> platforms = [];
   Random random = Random();
 

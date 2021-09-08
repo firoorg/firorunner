@@ -1,4 +1,4 @@
-import 'package:firo_runner/MovingObject.dart';
+import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
@@ -28,8 +28,8 @@ class Coin extends MovingObject {
     var platform = gameRef.platformHolder.l1;
 
     setSize(
-      gameRef.blockSize * (platform!.width / platform!.height / 14),
-      gameRef.blockSize * (platform!.width / platform!.height / 14),
+      gameRef.blockSize * (platform.width / platform.height / 14),
+      gameRef.blockSize * (platform.width / platform.height / 14),
     );
   }
 

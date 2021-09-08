@@ -1,14 +1,15 @@
 import 'dart:math';
 
-import 'package:firo_runner/Platform.dart';
+import 'package:firo_runner/platform.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
 
-import 'Bug.dart';
-import 'main.dart';
+import 'package:firo_runner/bug.dart';
+import 'package:firo_runner/main.dart';
 
 class BugHolder {
-  var bug;
-  var breaking;
+  late Image bug;
+  late Image breaking;
   Random random = Random();
 
   late List<List<Bug>> bugs = [];

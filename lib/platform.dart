@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:firo_runner/MovingObject.dart';
+import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
@@ -70,8 +70,8 @@ class Platform extends MovingObject {
 
     setSize(
       gameRef.blockSize *
-          (gameRef.platformHolder.l1!.width /
-              gameRef.platformHolder.l1!.height /
+          (gameRef.platformHolder.l1.width /
+              gameRef.platformHolder.l1.height /
               5),
       gameRef.blockSize,
     );
