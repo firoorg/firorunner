@@ -4,35 +4,75 @@ import 'package:firo_runner/MovingObject.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
-enum PlatformState { normal }
+enum PlatformState {
+  left,
+  mid,
+  right,
+  single,
+}
 
 class Platform extends MovingObject {
+  int row = 0;
   List<Function> removeChildren = [];
 
   Platform(MyGame gameRef) : super(gameRef) {
     var random = Random();
-    int version = random.nextInt(3) + 1;
-    var platform = gameRef.platformHolder.getPlatform(version);
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      platform,
+
+    int version = random.nextInt(2);
+
+    SpriteAnimation left = SpriteAnimation.fromFrameData(
+      version == 0 ? gameRef.platformHolder.l1 : gameRef.platformHolder.l2,
       SpriteAnimationData.sequenced(
-        amount: 7,
-        stepTime: 0.1,
-        textureSize: Vector2(800, 510),
+        amount: 5,
+        stepTime: 0.12,
+        textureSize: Vector2(1000, 807),
+      ),
+    );
+
+    SpriteAnimation mid = SpriteAnimation.fromFrameData(
+      version == 0 ? gameRef.platformHolder.m1 : gameRef.platformHolder.m2,
+      SpriteAnimationData.sequenced(
+        amount: 5,
+        stepTime: 0.12,
+        textureSize: Vector2(1000, 807),
+      ),
+    );
+
+    SpriteAnimation right = SpriteAnimation.fromFrameData(
+      version == 0 ? gameRef.platformHolder.r1 : gameRef.platformHolder.r2,
+      SpriteAnimationData.sequenced(
+        amount: 5,
+        stepTime: 0.12,
+        textureSize: Vector2(1000, 807),
+      ),
+    );
+
+    SpriteAnimation single = SpriteAnimation.fromFrameData(
+      version == 0 ? gameRef.platformHolder.o1 : gameRef.platformHolder.o2,
+      SpriteAnimationData.sequenced(
+        amount: 5,
+        stepTime: 0.12,
+        textureSize: Vector2(1000, 807),
       ),
     );
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
-        PlatformState.normal: normal,
+        PlatformState.left: left,
+        PlatformState.mid: mid,
+        PlatformState.right: right,
+        PlatformState.single: single,
       },
-      current: PlatformState.normal,
+      current: PlatformState.single,
     );
 
     sprite.changePriorityWithoutResorting(PLATFORM_PRIORITY);
 
     setSize(
-      gameRef.blockSize * (platform!.width / platform!.height / 7),
+      gameRef.blockSize *
+          (gameRef.platformHolder.l1!.width /
+              gameRef.platformHolder.l1!.height /
+              5),
       gameRef.blockSize,
     );
   }
@@ -46,6 +86,37 @@ class Platform extends MovingObject {
       for (Function removeChild in removeChildren) {
         removeChild();
       }
+    }
+  }
+
+  @override
+  void update(double dt) {
+    List<Platform> platformLevel = gameRef.platformHolder.platforms[row];
+    int index = platformLevel.indexOf(this);
+    Vector2 right = Vector2(-200, -200);
+    if (index + 1 < platformLevel.length) {
+      right = platformLevel.elementAt(index + 1).sprite.position;
+    }
+    super.update(dt);
+    if (index == -1 || sprite.position.x <= 0) {
+      return;
+    }
+    Vector2 left = Vector2(-200, -200);
+    if (index - 1 >= 0) {
+      left = platformLevel.elementAt(index - 1).sprite.position;
+    }
+
+    bool hasLeft = (left.x - sprite.position.x).abs() < 1.9 * sprite.size.x;
+    bool hasRight = (sprite.position.x - right.x).abs() < 1.9 * sprite.size.x;
+
+    if (hasLeft && hasRight) {
+      sprite.current = PlatformState.mid;
+    } else if (hasLeft && !hasRight) {
+      sprite.current = PlatformState.right;
+    } else if (!hasLeft && hasRight) {
+      sprite.current = PlatformState.left;
+    } else {
+      sprite.current = PlatformState.single;
     }
   }
 }

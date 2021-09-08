@@ -25,7 +25,7 @@ class Coin extends MovingObject {
 
     sprite.changePriorityWithoutResorting(COIN_PRIORITY);
 
-    var platform = gameRef.platformHolder.getPlatform(0);
+    var platform = gameRef.platformHolder.l1;
 
     setSize(
       gameRef.blockSize * (platform!.width / platform!.height / 14),

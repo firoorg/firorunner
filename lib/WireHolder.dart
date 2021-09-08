@@ -65,7 +65,7 @@ class WireHolder {
       if (level % 3 == 0) {
         wire.sprite.renderFlipY = true;
         wire.setPosition(
-            xCoordinate, gameRef.blockSize * level - gameRef.blockSize / 6);
+            xCoordinate, gameRef.blockSize * level - 2 * gameRef.blockSize / 7);
       } else {
         wire.setPosition(
             xCoordinate, gameRef.blockSize * level + gameRef.blockSize / 10);

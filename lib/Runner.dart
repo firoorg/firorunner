@@ -41,7 +41,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     );
 
     setSize(runnerSize, gameRef.blockSize);
-    runnerPosition = Vector2(gameRef.blockSize, gameRef.blockSize * 4);
+    runnerPosition = Vector2(gameRef.blockSize * 2, gameRef.blockSize * 4);
     setPosition(runnerPosition);
   }
 

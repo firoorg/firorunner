@@ -5,16 +5,26 @@ import 'package:flame/flame.dart';
 import 'Platform.dart';
 
 class PlatformHolder {
-  var platform1;
-  var platform2;
-  var platform3;
+  var l1;
+  var l2;
+  var m1;
+  var m2;
+  var r1;
+  var r2;
+  var o1;
+  var o2;
   late List<List<Platform>> platforms = [];
   Random random = Random();
 
   Future loadPlatforms() async {
-    platform1 = await Flame.images.load('p1-frames.png');
-    platform2 = await Flame.images.load('p2-frames.png');
-    platform3 = await Flame.images.load('p3-frames.png');
+    l1 = await Flame.images.load('platform-left-nowire-frames.png');
+    l2 = await Flame.images.load('platform-left-wire-frames.png');
+    m1 = await Flame.images.load('platform-mid-nowire-frames.png');
+    m2 = await Flame.images.load('platform-mid-wire-frames.png');
+    r1 = await Flame.images.load('platform-right-nowire-frames.png');
+    r2 = await Flame.images.load('platform-right-wire-frames.png');
+    o1 = await Flame.images.load('platform-single-nowire-frames.png');
+    o2 = await Flame.images.load('platform-single-wire-frames.png');
   }
 
   void setUp() {
@@ -29,17 +39,6 @@ class PlatformHolder {
     }
   }
 
-  getPlatform(int imageNumber) {
-    switch (imageNumber) {
-      case 1:
-        return platform1;
-      case 2:
-        return platform2;
-      default:
-        return platform3;
-    }
-  }
-
   bool generatePlatform(MyGame gameRef, int level, bool force) {
     double xCoordinate = 0;
     if (platforms[level].isNotEmpty) {
@@ -51,6 +50,7 @@ class PlatformHolder {
     } else {
       Platform platform = Platform(gameRef);
       platform.setPosition(xCoordinate, gameRef.blockSize * level);
+      platform.row = level;
       gameRef.add(platform.sprite);
       platforms[level].add(platform);
       return false;
