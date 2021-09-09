@@ -275,6 +275,9 @@ class Runner extends Component with HasGameRef<MyGame> {
       for (int i = 0; i < coinLevel.length;) {
         if (coinLevel[i].intersect(runnerRect) != "none") {
           gameRef.gameState.numCoins++;
+          if (gameRef.gameState.numCoins % 5 == 0) {
+            gameRef.fireworks.reset();
+          }
           gameRef.coinHolder.remove(coinLevel, i);
           continue;
         }
@@ -376,9 +379,9 @@ class Runner extends Component with HasGameRef<MyGame> {
     );
 
     SpriteAnimation falling = await loadSpriteAnimation(
-      'hover-frames.png',
+      'fall-frames.png',
       SpriteAnimationData.sequenced(
-        amount: 3,
+        amount: 7,
         stepTime: 0.1,
         textureSize: Vector2(512, 512),
       ),

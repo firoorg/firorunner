@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:firo_runner/bug_holder.dart';
 import 'package:firo_runner/circuit_background.dart';
 import 'package:firo_runner/coin_holder.dart';
+import 'package:firo_runner/firework.dart';
 import 'package:firo_runner/game_state.dart';
 import 'package:firo_runner/platform_holder.dart';
 import 'package:firo_runner/wire.dart';
@@ -10,7 +11,6 @@ import 'package:firo_runner/wire_holder.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
-import 'package:flame/game.dart' as flame;
 import 'package:flame/game.dart';
 import 'package:flame/gestures.dart';
 import 'package:flame/keyboard.dart';
@@ -32,10 +32,12 @@ const LEVEL6 = 50000000;
 const LEVEL7 = 60000000;
 
 const RUNNER_PRIORITY = 100;
+const BUG_PRIORITY = 75;
+const COIN_PRIORITY = 70;
 const PLATFORM_PRIORITY = 50;
 const WIRE_PRIORITY = 25;
-const COIN_PRIORITY = 70;
-const BUG_PRIORITY = 75;
+const FIREWORK_PRIORITY = 15;
+const WINDOW_PRIORITY = 10;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,8 +48,9 @@ void main() async {
 }
 
 class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
-  TextPaint textPaint = TextPaint(
-    config: const TextPaintConfig(fontSize: 48.0),
+  TextPaint fireworksPaint = TextPaint(
+    config: const TextPaintConfig(
+        fontSize: 48.0, fontFamily: 'Codystar', color: COLOR),
   );
 
   late CircuitBackground circuitBackground;
@@ -55,6 +58,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late CoinHolder coinHolder;
   late WireHolder wireHolder;
   late BugHolder bugHolder;
+  late Firework fireworks;
   Random random = Random();
   bool playingMusic = false;
 
@@ -87,6 +91,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     await wireHolder.loadWires();
     bugHolder = BugHolder();
     await bugHolder.loadBugs();
+    fireworks = Firework(this);
+    await fireworks.load();
 
     gameState = GameState();
 
@@ -180,6 +186,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   void setUp() {
     add(runner);
+    fireworks.setUp();
     runner.sprite.clearEffects();
     runner.sprite.current = RunnerState.run;
     circuitBackground.setUp();
@@ -202,9 +209,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   @override
   void render(Canvas canvas) {
     circuitBackground.render(canvas);
+    fireworks.renderText(canvas);
     super.render(canvas);
     final fpsCount = fps(1);
-    textPaint.render(
+    fireworksPaint.render(
       canvas,
       fpsCount.toString(),
       Vector2(0, 0),
@@ -213,6 +221,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   void update(double dt) {
+    fireworks.update(dt);
     platformHolder.removePast(this);
     coinHolder.removePast(this);
     wireHolder.removePast(this);

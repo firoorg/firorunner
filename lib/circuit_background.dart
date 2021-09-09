@@ -130,26 +130,30 @@ class CircuitBackground extends MovingObject {
       current: WindowState.first,
     );
 
+    windowA.changePriorityWithoutResorting(WINDOW_PRIORITY);
+
+    windowA.changePriorityWithoutResorting(WINDOW_PRIORITY);
+
     setUp();
   }
 
   void setUp() {
     windowA.current = WindowState.first;
     windowB.current = WindowState.first;
-    gameRef.add(windowA);
-    gameRef.add(windowB);
+    // gameRef.add(windowA);
+    // gameRef.add(windowB);
     background1Position = Vector2(0, 0);
     background1Size = Vector2(
-        gameRef.size.y * (background.width / background.height),
-        gameRef.size.y);
+        gameRef.viewport.canvasSize.y * (background.width / background.height),
+        gameRef.viewport.canvasSize.y);
     windowA.position = background1Position;
     windowA.size = background1Size;
 
     background2Position =
         Vector2(background1Position.x + background1Size.x - 1, 0);
     background2Size = Vector2(
-        gameRef.size.y * (background.width / background.height),
-        gameRef.size.y);
+        gameRef.viewport.canvasSize.y * (background.width / background.height),
+        gameRef.viewport.canvasSize.y);
     windowB.position = background2Position;
     windowB.size = background2Size;
   }
@@ -206,9 +210,13 @@ class CircuitBackground extends MovingObject {
   void render(Canvas canvas) {
     background1.render(canvas,
         size: background1Size, position: background1Position);
-    // windowA.render(canvas);
+    canvas.save();
+    windowA.render(canvas);
+    canvas.restore();
     background2.render(canvas,
         size: background2Size, position: background2Position);
-    // windowB.render(canvas);
+    canvas.save();
+    windowB.render(canvas);
+    canvas.restore();
   }
 }

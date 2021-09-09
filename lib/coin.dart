@@ -10,7 +10,7 @@ class Coin extends MovingObject {
     SpriteAnimation normal = SpriteAnimation.fromFrameData(
       coin,
       SpriteAnimationData.sequenced(
-        amount: 10,
+        amount: 12,
         stepTime: 0.1,
         textureSize: Vector2(512, 512),
       ),
