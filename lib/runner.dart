@@ -218,6 +218,9 @@ class Runner extends Component with HasGameRef<MyGame> {
   @override
   void update(double dt) {
     super.update(dt);
+    if (sprite.position.y + sprite.size.y >= gameRef.size.y) {
+      event("die");
+    }
     // If the animation is finished
     if (sprite.animation?.done() ?? false) {
       sprite.animation!.reset();

@@ -170,7 +170,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   bool shouldReset = false;
 
   void reset() {
-    if (!(runner.sprite.animation?.done() ?? false)) {
+    if (!(runner.sprite.animation?.done() ?? false) &&
+        runner.sprite.animation!.loop == false) {
       return;
     }
     runner.sprite.animation!.reset();

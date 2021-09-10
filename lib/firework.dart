@@ -19,7 +19,7 @@ class Firework extends Component {
     SpriteAnimation normal = SpriteAnimation.fromFrameData(
       firework,
       SpriteAnimationData.sequenced(
-        amount: 9,
+        amount: 10,
         stepTime: 0.25,
         textureSize: Vector2(512, 512),
         loop: false,
