@@ -115,21 +115,23 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (shouldReset) {
       return;
     }
-    for (int i = 2; i < 9; i = i + 3) {
-      while (!platformHolder.generatePlatform(this, i, false)) {}
-    }
-    int wireChosenRegion = random.nextInt(8) + 1;
-    if (wireChosenRegion % 3 != 2) {
+
+    platformHolder.generatePlatforms(this);
+
+    int wireChosenRegion = random.nextInt(9);
+    if (wireChosenRegion % 3 != 2 &&
+        wireChosenRegion != 6 &&
+        wireChosenRegion != 7) {
       wireHolder.generateWire(this, wireChosenRegion, false);
     }
 
-    int bugChosenRegion = random.nextInt(8) + 1;
-    if (bugChosenRegion % 3 != 2) {
+    int bugChosenRegion = random.nextInt(9);
+    if (bugChosenRegion % 3 != 2 && bugChosenRegion != 6) {
       bugHolder.generateBug(this, bugChosenRegion, false);
     }
 
-    int choseCoinLevel = random.nextInt(8) + 1;
-    if (choseCoinLevel % 3 != 2) {
+    int choseCoinLevel = random.nextInt(9);
+    if (choseCoinLevel % 3 != 2 && choseCoinLevel != 6) {
       coinHolder.generateCoin(this, choseCoinLevel, false);
     }
   }
@@ -200,10 +202,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
     runner.setUp();
 
-    // Generate the first 4 Platforms that will always be there at the start.
-    for (int i = 0; i < 4; i++) {
-      platformHolder.generatePlatform(this, 8, true);
-    }
     fillScreen();
   }
 

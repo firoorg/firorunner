@@ -15,6 +15,8 @@ class PlatformHolder {
   late Image o1;
   late Image o2;
   late List<List<Platform>> platforms = [];
+  int timeSinceLastTopHole = 0;
+  int timeSinceLastBottomHole = 0;
   Random random = Random();
 
   Future loadPlatforms() async {
@@ -29,6 +31,8 @@ class PlatformHolder {
   }
 
   void setUp() {
+    timeSinceLastTopHole = 0;
+    timeSinceLastBottomHole = 0;
     for (int i = 0; i < platforms.length; i++) {
       for (int j = 0; j < platforms[i].length; j++) {
         remove(platforms[i], j);
@@ -40,13 +44,47 @@ class PlatformHolder {
     }
   }
 
-  bool generatePlatform(MyGame gameRef, int level, bool force) {
-    double xCoordinate = 0;
-    if (platforms[level].isNotEmpty) {
+  void generatePlatforms(MyGame gameRef) {
+    while (!generatePlatform(gameRef, 2)) {
+      timeSinceLastTopHole++;
+    }
+    while (!generatePlatform(gameRef, 5)) {
+      timeSinceLastBottomHole++;
+    }
+
+    int topChance =
+        random.nextInt(timeSinceLastTopHole > 0 ? timeSinceLastTopHole : 1);
+    int bottomChance = random
+        .nextInt(timeSinceLastBottomHole > 0 ? timeSinceLastBottomHole : 1);
+
+    if (topChance > 50) {
+      remove(platforms[2], platforms[2].length - 2);
+      remove(platforms[2], platforms[2].length - 2);
+      timeSinceLastTopHole = 0;
+    }
+    if (bottomChance > 30) {
+      Platform start = platforms[5].elementAt(platforms[5].length - 10);
+      generatePlatform(gameRef, 8, xPosition: start.sprite.position.x);
+      for (int i = 0; i < 8; i++) {
+        generatePlatform(gameRef, 8);
+      }
+      int lastToRemove = platforms[5].length - 3;
+      int firstToRemove = platforms[5].length - 10;
+      remove(platforms[5], lastToRemove);
+      remove(platforms[5], lastToRemove);
+      remove(platforms[5], firstToRemove);
+      remove(platforms[5], firstToRemove);
+      timeSinceLastBottomHole = 0;
+    }
+  }
+
+  bool generatePlatform(MyGame gameRef, int level, {double xPosition = 0}) {
+    double xCoordinate = xPosition;
+    if (platforms[level].isNotEmpty && xPosition == 0) {
       xCoordinate = platforms[level].last.getRightEnd();
     }
 
-    if (xCoordinate > gameRef.size.x + 1000) {
+    if (xCoordinate > gameRef.size.x + 2000) {
       return true;
     } else {
       Platform platform = Platform(gameRef);
@@ -74,24 +112,10 @@ class PlatformHolder {
 
   void removePast(MyGame gameRef) {
     for (List<Platform> platformLevel in platforms) {
-      int removed = 0;
       while (platformLevel.isNotEmpty &&
           platformLevel[0].sprite.position.x + platformLevel[0].sprite.width <
               0) {
         remove(platformLevel, 0);
-        removed++;
-      }
-      if (platformLevel.isNotEmpty &&
-          platformLevel.length > 3 &&
-          random.nextInt(100) > 65 &&
-          removed > 0) {
-        int secondToLast = platformLevel.length - 4;
-        double secondToLastPosition =
-            platformLevel.elementAt(secondToLast).sprite.x;
-        if (secondToLastPosition > gameRef.size.x) {
-          remove(platformLevel, secondToLast + 1);
-          remove(platformLevel, secondToLast);
-        }
       }
     }
   }

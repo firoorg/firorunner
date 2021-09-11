@@ -5,6 +5,7 @@ import 'package:flame/flame.dart';
 import 'package:firo_runner/coin.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/extensions.dart';
+import 'package:firo_runner/platform.dart';
 
 class CoinHolder {
   late Image coin;
@@ -36,14 +37,34 @@ class CoinHolder {
     if (totalCoins() > 5) {
       return false;
     }
-    double xCoordinate = gameRef.platformHolder.getFlushX();
-    xCoordinate = xCoordinate +
-        gameRef.blockSize * random.nextInt(5) +
-        gameRef.blockSize * 20;
 
-    if (xCoordinate < gameRef.size.x || random.nextInt(100) > 25) {
+    if (coins[level].isNotEmpty) {
+      return false;
+    }
+
+    if (random.nextInt(100) > 25) {
       return true;
     } else {
+      int nearestPlatform = level <= 0
+          ? 0
+          : level <= 3
+              ? 2
+              : level <= 6
+                  ? 5
+                  : 8;
+
+      Platform? platform =
+          gameRef.platformHolder.getPlatformOffScreen(nearestPlatform);
+      double xCoordinate = -100;
+
+      if (level == 0) {
+        xCoordinate = gameRef.size.x;
+      } else if (platform != null) {
+        xCoordinate = platform.sprite.x;
+      } else {
+        return false;
+      }
+
       Coin coin = Coin(gameRef);
       coin.setPosition(xCoordinate, gameRef.blockSize * level);
 
@@ -53,8 +74,28 @@ class CoinHolder {
 
       coins[level].add(coin);
       gameRef.add(coin.sprite);
-      return false;
     }
+    return false;
+
+    // double xCoordinate = gameRef.platformHolder.getFlushX();
+    // xCoordinate = xCoordinate +
+    //     gameRef.blockSize * random.nextInt(5) +
+    //     gameRef.blockSize * 20;
+    //
+    // if (xCoordinate < gameRef.size.x || random.nextInt(100) > 25) {
+    //   return true;
+    // } else {
+    //   Coin coin = Coin(gameRef);
+    //   coin.setPosition(xCoordinate, gameRef.blockSize * level);
+    //
+    //   if (gameRef.isTooNearOtherObstacles(coin.sprite.toRect())) {
+    //     return false;
+    //   }
+    //
+    //   coins[level].add(coin);
+    //   gameRef.add(coin.sprite);
+    //   return false;
+    // }
   }
 
   int totalCoins() {
