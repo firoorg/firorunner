@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:firo_runner/bug.dart';
 import 'package:firo_runner/main.dart';
+import 'package:firo_runner/wire.dart';
 import 'package:flame/flame.dart';
 import 'package:firo_runner/platform.dart';
 import 'package:flame/extensions.dart';
@@ -44,6 +46,50 @@ class PlatformHolder {
     }
   }
 
+  void removeUnfairObstacles(
+      MyGame gameRef, Platform currentPlatform, int from, int to) {
+    for (int i = from; i <= to; i++) {
+      if (i == 0) {
+        for (Bug bug in gameRef.bugHolder.bugs[0]) {
+          if (bug.sprite.x >= currentPlatform.sprite.x &&
+              bug.sprite.x <
+                  currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
+            gameRef.bugHolder.bugs[0].remove(bug);
+            bug.remove();
+          }
+        }
+        for (Wire wire in gameRef.wireHolder.wires[0]) {
+          if (wire.sprite.x >= currentPlatform.sprite.x &&
+              wire.sprite.x <
+                  currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
+            gameRef.wireHolder.wires[0].remove(wire);
+            wire.remove();
+          }
+        }
+      } else {
+        int nearestPlatform = getNearestPlatform(i);
+        for (Platform platform in platforms[nearestPlatform]) {
+          if (platform.sprite.x >= currentPlatform.sprite.x &&
+              platform.sprite.x <
+                  currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
+            platform.remove();
+            platform.prohibitObstacles = true;
+          }
+        }
+      }
+    }
+  }
+
+  int getNearestPlatform(int level) {
+    return level <= 0
+        ? 0
+        : level <= 3
+            ? 2
+            : level <= 6
+                ? 5
+                : 8;
+  }
+
   void generatePlatforms(MyGame gameRef) {
     while (!generatePlatform(gameRef, 2)) {
       timeSinceLastTopHole++;
@@ -58,8 +104,12 @@ class PlatformHolder {
         .nextInt(timeSinceLastBottomHole > 0 ? timeSinceLastBottomHole : 1);
 
     if (topChance > 50) {
+      removeUnfairObstacles(
+          gameRef, platforms[2][platforms[2].length - 4], 0, 4);
+      // Create an opening in the top.
       remove(platforms[2], platforms[2].length - 2);
       remove(platforms[2], platforms[2].length - 2);
+
       timeSinceLastTopHole = 0;
     }
     if (bottomChance > 30) {
@@ -70,10 +120,15 @@ class PlatformHolder {
       }
       int lastToRemove = platforms[5].length - 3;
       int firstToRemove = platforms[5].length - 10;
+
+      removeUnfairObstacles(gameRef, platforms[5][lastToRemove - 1], 3, 7);
       remove(platforms[5], lastToRemove);
       remove(platforms[5], lastToRemove);
+
+      removeUnfairObstacles(gameRef, platforms[5][firstToRemove - 1], 3, 7);
       remove(platforms[5], firstToRemove);
       remove(platforms[5], firstToRemove);
+
       timeSinceLastBottomHole = 0;
     }
   }

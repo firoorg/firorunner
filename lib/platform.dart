@@ -13,6 +13,7 @@ enum PlatformState {
 
 class Platform extends MovingObject {
   int row = 0;
+  bool prohibitObstacles = false;
   List<Function> removeChildren = [];
 
   Platform(MyGame gameRef) : super(gameRef) {

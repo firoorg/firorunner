@@ -41,16 +41,13 @@ class WireHolder {
     if (random.nextInt(100) > 100) {
       return true;
     } else {
-      int nearestPlatform = level <= 0
-          ? 0
-          : level <= 3
-              ? 2
-              : level <= 6
-                  ? 5
-                  : 8;
+      int nearestPlatform = gameRef.platformHolder.getNearestPlatform(level);
 
       Platform? platform =
           gameRef.platformHolder.getPlatformOffScreen(nearestPlatform);
+      if (platform != null && platform.prohibitObstacles) {
+        return false;
+      }
       double xCoordinate = -100;
 
       if (level == 0) {

@@ -210,7 +210,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     circuitBackground.render(canvas);
     fireworks.renderText(canvas);
     super.render(canvas);
-    final fpsCount = fps(1);
+    final fpsCount = fps(10000);
     fireworksPaint.render(
       canvas,
       fpsCount.toString(),
@@ -300,6 +300,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (!playingMusic && kIsWeb) {
       playMusic();
     }
+    print(event.data.logicalKey.keyId);
+    print(event.data.keyLabel);
     if (event is RawKeyUpEvent) {
       keyboardKey = null;
       switch (event.data.keyLabel) {
