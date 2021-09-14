@@ -99,7 +99,7 @@ class Platform extends MovingObject {
       right = platformLevel.elementAt(index + 1).sprite.position;
     }
     super.update(dt);
-    if (index == -1 || sprite.position.x <= 0) {
+    if (index == -1 || (index < 1 && sprite.x <= sprite.width)) {
       return;
     }
     Vector2 left = Vector2(-200, -200);

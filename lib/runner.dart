@@ -239,6 +239,13 @@ class Runner extends Component with HasGameRef<MyGame> {
           event("kick");
         }
         break;
+      case "left":
+        if (runnerState == "kick") {
+          sprite.animation!.reset();
+          sprite.clearEffects();
+          event("run");
+        }
+        break;
       case "center":
         // if (runnerState == "fall") {
         //   updateLevel();
@@ -367,8 +374,6 @@ class Runner extends Component with HasGameRef<MyGame> {
           }
         } else if (intersectState == "left" && runnerState == "kick") {
           bugLevel[i].sprite.current = BugState.breaking;
-          // bugLevel[i].remove();
-          // bugLevel.removeAt(i);
         } else {
           event("glitch");
           return;
@@ -416,8 +421,8 @@ class Runner extends Component with HasGameRef<MyGame> {
     SpriteAnimation kicking = await loadSpriteAnimation(
       'kick-frames.png',
       SpriteAnimationData.sequenced(
-        amount: 13,
-        stepTime: 0.05,
+        amount: 19,
+        stepTime: 0.03,
         textureSize: Vector2(512, 512),
         loop: false,
       ),

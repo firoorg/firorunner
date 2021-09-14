@@ -5,6 +5,7 @@ import 'package:firo_runner/circuit_background.dart';
 import 'package:firo_runner/coin_holder.dart';
 import 'package:firo_runner/firework.dart';
 import 'package:firo_runner/game_state.dart';
+import 'package:firo_runner/platform.dart';
 import 'package:firo_runner/platform_holder.dart';
 import 'package:firo_runner/wire.dart';
 import 'package:firo_runner/wire_holder.dart';
@@ -203,6 +204,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner.setUp();
 
     fillScreen();
+    platformHolder.platforms[2][0].sprite.current = PlatformState.left;
+    platformHolder.platforms[5][0].sprite.current = PlatformState.left;
   }
 
   @override
