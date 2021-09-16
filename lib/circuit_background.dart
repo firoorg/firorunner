@@ -140,8 +140,6 @@ class CircuitBackground extends MovingObject {
   void setUp() {
     windowA.current = WindowState.first;
     windowB.current = WindowState.first;
-    // gameRef.add(windowA);
-    // gameRef.add(windowB);
     background1Position = Vector2(0, 0);
     background1Size = Vector2(
         gameRef.viewport.canvasSize.y * (background.width / background.height),
@@ -218,5 +216,20 @@ class CircuitBackground extends MovingObject {
     canvas.save();
     windowB.render(canvas);
     canvas.restore();
+  }
+
+  @override
+  void resize(Vector2 newSize, double xRatio, double yRatio) {
+    background1Size =
+        Vector2(newSize.y * (background.width / background.height), newSize.y);
+    windowA.position = background1Position;
+    windowA.size = background1Size;
+
+    background2Position =
+        Vector2(background1Position.x + background1Size.x - 1, 0);
+    background2Size =
+        Vector2(newSize.y * (background.width / background.height), newSize.y);
+    windowB.position = background2Position;
+    windowB.size = background2Size;
   }
 }

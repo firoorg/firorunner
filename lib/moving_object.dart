@@ -47,4 +47,11 @@ class MovingObject {
     }
     return "none";
   }
+
+  void resize(Vector2 newSize, double xRatio, double yRatio) {
+    sprite.x *= xRatio;
+    sprite.y *= yRatio;
+    sprite.width *= xRatio;
+    sprite.height *= yRatio;
+  }
 }

@@ -28,6 +28,7 @@ class Runner extends Component with HasGameRef<MyGame> {
   String previousState = "run";
   var runnerPosition = Vector2(0, 0);
   late Vector2 runnerSize;
+  // late Rect runnerRect;
   bool dead = false;
 
   void setUp() {
@@ -104,7 +105,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           path: [
             Vector2(sprite.x, (level - 2) * gameRef.blockSize),
           ],
-          speed: 150,
+          duration: 0.5,
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
@@ -315,22 +316,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       return;
     }
     Rect runnerRect = sprite.toRect();
-    bool onTopOfPlatform = false;
-    for (List<Platform> platformLevel in gameRef.platformHolder.platforms) {
-      for (Platform p in platformLevel) {
-        String side = p.intersect(runnerRect);
-        if (side == "none") {
-          Rect belowRunner = Rect.fromLTRB(runnerRect.left, runnerRect.top,
-              runnerRect.right, runnerRect.bottom + 1);
-          if (p.intersect(belowRunner) != "none") {
-            onTopOfPlatform = true;
-          }
-        } else if (side == "bottom") {
-          // event("die");
-          return;
-        }
-      }
-    }
+    bool onTopOfPlatform = this.onTopOfPlatform();
 
     for (List<Coin> coinLevel in gameRef.coinHolder.coins) {
       for (int i = 0; i < coinLevel.length;) {
@@ -492,5 +478,15 @@ class Runner extends Component with HasGameRef<MyGame> {
     );
 
     changePriorityWithoutResorting(RUNNER_PRIORITY);
+  }
+
+  void resize(Vector2 newSize, double xRatio, double yRatio) {
+    sprite.x = gameRef.blockSize * 2;
+    sprite.y = gameRef.blockSize * level;
+    sprite.size.x = gameRef.blockSize;
+    sprite.size.y = gameRef.blockSize;
+    if (sprite.effects.isNotEmpty) {
+      sprite.effects.first.onComplete!();
+    }
   }
 }

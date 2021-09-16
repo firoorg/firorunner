@@ -70,26 +70,6 @@ class CoinHolder {
       gameRef.add(coin.sprite);
     }
     return false;
-
-    // double xCoordinate = gameRef.platformHolder.getFlushX();
-    // xCoordinate = xCoordinate +
-    //     gameRef.blockSize * random.nextInt(5) +
-    //     gameRef.blockSize * 20;
-    //
-    // if (xCoordinate < gameRef.size.x || random.nextInt(100) > 25) {
-    //   return true;
-    // } else {
-    //   Coin coin = Coin(gameRef);
-    //   coin.setPosition(xCoordinate, gameRef.blockSize * level);
-    //
-    //   if (gameRef.isTooNearOtherObstacles(coin.sprite.toRect())) {
-    //     return false;
-    //   }
-    //
-    //   coins[level].add(coin);
-    //   gameRef.add(coin.sprite);
-    //   return false;
-    // }
   }
 
   int totalCoins() {
@@ -122,6 +102,14 @@ class CoinHolder {
           continue;
         }
         i++;
+      }
+    }
+  }
+
+  void resize(Vector2 newSize, double xRatio, double yRatio) {
+    for (List<Coin> coinLevel in coins) {
+      for (Coin p in coinLevel) {
+        p.resize(newSize, xRatio, yRatio);
       }
     }
   }

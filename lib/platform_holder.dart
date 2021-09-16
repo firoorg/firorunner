@@ -196,4 +196,14 @@ class PlatformHolder {
     }
     return null;
   }
+
+  void resize(Vector2 newSize, double xRatio, double yRatio) {
+    for (List<Platform> platformLevel in platforms) {
+      for (Platform p in platformLevel) {
+        p.resize(newSize, xRatio, yRatio);
+        p.sprite.y = (p.sprite.position.y / p.gameRef.blockSize).round() *
+            p.gameRef.blockSize;
+      }
+    }
+  }
 }

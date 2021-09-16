@@ -118,4 +118,12 @@ class WireHolder {
       }
     }
   }
+
+  void resize(Vector2 newSize, double xRatio, double yRatio) {
+    for (List<Wire> platformLevel in wires) {
+      for (Wire p in platformLevel) {
+        p.resize(newSize, xRatio, yRatio);
+      }
+    }
+  }
 }

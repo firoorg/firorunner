@@ -97,4 +97,16 @@ class Firework extends Component {
     sprite1.animation!.reset();
     sprite2.animation!.reset();
   }
+
+  void resize(Vector2 newSize, double xRatio, double yRatio) {
+    sprite1.x *= xRatio;
+    sprite1.y *= yRatio;
+    sprite1.width *= xRatio;
+    sprite1.height *= yRatio;
+
+    sprite2.x *= xRatio;
+    sprite2.y *= yRatio;
+    sprite2.width *= xRatio;
+    sprite2.height *= yRatio;
+  }
 }

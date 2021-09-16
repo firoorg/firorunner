@@ -243,8 +243,20 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   void onResize(Vector2 canvasSize) {
+    Vector2 oldSize = viewport.canvasSize;
     super.onResize(canvasSize);
     blockSize = canvasSize.y / 9;
+    if (loaded) {
+      double xRatio = canvasSize.x / oldSize.x;
+      double yRatio = canvasSize.y / oldSize.y;
+      circuitBackground.resize(canvasSize, xRatio, yRatio);
+      runner.resize(canvasSize, xRatio, yRatio);
+      platformHolder.resize(canvasSize, xRatio, yRatio);
+      coinHolder.resize(canvasSize, xRatio, yRatio);
+      wireHolder.resize(canvasSize, xRatio, yRatio);
+      bugHolder.resize(canvasSize, xRatio, yRatio);
+      fireworks.resize(canvasSize, xRatio, yRatio);
+    }
   }
 
   // Mobile controls
