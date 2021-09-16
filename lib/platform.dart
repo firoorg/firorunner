@@ -78,11 +78,13 @@ class Platform extends MovingObject {
     );
   }
 
-  double getRightEnd() {
-    return sprite.position.x + sprite.width;
+  @override
+  void remove() {
+    removeChildrenObjects();
+    super.remove();
   }
 
-  void remove() {
+  void removeChildrenObjects() {
     if (removeChildren.isNotEmpty) {
       for (Function removeChild in removeChildren) {
         removeChild();
@@ -92,7 +94,7 @@ class Platform extends MovingObject {
 
   @override
   void update(double dt) {
-    List<Platform> platformLevel = gameRef.platformHolder.platforms[row];
+    List<MovingObject> platformLevel = gameRef.platformHolder.objects[row];
     int index = platformLevel.indexOf(this);
     Vector2 right = Vector2(-200, -200);
     if (index + 1 < platformLevel.length) {

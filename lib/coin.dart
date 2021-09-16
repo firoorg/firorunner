@@ -32,12 +32,4 @@ class Coin extends MovingObject {
       gameRef.blockSize * (platform.width / platform.height / 14),
     );
   }
-
-  double getRightEnd() {
-    return sprite.position.x + sprite.width;
-  }
-
-  void remove() {
-    sprite.remove();
-  }
 }

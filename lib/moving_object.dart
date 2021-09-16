@@ -26,6 +26,14 @@ class MovingObject {
     sprite.position = sprite.position - Vector2(velocity * dt, 0);
   }
 
+  double getRightEnd() {
+    return sprite.position.x + sprite.width;
+  }
+
+  void remove() {
+    sprite.remove();
+  }
+
   String intersect(Rect other) {
     final collision = sprite.toRect().intersect(other);
     if (!collision.isEmpty) {

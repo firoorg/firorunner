@@ -1,11 +1,9 @@
 import 'package:firo_runner/bug.dart';
-import 'package:firo_runner/coin.dart';
-import 'package:firo_runner/wire.dart';
+import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:firo_runner/platform.dart';
 
 import 'package:flame/components.dart';
 
@@ -278,8 +276,8 @@ class Runner extends Component with HasGameRef<MyGame> {
   bool onTopOfPlatform() {
     Rect runnerRect = sprite.toRect();
     bool onTopOfPlatform = false;
-    for (List<Platform> platformLevel in gameRef.platformHolder.platforms) {
-      for (Platform p in platformLevel) {
+    for (List<MovingObject> platformLevel in gameRef.platformHolder.objects) {
+      for (MovingObject p in platformLevel) {
         String side = p.intersect(runnerRect);
         if (side == "none") {
           Rect belowRunner = Rect.fromLTRB(runnerRect.left, runnerRect.top,
@@ -296,8 +294,8 @@ class Runner extends Component with HasGameRef<MyGame> {
   bool belowPlatform() {
     Rect runnerRect = sprite.toRect();
     bool belowPlatform = false;
-    for (List<Platform> platformLevel in gameRef.platformHolder.platforms) {
-      for (Platform p in platformLevel) {
+    for (List<MovingObject> platformLevel in gameRef.platformHolder.objects) {
+      for (MovingObject p in platformLevel) {
         String side = p.intersect(runnerRect);
         if (side == "none") {
           Rect belowRunner = Rect.fromLTRB(runnerRect.left, runnerRect.top - 1,
@@ -318,7 +316,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     Rect runnerRect = sprite.toRect();
     bool onTopOfPlatform = this.onTopOfPlatform();
 
-    for (List<Coin> coinLevel in gameRef.coinHolder.coins) {
+    for (List<MovingObject> coinLevel in gameRef.coinHolder.objects) {
       for (int i = 0; i < coinLevel.length;) {
         if (coinLevel[i].intersect(runnerRect) != "none") {
           gameRef.gameState.numCoins++;
@@ -332,7 +330,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       }
     }
 
-    for (List<Wire> wireLevel in gameRef.wireHolder.wires) {
+    for (List<MovingObject> wireLevel in gameRef.wireHolder.objects) {
       for (int i = 0; i < wireLevel.length; i++) {
         if (wireLevel[i].intersect(runnerRect) != "none") {
           event("electrocute");
@@ -341,7 +339,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       }
     }
 
-    for (List<Bug> bugLevel in gameRef.bugHolder.bugs) {
+    for (List<MovingObject> bugLevel in gameRef.bugHolder.objects) {
       for (int i = 0; i < bugLevel.length; i++) {
         String intersectState = bugLevel[i].intersect(runnerRect);
         if (bugLevel[i].sprite.current == BugState.breaking) {

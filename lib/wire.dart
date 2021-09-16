@@ -32,14 +32,6 @@ class Wire extends MovingObject {
     );
   }
 
-  double getRightEnd() {
-    return sprite.position.x + sprite.width;
-  }
-
-  void remove() {
-    sprite.remove();
-  }
-
   @override
   String intersect(Rect other) {
     Rect currentRect = sprite.toRect();

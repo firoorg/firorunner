@@ -5,6 +5,7 @@ import 'package:firo_runner/circuit_background.dart';
 import 'package:firo_runner/coin_holder.dart';
 import 'package:firo_runner/firework.dart';
 import 'package:firo_runner/game_state.dart';
+import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/platform.dart';
 import 'package:firo_runner/platform_holder.dart';
 import 'package:firo_runner/wire.dart';
@@ -18,8 +19,6 @@ import 'package:flame/keyboard.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firo_runner/bug.dart';
-import 'package:firo_runner/coin.dart';
 import 'package:firo_runner/runner.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -46,6 +45,16 @@ void main() async {
   await Flame.device.setLandscape();
   final myGame = MyGame();
   runApp(GameWidget(game: myGame));
+}
+
+int getNearestPlatform(int level) {
+  return level <= 0
+      ? 0
+      : level <= 3
+          ? 2
+          : level <= 6
+              ? 5
+              : 8;
 }
 
 class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
@@ -85,13 +94,13 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     circuitBackground = CircuitBackground(this);
     await circuitBackground.load();
     platformHolder = PlatformHolder();
-    await platformHolder.loadPlatforms();
+    await platformHolder.load();
     coinHolder = CoinHolder();
-    await coinHolder.loadCoins();
+    await coinHolder.load();
     wireHolder = WireHolder();
-    await wireHolder.loadWires();
+    await wireHolder.load();
     bugHolder = BugHolder();
-    await bugHolder.loadBugs();
+    await bugHolder.load();
     fireworks = Firework(this);
     await fireworks.load();
 
@@ -143,24 +152,24 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
         3 * rect.top - 2 * rect.bottom - 1,
         3 * rect.right - 2 * rect.left + 1,
         3 * rect.bottom - 2 * rect.top + 1);
-    for (List<Wire> wireLevel in wireHolder.wires) {
-      for (Wire wire in wireLevel) {
+    for (List<MovingObject> wireLevel in wireHolder.objects) {
+      for (MovingObject wire in wireLevel) {
         if (wire.intersect(obstacleBounds) != "none") {
           return true;
         }
       }
     }
 
-    for (List<Coin> coinLevel in coinHolder.coins) {
-      for (Coin coin in coinLevel) {
+    for (List<MovingObject> coinLevel in coinHolder.objects) {
+      for (MovingObject coin in coinLevel) {
         if (coin.intersect(obstacleBounds) != "none") {
           return true;
         }
       }
     }
 
-    for (List<Bug> bugLevel in bugHolder.bugs) {
-      for (Bug bug in bugLevel) {
+    for (List<MovingObject> bugLevel in bugHolder.objects) {
+      for (MovingObject bug in bugLevel) {
         if (bug.intersect(obstacleBounds) != "none") {
           return true;
         }
@@ -204,8 +213,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner.setUp();
 
     fillScreen();
-    platformHolder.platforms[2][0].sprite.current = PlatformState.left;
-    platformHolder.platforms[5][0].sprite.current = PlatformState.left;
+    platformHolder.objects[2][0].sprite.current = PlatformState.left;
+    platformHolder.objects[5][0].sprite.current = PlatformState.left;
   }
 
   @override

@@ -42,12 +42,4 @@ class Bug extends MovingObject {
       gameRef.blockSize,
     );
   }
-
-  double getRightEnd() {
-    return sprite.position.x + sprite.width;
-  }
-
-  void remove() {
-    sprite.remove();
-  }
 }

@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:firo_runner/holder.dart';
 import 'package:firo_runner/platform.dart';
 import 'package:flame/flame.dart';
 
@@ -7,26 +6,12 @@ import 'package:firo_runner/wire.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/extensions.dart';
 
-class WireHolder {
+class WireHolder extends Holder {
   late Image wire;
-  Random random = Random();
 
-  late List<List<Wire>> wires = [];
-
-  Future loadWires() async {
+  @override
+  Future load() async {
     wire = await Flame.images.load("wire-frames.png");
-  }
-
-  void setUp() {
-    for (int i = 0; i < wires.length; i++) {
-      for (int j = 0; j < wires[i].length; j++) {
-        remove(wires[i], j);
-      }
-    }
-    wires = [];
-    for (int i = 0; i < 9; i++) {
-      wires.add([]);
-    }
   }
 
   getWire() {
@@ -34,14 +19,14 @@ class WireHolder {
   }
 
   bool generateWire(MyGame gameRef, int level, bool force) {
-    if (wires[level].isNotEmpty) {
+    if (objects[level].isNotEmpty) {
       return false;
     }
 
     if (random.nextInt(100) > 100) {
       return true;
     } else {
-      int nearestPlatform = gameRef.platformHolder.getNearestPlatform(level);
+      int nearestPlatform = getNearestPlatform(level);
 
       Platform? platform =
           gameRef.platformHolder.getPlatformOffScreen(nearestPlatform);
@@ -73,57 +58,15 @@ class WireHolder {
         return false;
       }
 
-      wires[level].add(wire);
+      objects[level].add(wire);
       gameRef.add(wire.sprite);
       if (platform != null) {
         platform.removeChildren.add(() {
-          wires[level].remove(wire);
+          objects[level].remove(wire);
           wire.remove();
         });
       }
       return false;
-    }
-  }
-
-  int totalWires() {
-    int total = 0;
-    for (List<Wire> levelWires in wires) {
-      total += levelWires.length;
-    }
-    return total;
-  }
-
-  void update(double dt) {
-    for (List<Wire> wireLevel in wires) {
-      for (Wire p in wireLevel) {
-        p.update(dt);
-      }
-    }
-  }
-
-  void remove(List<Wire> levelHolder, int j) {
-    levelHolder[j].remove();
-    levelHolder[j].sprite.remove();
-    levelHolder.removeAt(j);
-  }
-
-  void removePast(MyGame gameRef) {
-    for (List<Wire> wireLevel in wires) {
-      for (int i = 0; i < wireLevel.length;) {
-        if (wireLevel[i].sprite.x + wireLevel[i].sprite.width < 0) {
-          remove(wireLevel, i);
-          continue;
-        }
-        i++;
-      }
-    }
-  }
-
-  void resize(Vector2 newSize, double xRatio, double yRatio) {
-    for (List<Wire> platformLevel in wires) {
-      for (Wire p in platformLevel) {
-        p.resize(newSize, xRatio, yRatio);
-      }
     }
   }
 }

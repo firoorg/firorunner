@@ -1,13 +1,11 @@
-import 'dart:math';
-
-import 'package:firo_runner/bug.dart';
+import 'package:firo_runner/holder.dart';
 import 'package:firo_runner/main.dart';
-import 'package:firo_runner/wire.dart';
+import 'package:firo_runner/moving_object.dart';
 import 'package:flame/flame.dart';
 import 'package:firo_runner/platform.dart';
 import 'package:flame/extensions.dart';
 
-class PlatformHolder {
+class PlatformHolder extends Holder {
   late Image l1;
   late Image l2;
   late Image m1;
@@ -16,12 +14,11 @@ class PlatformHolder {
   late Image r2;
   late Image o1;
   late Image o2;
-  late List<List<Platform>> platforms = [];
   int timeSinceLastTopHole = 0;
   int timeSinceLastBottomHole = 0;
-  Random random = Random();
 
-  Future loadPlatforms() async {
+  @override
+  Future load() async {
     l1 = await Flame.images.load('platform-left-nowire-frames.png');
     l2 = await Flame.images.load('platform-left-wire-frames.png');
     m1 = await Flame.images.load('platform-mid-nowire-frames.png');
@@ -32,62 +29,45 @@ class PlatformHolder {
     o2 = await Flame.images.load('platform-single-wire-frames.png');
   }
 
+  @override
   void setUp() {
     timeSinceLastTopHole = 0;
     timeSinceLastBottomHole = 0;
-    for (int i = 0; i < platforms.length; i++) {
-      for (int j = 0; j < platforms[i].length; j++) {
-        remove(platforms[i], j);
-      }
-    }
-    platforms = [];
-    for (int i = 0; i < 9; i++) {
-      platforms.add([]);
-    }
+    super.setUp();
   }
 
   void removeUnfairObstacles(
       MyGame gameRef, Platform currentPlatform, int from, int to) {
     for (int i = from; i <= to; i++) {
       if (i == 0) {
-        for (Bug bug in gameRef.bugHolder.bugs[0]) {
+        List<MovingObject> bugLevel = gameRef.bugHolder.objects[0];
+        for (MovingObject bug in gameRef.bugHolder.objects[0]) {
           if (bug.sprite.x >= currentPlatform.sprite.x &&
               bug.sprite.x <
                   currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
-            gameRef.bugHolder.bugs[0].remove(bug);
-            bug.remove();
+            gameRef.bugHolder.remove(bugLevel, bugLevel.indexOf(bug));
           }
         }
-        for (Wire wire in gameRef.wireHolder.wires[0]) {
+        List<MovingObject> wireLevel = gameRef.wireHolder.objects[0];
+        for (MovingObject wire in gameRef.wireHolder.objects[0]) {
           if (wire.sprite.x >= currentPlatform.sprite.x &&
               wire.sprite.x <
                   currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
-            gameRef.wireHolder.wires[0].remove(wire);
-            wire.remove();
+            gameRef.wireHolder.remove(wireLevel, wireLevel.indexOf(wire));
           }
         }
       } else {
         int nearestPlatform = getNearestPlatform(i);
-        for (Platform platform in platforms[nearestPlatform]) {
+        for (MovingObject platform in objects[nearestPlatform]) {
           if (platform.sprite.x >= currentPlatform.sprite.x &&
               platform.sprite.x <
                   currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
-            platform.remove();
+            (platform as Platform).removeChildrenObjects();
             platform.prohibitObstacles = true;
           }
         }
       }
     }
-  }
-
-  int getNearestPlatform(int level) {
-    return level <= 0
-        ? 0
-        : level <= 3
-            ? 2
-            : level <= 6
-                ? 5
-                : 8;
   }
 
   void generatePlatforms(MyGame gameRef) {
@@ -105,29 +85,31 @@ class PlatformHolder {
 
     if (topChance > 50) {
       removeUnfairObstacles(
-          gameRef, platforms[2][platforms[2].length - 4], 0, 4);
+          gameRef, objects[2][objects[2].length - 4] as Platform, 0, 4);
       // Create an opening in the top.
-      remove(platforms[2], platforms[2].length - 2);
-      remove(platforms[2], platforms[2].length - 2);
+      remove(objects[2], objects[2].length - 2);
+      remove(objects[2], objects[2].length - 2);
 
       timeSinceLastTopHole = 0;
     }
     if (bottomChance > 30) {
-      Platform start = platforms[5].elementAt(platforms[5].length - 10);
+      Platform start = objects[5].elementAt(objects[5].length - 10) as Platform;
       generatePlatform(gameRef, 8, xPosition: start.sprite.position.x);
       for (int i = 0; i < 8; i++) {
         generatePlatform(gameRef, 8);
       }
-      int lastToRemove = platforms[5].length - 3;
-      int firstToRemove = platforms[5].length - 10;
+      int lastToRemove = objects[5].length - 3;
+      int firstToRemove = objects[5].length - 10;
 
-      removeUnfairObstacles(gameRef, platforms[5][lastToRemove - 1], 3, 7);
-      remove(platforms[5], lastToRemove);
-      remove(platforms[5], lastToRemove);
+      removeUnfairObstacles(
+          gameRef, objects[5][lastToRemove - 1] as Platform, 3, 7);
+      remove(objects[5], lastToRemove);
+      remove(objects[5], lastToRemove);
 
-      removeUnfairObstacles(gameRef, platforms[5][firstToRemove - 1], 3, 7);
-      remove(platforms[5], firstToRemove);
-      remove(platforms[5], firstToRemove);
+      removeUnfairObstacles(
+          gameRef, objects[5][firstToRemove - 1] as Platform, 3, 7);
+      remove(objects[5], firstToRemove);
+      remove(objects[5], firstToRemove);
 
       timeSinceLastBottomHole = 0;
     }
@@ -135,8 +117,8 @@ class PlatformHolder {
 
   bool generatePlatform(MyGame gameRef, int level, {double xPosition = 0}) {
     double xCoordinate = xPosition;
-    if (platforms[level].isNotEmpty && xPosition == 0) {
-      xCoordinate = platforms[level].last.getRightEnd();
+    if (objects[level].isNotEmpty && xPosition == 0) {
+      xCoordinate = objects[level].last.getRightEnd();
     }
 
     if (xCoordinate > gameRef.size.x + 2000) {
@@ -146,64 +128,30 @@ class PlatformHolder {
       platform.setPosition(xCoordinate, gameRef.blockSize * level);
       platform.row = level;
       gameRef.add(platform.sprite);
-      platforms[level].add(platform);
+      objects[level].add(platform);
       return false;
     }
   }
 
-  void update(double dt) {
-    for (List<Platform> platformLevel in platforms) {
-      for (Platform p in platformLevel) {
-        p.update(dt);
-      }
-    }
-  }
-
-  void remove(List<Platform> levelHolder, int j) {
-    levelHolder[j].remove();
-    levelHolder[j].sprite.remove();
-    levelHolder.removeAt(j);
-  }
-
-  void removePast(MyGame gameRef) {
-    for (List<Platform> platformLevel in platforms) {
-      while (platformLevel.isNotEmpty &&
-          platformLevel[0].sprite.position.x + platformLevel[0].sprite.width <
-              0) {
-        remove(platformLevel, 0);
-      }
-    }
-  }
-
   double getFlushX() {
-    Platform platform =
-        platforms[2].firstWhere((element) => element.sprite.x > 0, orElse: () {
-      return platforms[5].firstWhere((element) => element.sprite.x > 0,
+    MovingObject platform =
+        objects[2].firstWhere((element) => element.sprite.x > 0, orElse: () {
+      return objects[5].firstWhere((element) => element.sprite.x > 0,
           orElse: () {
-        return platforms[8].firstWhere((element) => element.sprite.x > 0);
+        return objects[8].firstWhere((element) => element.sprite.x > 0);
       });
     });
     return platform.sprite.x;
   }
 
   Platform? getPlatformOffScreen(int level) {
-    for (int i = 0; i < platforms[level].length; i++) {
-      Platform p = platforms[level][i];
+    for (int i = 0; i < objects[level].length; i++) {
+      Platform p = objects[level][i] as Platform;
       if (p.sprite.x > p.gameRef.size.x) {
-        int chosenIndex = random.nextInt(platforms[level].length - i) + i;
-        return platforms[level][chosenIndex];
+        int chosenIndex = random.nextInt(objects[level].length - i) + i;
+        return objects[level][chosenIndex] as Platform;
       }
     }
     return null;
-  }
-
-  void resize(Vector2 newSize, double xRatio, double yRatio) {
-    for (List<Platform> platformLevel in platforms) {
-      for (Platform p in platformLevel) {
-        p.resize(newSize, xRatio, yRatio);
-        p.sprite.y = (p.sprite.position.y / p.gameRef.blockSize).round() *
-            p.gameRef.blockSize;
-      }
-    }
   }
 }
