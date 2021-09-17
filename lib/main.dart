@@ -9,6 +9,7 @@ import 'package:firo_runner/game_state.dart';
 import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/platform.dart';
 import 'package:firo_runner/platform_holder.dart';
+import 'package:firo_runner/wall_holder.dart';
 import 'package:firo_runner/wire.dart';
 import 'package:firo_runner/wire_holder.dart';
 import 'package:flame/components.dart';
@@ -36,6 +37,7 @@ const RUNNER_PRIORITY = 100;
 const BUG_PRIORITY = 75;
 const COIN_PRIORITY = 70;
 const PLATFORM_PRIORITY = 50;
+const WALL_PRIORITY = 40;
 const DEBRIS_PRIORITY = 30;
 const WIRE_PRIORITY = 25;
 const FIREWORK_PRIORITY = 15;
@@ -72,6 +74,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late BugHolder bugHolder;
   late Firework fireworks;
   late DebrisHolder debrisHolder;
+  late WallHolder wallHolder;
   Random random = Random();
   bool playingMusic = false;
 
@@ -106,6 +109,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     await bugHolder.load();
     debrisHolder = DebrisHolder();
     await debrisHolder.load();
+    wallHolder = WallHolder();
+    await wallHolder.load();
     fireworks = Firework(this);
     await fireworks.load();
 
@@ -154,14 +159,19 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (choseCoinLevel % 3 != 2 && choseCoinLevel != 6) {
       coinHolder.generateCoin(this, choseCoinLevel, false);
     }
+
+    int wallChosenRegion = random.nextInt(9);
+    if (wallChosenRegion % 3 == 1 && wallChosenRegion != 7) {
+      wallHolder.generateWall(this, wallChosenRegion, false);
+    }
   }
 
   bool isTooNearOtherObstacles(Rect rect) {
     Rect obstacleBounds = Rect.fromLTRB(
-        3 * rect.left - 2 * rect.right - 1,
-        3 * rect.top - 2 * rect.bottom - 1,
-        3 * rect.right - 2 * rect.left + 1,
-        3 * rect.bottom - 2 * rect.top + 1);
+        3 * rect.left - 2 * (rect.left + blockSize) - 1,
+        3 * rect.top - 2 * (rect.top + blockSize) - 1,
+        3 * (rect.left + blockSize) - 2 * rect.left + 1,
+        3 * (rect.top + blockSize) - 2 * rect.top + 1);
     for (List<MovingObject> wireLevel in wireHolder.objects) {
       for (MovingObject wire in wireLevel) {
         if (wire.intersect(obstacleBounds) != "none") {
@@ -189,6 +199,14 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     for (List<MovingObject> debrisLevel in debrisHolder.objects) {
       for (MovingObject debris in debrisLevel) {
         if (debris.intersect(obstacleBounds) != "none") {
+          return true;
+        }
+      }
+    }
+
+    for (List<MovingObject> wallLevel in wallHolder.objects) {
+      for (MovingObject wall in wallLevel) {
+        if (wall.intersect(obstacleBounds) != "none") {
           return true;
         }
       }
@@ -226,6 +244,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     wireHolder.setUp();
     bugHolder.setUp();
     debrisHolder.setUp();
+    wallHolder.setUp();
 
     gameState.setUp(this);
 
@@ -257,6 +276,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     wireHolder.removePast(this);
     bugHolder.removePast(this);
     debrisHolder.removePast(this);
+    wallHolder.removePast(this);
     fillScreen();
     super.update(dt);
     circuitBackground.update(dt);
@@ -266,6 +286,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     wireHolder.update(dt);
     bugHolder.update(dt);
     debrisHolder.update(dt);
+    wallHolder.update(dt);
     if (shouldReset) {
       reset();
     }
@@ -286,6 +307,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       wireHolder.resize(canvasSize, xRatio, yRatio);
       bugHolder.resize(canvasSize, xRatio, yRatio);
       debrisHolder.resize(canvasSize, xRatio, yRatio);
+      wallHolder.resize(canvasSize, xRatio, yRatio);
       fireworks.resize(canvasSize, xRatio, yRatio);
     }
   }

@@ -412,8 +412,23 @@ class Runner extends Component with HasGameRef<MyGame> {
         String intersectState = debrisLevel[i].intersect(slim);
         if (intersectState == "none") {
           continue;
-        } else if ((runnerState == "duck" || runnerState == "float") &&
-            intersectState != "above") {
+        } else if (runnerState == "duck" && intersectState != "above") {
+          continue;
+        } else {
+          event("die");
+        }
+      }
+    }
+
+    for (List<MovingObject> debrisLevel in gameRef.wallHolder.objects) {
+      for (int i = 0; i < debrisLevel.length; i++) {
+        Rect slim = Rect.fromLTRB(
+            runnerRect.left + sprite.width / 3,
+            runnerRect.top + sprite.height / (runnerState == "duck" ? 3 : 6),
+            runnerRect.right - sprite.width / 3,
+            runnerRect.bottom - sprite.height / 3);
+        String intersectState = debrisLevel[i].intersect(slim);
+        if (intersectState == "none") {
           continue;
         } else {
           event("die");
