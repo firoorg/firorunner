@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:firo_runner/bug_holder.dart';
 import 'package:firo_runner/circuit_background.dart';
 import 'package:firo_runner/coin_holder.dart';
+import 'package:firo_runner/debris_holder.dart';
 import 'package:firo_runner/firework.dart';
 import 'package:firo_runner/game_state.dart';
 import 'package:firo_runner/moving_object.dart';
@@ -35,6 +36,7 @@ const RUNNER_PRIORITY = 100;
 const BUG_PRIORITY = 75;
 const COIN_PRIORITY = 70;
 const PLATFORM_PRIORITY = 50;
+const DEBRIS_PRIORITY = 30;
 const WIRE_PRIORITY = 25;
 const FIREWORK_PRIORITY = 15;
 const WINDOW_PRIORITY = 10;
@@ -69,6 +71,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late WireHolder wireHolder;
   late BugHolder bugHolder;
   late Firework fireworks;
+  late DebrisHolder debrisHolder;
   Random random = Random();
   bool playingMusic = false;
 
@@ -101,6 +104,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     await wireHolder.load();
     bugHolder = BugHolder();
     await bugHolder.load();
+    debrisHolder = DebrisHolder();
+    await debrisHolder.load();
     fireworks = Firework(this);
     await fireworks.load();
 
@@ -136,8 +141,13 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     }
 
     int bugChosenRegion = random.nextInt(9);
-    if (bugChosenRegion % 3 != 2 && bugChosenRegion != 6) {
+    if (bugChosenRegion % 3 != 2 && bugChosenRegion % 3 != 0) {
       bugHolder.generateBug(this, bugChosenRegion, false);
+    }
+
+    int debrisChosenRegion = random.nextInt(9);
+    if (debrisChosenRegion % 3 == 0 && debrisChosenRegion != 6) {
+      debrisHolder.generateDebris(this, debrisChosenRegion, false);
     }
 
     int choseCoinLevel = random.nextInt(9);
@@ -176,6 +186,14 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       }
     }
 
+    for (List<MovingObject> debrisLevel in debrisHolder.objects) {
+      for (MovingObject debris in debrisLevel) {
+        if (debris.intersect(obstacleBounds) != "none") {
+          return true;
+        }
+      }
+    }
+
     return false;
   }
 
@@ -207,6 +225,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     coinHolder.setUp();
     wireHolder.setUp();
     bugHolder.setUp();
+    debrisHolder.setUp();
 
     gameState.setUp(this);
 
@@ -237,6 +256,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     coinHolder.removePast(this);
     wireHolder.removePast(this);
     bugHolder.removePast(this);
+    debrisHolder.removePast(this);
     fillScreen();
     super.update(dt);
     circuitBackground.update(dt);
@@ -245,6 +265,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     coinHolder.update(dt);
     wireHolder.update(dt);
     bugHolder.update(dt);
+    debrisHolder.update(dt);
     if (shouldReset) {
       reset();
     }
@@ -264,6 +285,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       coinHolder.resize(canvasSize, xRatio, yRatio);
       wireHolder.resize(canvasSize, xRatio, yRatio);
       bugHolder.resize(canvasSize, xRatio, yRatio);
+      debrisHolder.resize(canvasSize, xRatio, yRatio);
       fireworks.resize(canvasSize, xRatio, yRatio);
     }
   }
