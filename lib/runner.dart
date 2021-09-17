@@ -4,6 +4,7 @@ import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 import 'package:flame/components.dart';
 
@@ -119,21 +120,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         sprite.clearEffects();
         runnerState = event;
         sprite.current = RunnerState.fall;
-        sprite.addEffect(MoveEffect(
-          path: [
-            Vector2(sprite.x, (level + 1) * gameRef.blockSize),
-          ],
-          duration: 0.2,
-          curve: Curves.ease,
-          onComplete: () {
-            updateLevel();
-            if (onTopOfPlatform()) {
-              this.event("run");
-            } else {
-              this.event("fall");
-            }
-          },
-        ));
+        sprite.addEffect(getFallingEffect());
         break;
       case "kick":
         runnerState = event;
@@ -205,6 +192,56 @@ class Runner extends Component with HasGameRef<MyGame> {
       default:
         break;
     }
+  }
+
+  MoveEffect getFallingEffect() {
+    for (int i = level; i < 9; i++) {
+      if (i % 3 != 2) {
+        continue;
+      }
+      int distance = (i - 1 - level);
+      double time = 0.2;
+      for (int x = 2; x < distance; x++) {
+        time += time * pow(0.5, x - 1);
+      }
+      double estimatedXCoordinate =
+          time * gameRef.gameState.getVelocity() + sprite.x;
+      for (MovingObject p in gameRef.platformHolder.objects[i]) {
+        if (estimatedXCoordinate >= p.sprite.x - p.sprite.width / 2 &&
+            estimatedXCoordinate <= p.sprite.x + p.sprite.width) {
+          return MoveEffect(
+            path: [
+              Vector2(sprite.x, (i - 1) * gameRef.blockSize),
+            ],
+            duration: time,
+            curve: Curves.ease,
+            onComplete: () {
+              updateLevel();
+              if (onTopOfPlatform()) {
+                event("run");
+              } else {
+                event("fall");
+              }
+            },
+          );
+        }
+      }
+    }
+    return MoveEffect(
+      path: [
+        Vector2(sprite.x, 8 * gameRef.blockSize),
+      ],
+      duration: 0.2 * (8 - level),
+      curve: Curves.ease,
+      onComplete: () {
+        updateLevel();
+        if (onTopOfPlatform()) {
+          event("run");
+        } else {
+          event("fall");
+        }
+      },
+    );
   }
 
   void control(String input) {
