@@ -25,7 +25,8 @@ class BugHolder extends Holder {
     }
   }
 
-  bool generateBug(MyGame gameRef, int level, bool force) {
+  bool generateBug(MyGame gameRef, int level,
+      {bool force = false, double xPosition = 0}) {
     if (objects[level].isNotEmpty) {
       return false;
     }

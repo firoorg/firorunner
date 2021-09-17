@@ -18,7 +18,8 @@ class WireHolder extends Holder {
     return wire;
   }
 
-  bool generateWire(MyGame gameRef, int level, bool force) {
+  bool generateWire(MyGame gameRef, int level,
+      {bool force = false, double xPosition = 0}) {
     if (objects[level].isNotEmpty) {
       return false;
     }

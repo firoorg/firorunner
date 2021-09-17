@@ -18,7 +18,8 @@ class WallHolder extends Holder {
     return wall;
   }
 
-  bool generateWall(MyGame gameRef, int level, bool force) {
+  bool generateWall(MyGame gameRef, int level,
+      {bool force = false, double xPosition = 0}) {
     if (objects[level].isNotEmpty) {
       return false;
     }

@@ -142,27 +142,27 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (wireChosenRegion % 3 != 2 &&
         wireChosenRegion != 6 &&
         wireChosenRegion != 7) {
-      wireHolder.generateWire(this, wireChosenRegion, false);
+      wireHolder.generateWire(this, wireChosenRegion);
     }
 
     int bugChosenRegion = random.nextInt(9);
     if (bugChosenRegion % 3 != 2 && bugChosenRegion % 3 != 0) {
-      bugHolder.generateBug(this, bugChosenRegion, false);
+      bugHolder.generateBug(this, bugChosenRegion);
     }
 
     int debrisChosenRegion = random.nextInt(9);
     if (debrisChosenRegion % 3 == 0 && debrisChosenRegion != 6) {
-      debrisHolder.generateDebris(this, debrisChosenRegion, false);
+      debrisHolder.generateDebris(this, debrisChosenRegion);
     }
 
     int choseCoinLevel = random.nextInt(9);
     if (choseCoinLevel % 3 != 2 && choseCoinLevel != 6) {
-      coinHolder.generateCoin(this, choseCoinLevel, false);
+      coinHolder.generateCoin(this, choseCoinLevel);
     }
 
     int wallChosenRegion = random.nextInt(9);
     if (wallChosenRegion % 3 == 1 && wallChosenRegion != 7) {
-      wallHolder.generateWall(this, wallChosenRegion, false);
+      wallHolder.generateWall(this, wallChosenRegion);
     }
   }
 

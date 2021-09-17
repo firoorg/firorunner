@@ -18,7 +18,8 @@ class DebrisHolder extends Holder {
     return debris;
   }
 
-  bool generateDebris(MyGame gameRef, int level, bool force) {
+  bool generateDebris(MyGame gameRef, int level,
+      {bool force = false, double xPosition = 0}) {
     if (objects[level].isNotEmpty) {
       return false;
     }

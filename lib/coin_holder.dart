@@ -18,16 +18,17 @@ class CoinHolder extends Holder {
     return coin;
   }
 
-  bool generateCoin(MyGame gameRef, int level, bool force) {
-    if (total() > 5) {
+  bool generateCoin(MyGame gameRef, int level,
+      {bool force = false, double xPosition = 0}) {
+    if (total() > 5 && !force) {
       return false;
     }
 
-    if (objects[level].isNotEmpty) {
+    if (objects[level].isNotEmpty && !force) {
       return false;
     }
 
-    if (random.nextInt(100) > 25) {
+    if (random.nextInt(100) > 25 && !force) {
       return true;
     } else {
       int nearestPlatform = getNearestPlatform(level);
@@ -36,7 +37,9 @@ class CoinHolder extends Holder {
           gameRef.platformHolder.getPlatformOffScreen(nearestPlatform);
       double xCoordinate = -100;
 
-      if (level == 0) {
+      if (force) {
+        xCoordinate = xPosition;
+      } else if (level == 0) {
         xCoordinate = gameRef.size.x;
       } else if (platform != null) {
         xCoordinate = platform.sprite.x;
@@ -47,7 +50,7 @@ class CoinHolder extends Holder {
       Coin coin = Coin(gameRef);
       coin.setPosition(xCoordinate, gameRef.blockSize * level);
 
-      if (gameRef.isTooNearOtherObstacles(coin.sprite.toRect())) {
+      if (gameRef.isTooNearOtherObstacles(coin.sprite.toRect()) && !force) {
         return false;
       }
 

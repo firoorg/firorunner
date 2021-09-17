@@ -395,6 +395,8 @@ class Runner extends Component with HasGameRef<MyGame> {
           }
         } else if (intersectState == "left" && runnerState == "kick") {
           bugLevel[i].sprite.current = BugState.breaking;
+          gameRef.coinHolder.generateCoin(gameRef, level,
+              force: true, xPosition: bugLevel[i].sprite.x + gameRef.blockSize);
         } else {
           event("glitch");
           return;
