@@ -93,7 +93,8 @@ class Firework extends Component {
   }
 
   void reset() {
-    message = gameRef.gameState.numCoins.toString();
+    // message = gameRef.gameState.numCoins.toString();
+    message = "Speed Up!";
     sprite1.animation!.reset();
     sprite2.animation!.reset();
   }
