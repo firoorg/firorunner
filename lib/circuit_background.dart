@@ -74,7 +74,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation secondOverlay = SpriteAnimation.fromFrameData(
@@ -82,7 +82,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation thirdOverlay = SpriteAnimation.fromFrameData(
@@ -90,7 +90,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation fourthOverlay = SpriteAnimation.fromFrameData(
@@ -98,7 +98,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation fifthOverlay = SpriteAnimation.fromFrameData(
@@ -106,7 +106,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation sixthOverlay = SpriteAnimation.fromFrameData(
@@ -114,7 +114,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation seventhOverlay = SpriteAnimation.fromFrameData(
@@ -122,7 +122,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     overlayA = SpriteAnimationGroupComponent(
@@ -168,7 +168,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation secondWindow = SpriteAnimation.fromFrameData(
@@ -176,7 +176,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation thirdWindow = SpriteAnimation.fromFrameData(
@@ -184,7 +184,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation fourthWindow = SpriteAnimation.fromFrameData(
@@ -192,7 +192,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation fifthWindow = SpriteAnimation.fromFrameData(
@@ -200,7 +200,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation sixthWindow = SpriteAnimation.fromFrameData(
@@ -208,7 +208,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     SpriteAnimation seventhWindow = SpriteAnimation.fromFrameData(
@@ -216,7 +216,7 @@ class CircuitBackground extends MovingObject {
         SpriteAnimationData.sequenced(
             amount: 1,
             stepTime: 1,
-            textureSize: Vector2(3840, 1280),
+            textureSize: Vector2(2048, 683),
             loop: false));
 
     windowA = SpriteAnimationGroupComponent(
