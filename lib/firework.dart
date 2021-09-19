@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
@@ -11,9 +13,26 @@ class Firework extends Component {
   late SpriteAnimationGroupComponent sprite2;
   Firework(this.gameRef);
   double timeSinceFirework = 0;
+  late Random random;
   String message = "";
+  List<String> messages = [
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+    "Speed Up!",
+  ];
 
   Future load() async {
+    random = Random();
     Image firework = await Flame.images.load("fireworks-frames.png");
 
     SpriteAnimation normal = SpriteAnimation.fromFrameData(
@@ -93,8 +112,7 @@ class Firework extends Component {
   }
 
   void reset() {
-    // message = gameRef.gameState.numCoins.toString();
-    message = "Speed Up!";
+    message = messages.elementAt(random.nextInt(messages.length));
     sprite1.animation!.reset();
     sprite2.animation!.reset();
   }
