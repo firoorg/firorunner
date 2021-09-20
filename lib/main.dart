@@ -24,6 +24,8 @@ import 'package:flutter/services.dart';
 import 'package:firo_runner/runner.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+import 'package:firo_runner/lose_menu_overlay.dart';
+
 const COLOR = Color(0xFFDDC0A3);
 
 const LEVEL2 = 10000000;
@@ -33,6 +35,7 @@ const LEVEL5 = 40000000;
 const LEVEL6 = 50000000;
 const LEVEL7 = 60000000;
 
+const OVERLAY_PRIORITY = 110;
 const RUNNER_PRIORITY = 100;
 const BUG_PRIORITY = 75;
 const COIN_PRIORITY = 70;
@@ -43,12 +46,24 @@ const WIRE_PRIORITY = 25;
 const FIREWORK_PRIORITY = 15;
 const WINDOW_PRIORITY = 10;
 
+const overlayText = TextStyle(
+  fontSize: 30,
+  color: Colors.white,
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   final myGame = MyGame();
-  runApp(GameWidget(game: myGame));
+  runApp(GameWidget<MyGame>(
+    game: myGame,
+    overlayBuilderMap: {
+      'gameOver': (_, myGame) {
+        return LoseMenuOverlay(game: myGame);
+      },
+    },
+  ));
 }
 
 int getNearestPlatform(int level) {
@@ -67,6 +82,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
         fontSize: 48.0, fontFamily: 'Codystar', color: COLOR),
   );
 
+  TextPaint scoresPaint = TextPaint(
+    config: const TextPaintConfig(fontSize: 16.0, color: COLOR),
+  );
+
   late CircuitBackground circuitBackground;
   late PlatformHolder platformHolder;
   late CoinHolder coinHolder;
@@ -83,14 +102,14 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late double blockSize;
 
   bool loaded = false;
+  bool firstDeath = true;
   late Wire wire;
+  late TextComponent _distance;
+  late TextComponent _coins;
 
   MyGame() : super() {
     viewport.resize(Vector2(1920, 1080));
   }
-
-  // @override
-  // flame.Viewport viewport = FixedResolutionViewport(Vector2(1920, 1080));
 
   @override
   Future<void> onLoad() async {
@@ -123,6 +142,14 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       playMusic();
     }
     loaded = true;
+    _distance = TextComponent("Distance: 0",
+        position: Vector2(size.x - 100, 10), textRenderer: scoresPaint)
+      ..anchor = Anchor.topRight;
+    _distance.changePriorityWithoutResorting(OVERLAY_PRIORITY);
+    _coins = TextComponent("Coins: 0",
+        position: Vector2(size.x - 10, 10), textRenderer: scoresPaint)
+      ..anchor = Anchor.topRight;
+    _coins.changePriorityWithoutResorting(OVERLAY_PRIORITY);
     setUp();
   }
 
@@ -217,12 +244,19 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   bool shouldReset = false;
 
-  void reset() {
+  void displayLoss() {
     if (!(runner.sprite.animation?.done() ?? false) &&
-        runner.sprite.animation!.loop == false) {
+        runner.sprite.animation!.loop == false &&
+        firstDeath) {
       return;
     }
+    firstDeath = false;
+    overlays.add('gameOver');
+  }
+
+  void reset() {
     runner.sprite.animation!.reset();
+    overlays.remove('gameOver');
     shouldReset = false;
     components.clear();
     setUp();
@@ -249,6 +283,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     gameState.setUp(this);
 
     runner.setUp();
+    add(_coins);
+    add(_distance);
 
     fillScreen();
     platformHolder.objects[2][0].sprite.current = PlatformState.left;
@@ -287,8 +323,11 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     bugHolder.update(dt);
     debrisHolder.update(dt);
     wallHolder.update(dt);
-    if (shouldReset) {
-      reset();
+
+    _distance.text = "Distance: ${gameState.getPlayerDistance()}";
+    _coins.text = "Coins: ${gameState.numCoins}";
+    if (shouldReset && !overlays.isActive('gameOver')) {
+      displayLoss();
     }
   }
 

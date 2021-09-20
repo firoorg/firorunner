@@ -91,6 +91,14 @@ class GameState extends Component {
     return distance ~/ 10 + numCoins * 1000000;
   }
 
+  int getPlayerScore() {
+    return getScore() ~/ 10000;
+  }
+
+  int getPlayerDistance() {
+    return distance ~/ 1000000;
+  }
+
   double getVelocity() {
     if (!isPaused) {
       switch (getLevel()) {

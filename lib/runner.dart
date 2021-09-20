@@ -164,7 +164,13 @@ class Runner extends Component with HasGameRef<MyGame> {
           return;
         }
         sprite.clearEffects();
-        updateLevel();
+        level = 11;
+        sprite.addEffect(MoveEffect(
+          path: [Vector2(sprite.position.x, gameRef.blockSize * 11)],
+          duration: 2,
+          curve: Curves.bounceOut,
+          onComplete: () {},
+        ));
         runnerState = event;
         sprite.current = RunnerState.die;
         gameRef.die();
@@ -174,7 +180,13 @@ class Runner extends Component with HasGameRef<MyGame> {
           return;
         }
         sprite.clearEffects();
-        updateLevel();
+        level = 11;
+        sprite.addEffect(MoveEffect(
+          path: [Vector2(sprite.position.x, gameRef.blockSize * 11)],
+          duration: 1,
+          curve: Curves.bounceOut,
+          onComplete: () {},
+        ));
         runnerState = event;
         sprite.current = RunnerState.electrocute;
         gameRef.die();
@@ -184,7 +196,13 @@ class Runner extends Component with HasGameRef<MyGame> {
           return;
         }
         sprite.clearEffects();
-        updateLevel();
+        level = 11;
+        sprite.addEffect(MoveEffect(
+          path: [Vector2(sprite.position.x, gameRef.blockSize * 11)],
+          duration: 1,
+          curve: Curves.bounceOut,
+          onComplete: () {},
+        ));
         runnerState = event;
         sprite.current = RunnerState.glitch;
         gameRef.die();
