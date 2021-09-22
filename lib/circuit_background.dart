@@ -377,17 +377,18 @@ class CircuitBackground extends MovingObject {
 
   @override
   void resize(Vector2 newSize, double xRatio, double yRatio) {
-    background1Size =
-        Vector2(newSize.y * (background.width / background.height), newSize.y);
+    background1Position.x *= xRatio;
+    background1Position.y *= yRatio;
+    background1Size.x *= xRatio;
+    background1Size.y *= yRatio;
+    background2Position.x *= xRatio;
+    background2Position.y *= yRatio;
+    background2Size.x *= xRatio;
+    background2Size.y *= yRatio;
     windowA.position = background1Position;
     windowA.size = background1Size;
     overlayA.position = background1Position;
     overlayA.size = background1Size;
-
-    background2Position =
-        Vector2(background1Position.x + background1Size.x - 1, 0);
-    background2Size =
-        Vector2(newSize.y * (background.width / background.height), newSize.y);
     windowB.position = background2Position;
     windowB.size = background2Size;
     overlayB.position = background2Position;
