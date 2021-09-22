@@ -14,6 +14,8 @@ class PlatformHolder extends Holder {
   late Image r2;
   late Image o1;
   late Image o2;
+  bool noTopObstaclesForNext = false;
+  bool noMiddleObstaclesForNext = false;
   int timeSinceLastTopHole = 0;
   int timeSinceLastBottomHole = 0;
 
@@ -91,6 +93,7 @@ class PlatformHolder extends Holder {
       remove(objects[2], objects[2].length - 2);
 
       timeSinceLastTopHole = 0;
+      noTopObstaclesForNext = true;
     }
     if (bottomChance > 30) {
       Platform start = objects[5].elementAt(objects[5].length - 10) as Platform;
@@ -112,6 +115,7 @@ class PlatformHolder extends Holder {
       remove(objects[5], firstToRemove);
 
       timeSinceLastBottomHole = 0;
+      noMiddleObstaclesForNext = true;
     }
   }
 
@@ -129,6 +133,13 @@ class PlatformHolder extends Holder {
       platform.row = level;
       gameRef.add(platform.sprite);
       objects[level].add(platform);
+      if (level == 2 && noTopObstaclesForNext) {
+        platform.prohibitObstacles = true;
+        noTopObstaclesForNext = false;
+      } else if (level == 5 && noMiddleObstaclesForNext) {
+        platform.prohibitObstacles = true;
+        noMiddleObstaclesForNext = false;
+      }
       return false;
     }
   }

@@ -46,7 +46,10 @@ class LoseMenuOverlay extends StatelessWidget {
                     ),
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Text("Main Menu"),
+                      child: Text(
+                        " Main Menu ",
+                        style: overlayText,
+                      ),
                     ),
                   ),
                   // ),
@@ -70,7 +73,10 @@ class LoseMenuOverlay extends StatelessWidget {
                     ),
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Text("Replay"),
+                      child: Text(
+                        " Replay ",
+                        style: overlayText,
+                      ),
                     ),
                   ),
                   // ),

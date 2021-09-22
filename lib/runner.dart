@@ -72,9 +72,9 @@ class Runner extends Component with HasGameRef<MyGame> {
     if (gameRef.gameState.isPaused) {
       return;
     }
-    previousState = runnerState;
     switch (event) {
       case "jump":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.jump;
         sprite.addEffect(MoveEffect(
@@ -94,6 +94,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (belowPlatform()) {
           break;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         if (level - 1 < 0) {
           break;
@@ -117,20 +118,24 @@ class Runner extends Component with HasGameRef<MyGame> {
         ));
         break;
       case "fall":
+        previousState = runnerState;
         sprite.clearEffects();
         runnerState = event;
         sprite.current = RunnerState.fall;
         sprite.addEffect(getFallingEffect());
         break;
       case "kick":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.kick;
         break;
       case "run":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.run;
         break;
       case "float":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.float;
         sprite.addEffect(MoveEffect(
@@ -148,6 +153,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         ));
         break;
       case "duck":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.duck;
         sprite.addEffect(MoveEffect(
@@ -163,6 +169,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         level = 11;
         sprite.addEffect(MoveEffect(
@@ -179,6 +186,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         level = 11;
         sprite.addEffect(MoveEffect(
@@ -195,6 +203,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         level = 11;
         sprite.addEffect(MoveEffect(
@@ -324,6 +333,14 @@ class Runner extends Component with HasGameRef<MyGame> {
       sprite.current = RunnerState.run;
     }
 
+    if (runnerState == "float" || runnerState == "double_jump") {
+      if (onTopOfPlatform()) {
+        updateLevel();
+        sprite.clearEffects();
+        event("run");
+      }
+    }
+
     intersecting();
     sprite.update(dt);
   }
@@ -347,7 +364,11 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   bool belowPlatform() {
-    Rect runnerRect = sprite.toRect();
+    Rect runnerRect = Rect.fromLTRB(
+        sprite.toRect().left,
+        sprite.toRect().top,
+        sprite.toRect().right - sprite.toRect().width / 2,
+        sprite.toRect().bottom);
     bool belowPlatform = false;
     for (List<MovingObject> platformLevel in gameRef.platformHolder.objects) {
       for (MovingObject p in platformLevel) {
