@@ -1,12 +1,14 @@
+import 'package:flame/extensions.dart';
 import 'package:firo_runner/bug.dart';
 import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
-import 'package:flame/extensions.dart';
-import 'package:flutter/material.dart';
+import 'package:flame/flame.dart';
+// import 'package:flutter/material.dart';
 import 'dart:math';
-
 import 'package:flame/components.dart';
+import 'package:flame/image_composition.dart';
+import 'package:flutter/animation.dart';
 
 enum RunnerState {
   run,
@@ -61,7 +63,11 @@ class Runner extends Component with HasGameRef<MyGame> {
   @override
   void render(Canvas c) {
     super.render(c);
-    getSprite().render(c, position: sprite.position, size: sprite.size);
+    // getSprite().render(c, position: sprite.position, size: sprite.size);
+    getSprite().render(c,
+        position: Vector2(sprite.position.x - sprite.size.x / 3,
+            sprite.position.y - sprite.size.y / 3),
+        size: sprite.size * 1.6);
   }
 
   void updateLevel() {
@@ -462,52 +468,96 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   Future load(loadSpriteAnimation) async {
-    SpriteAnimation running = await loadSpriteAnimation(
-      'run-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 7,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+    List<Image> satellites = [];
+    for (int i = 1; i <= 38; i++) {
+      satellites.add(await Flame.images.load(
+          'runner/satellite/satellite00${i < 10 ? "0" + i.toString() : i.toString()}.png'));
+    }
 
-    SpriteAnimation jumping = await loadSpriteAnimation(
-      'jump-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 5,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-        loop: false,
-      ),
-    );
+    List<Sprite> runs = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/run/run00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
 
-    SpriteAnimation ducking = await loadSpriteAnimation(
-      'crawl-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 3,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+      runs.add(Sprite(await composition.compose()));
+    }
 
-    SpriteAnimation kicking = await loadSpriteAnimation(
-      'kick-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 19,
-        stepTime: 0.03,
-        textureSize: Vector2(512, 512),
-        loop: false,
-      ),
-    );
+    SpriteAnimation running =
+        SpriteAnimation.spriteList(runs, stepTime: 0.02, loop: true);
 
-    SpriteAnimation floating = await loadSpriteAnimation(
-      'hover-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 3,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+    List<Sprite> jumps = [];
+    for (int i = 1; i <= 6; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/jump/jump00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      jumps.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation jumping =
+        SpriteAnimation.spriteList(jumps, stepTime: 0.02, loop: false);
+
+    List<Sprite> ducks = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/duck1/duck100${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      ducks.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation ducking =
+        SpriteAnimation.spriteList(ducks, stepTime: 0.02, loop: true);
+
+    List<Sprite> kicks = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/attack1/attack100${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      kicks.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation kicking =
+        SpriteAnimation.spriteList(kicks, stepTime: 0.02, loop: false);
+
+    List<Sprite> floats = [];
+    for (int i = 1; i <= 44; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(((i - 1) % 38)), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/hover1/hover100${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      floats.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation floating =
+        SpriteAnimation.spriteList(floats, stepTime: 0.02, loop: true);
+
+    // TODO Falling animations
+    // List<Sprite> falls = [];
+    // for (int i = 1; i <= 38; i++) {
+    //   falls.add(Sprite(await Flame.images.load(
+    //       'runner/run/run00${i < 10 ? "0" + i.toString() : i.toString()}.png')));
+    // }
+    //
+    // SpriteAnimation falling =
+    //     SpriteAnimation.spriteList(falls, stepTime: 0.02, loop: true);
 
     SpriteAnimation falling = await loadSpriteAnimation(
       'fall-frames.png',
@@ -518,35 +568,23 @@ class Runner extends Component with HasGameRef<MyGame> {
       ),
     );
 
-    SpriteAnimation dying = await loadSpriteAnimation(
-      'death-normal-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 20,
-        stepTime: 0.05,
-        textureSize: Vector2(512, 512),
-        loop: false,
-      ),
-    );
+    List<Sprite> dies = [];
+    for (int i = 1; i <= 57; i++) {
+      dies.add(Sprite(await Flame.images.load(
+          'runner/death/death200${i < 10 ? "0" + i.toString() : i.toString()}.png')));
+    }
 
-    SpriteAnimation dyingElectrocuted = await loadSpriteAnimation(
-      'electrocuted-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 2,
-        stepTime: 0.25,
-        textureSize: Vector2(512, 512),
-        loop: false,
-      ),
-    );
+    SpriteAnimation dying =
+        SpriteAnimation.spriteList(dies, stepTime: 0.02, loop: false);
 
-    SpriteAnimation dyingGlitch = await loadSpriteAnimation(
-      'death-glitched-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 8,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-        loop: false,
-      ),
-    );
+    List<Sprite> dyingGlitches = [];
+    for (int i = 1; i <= 81; i++) {
+      dyingGlitches.add(Sprite(await Flame.images.load(
+          'runner/deathglitch/death100${i < 10 ? "0" + i.toString() : i.toString()}.png')));
+    }
+
+    SpriteAnimation dyingGlitch =
+        SpriteAnimation.spriteList(dyingGlitches, stepTime: 0.02, loop: false);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -557,7 +595,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         RunnerState.float: floating,
         RunnerState.fall: falling,
         RunnerState.die: dying,
-        RunnerState.electrocute: dyingElectrocuted,
+        RunnerState.electrocute: dying,
         RunnerState.glitch: dyingGlitch,
       },
       current: RunnerState.run,

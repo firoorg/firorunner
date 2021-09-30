@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firo_runner/bug_holder.dart';
@@ -23,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firo_runner/runner.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
 
 import 'package:firo_runner/lose_menu_overlay.dart';
 
@@ -244,12 +248,64 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   bool shouldReset = false;
 
-  void displayLoss() {
+  late Socket socket;
+  void dataHandler(data) {
+    print(new String.fromCharCodes(data).trim());
+  }
+
+  void errorHandler(error, StackTrace trace) {
+    print(error);
+  }
+
+  void doneHandler() {
+    socket.destroy();
+  }
+
+  Future<void> connectServer() async {
+    try {
+      Socket.connect('10.0.0.224', 50018).then((Socket sock) {
+        socket = sock;
+        socket.listen(dataHandler,
+            onError: errorHandler, onDone: doneHandler, cancelOnError: false);
+      });
+    } catch (e) {
+      print(e);
+    }
+    // try {
+    //   final response = await http.post(
+    //     Uri.parse('http://10.0.0.224:50017'),
+    //     headers: <String, String>{
+    //       'Content-Type': 'application/json; charset=UTF-8',
+    //     },
+    //     body: jsonEncode(<String, String>{
+    //       'title': "hi",
+    //     }),
+    //   );
+    //   if (response.statusCode == 201) {
+    //     // If the server did return a 201 CREATED response,
+    //     // then parse the JSON.
+    //     print("hello");
+    //     print(response);
+    //     print(response.body);
+    //   } else {
+    //     // If the server did not return a 201 CREATED response,
+    //     // then throw an exception.
+    //     throw Exception('Failed to create album.');
+    //   }
+    //   // var value = await channel.stream.first;
+    //   // print(value);
+    // } catch (e) {
+    //   print(e);
+    // }
+  }
+
+  Future<void> displayLoss() async {
     if (!(runner.sprite.animation?.done() ?? false) &&
         runner.sprite.animation!.loop == false &&
         firstDeath) {
       return;
     }
+    await connectServer();
     firstDeath = false;
     overlays.add('gameOver');
   }
