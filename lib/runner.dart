@@ -4,8 +4,8 @@ import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/flame.dart';
-// import 'package:flutter/material.dart';
 import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/animation.dart';
@@ -78,9 +78,9 @@ class Runner extends Component with HasGameRef<MyGame> {
     if (gameRef.gameState.isPaused) {
       return;
     }
-    previousState = runnerState;
     switch (event) {
       case "jump":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.jump;
         sprite.addEffect(MoveEffect(
@@ -100,6 +100,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (belowPlatform()) {
           break;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         if (level - 1 < 0) {
           break;
@@ -123,20 +124,24 @@ class Runner extends Component with HasGameRef<MyGame> {
         ));
         break;
       case "fall":
+        previousState = runnerState;
         sprite.clearEffects();
         runnerState = event;
         sprite.current = RunnerState.fall;
         sprite.addEffect(getFallingEffect());
         break;
       case "kick":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.kick;
         break;
       case "run":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.run;
         break;
       case "float":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.float;
         sprite.addEffect(MoveEffect(
@@ -154,6 +159,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         ));
         break;
       case "duck":
+        previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.duck;
         sprite.addEffect(MoveEffect(
@@ -169,6 +175,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         level = 11;
         sprite.addEffect(MoveEffect(
@@ -185,6 +192,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         level = 11;
         sprite.addEffect(MoveEffect(
@@ -201,6 +209,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        previousState = runnerState;
         sprite.clearEffects();
         level = 11;
         sprite.addEffect(MoveEffect(
@@ -330,6 +339,14 @@ class Runner extends Component with HasGameRef<MyGame> {
       sprite.current = RunnerState.run;
     }
 
+    if (runnerState == "float" || runnerState == "double_jump") {
+      if (onTopOfPlatform()) {
+        updateLevel();
+        sprite.clearEffects();
+        event("run");
+      }
+    }
+
     intersecting();
     sprite.update(dt);
   }
@@ -353,7 +370,11 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   bool belowPlatform() {
-    Rect runnerRect = sprite.toRect();
+    Rect runnerRect = Rect.fromLTRB(
+        sprite.toRect().left,
+        sprite.toRect().top,
+        sprite.toRect().right - sprite.toRect().width / 2,
+        sprite.toRect().bottom);
     bool belowPlatform = false;
     for (List<MovingObject> platformLevel in gameRef.platformHolder.objects) {
       for (MovingObject p in platformLevel) {
@@ -443,14 +464,14 @@ class Runner extends Component with HasGameRef<MyGame> {
       }
     }
 
-    for (List<MovingObject> debrisLevel in gameRef.wallHolder.objects) {
-      for (int i = 0; i < debrisLevel.length; i++) {
+    for (List<MovingObject> wallLevel in gameRef.wallHolder.objects) {
+      for (int i = 0; i < wallLevel.length; i++) {
         Rect slim = Rect.fromLTRB(
             runnerRect.left + sprite.width / 3,
             runnerRect.top + sprite.height / (runnerState == "duck" ? 3 : 6),
             runnerRect.right - sprite.width / 3,
             runnerRect.bottom - sprite.height / 3);
-        String intersectState = debrisLevel[i].intersect(slim);
+        String intersectState = wallLevel[i].intersect(slim);
         if (intersectState == "none") {
           continue;
         } else {

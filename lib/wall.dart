@@ -31,7 +31,7 @@ class Wall extends MovingObject {
       gameRef.blockSize *
           (gameRef.wallHolder.wall.width / gameRef.wallHolder.wall.height / 5) *
           2.0,
-      gameRef.blockSize * 0.5,
+      gameRef.blockSize * 0.35,
     );
   }
 

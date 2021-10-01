@@ -64,7 +64,7 @@ class Platform extends MovingObject {
         PlatformState.right: right,
         PlatformState.single: single,
       },
-      current: PlatformState.single,
+      current: PlatformState.mid,
     );
 
     sprite.changePriorityWithoutResorting(PLATFORM_PRIORITY);
@@ -112,14 +112,19 @@ class Platform extends MovingObject {
     bool hasLeft = (left.x - sprite.position.x).abs() < 1.9 * sprite.size.x;
     bool hasRight = (sprite.position.x - right.x).abs() < 1.9 * sprite.size.x;
 
-    if (hasLeft && hasRight) {
-      sprite.current = PlatformState.mid;
-    } else if (hasLeft && !hasRight) {
-      sprite.current = PlatformState.right;
-    } else if (!hasLeft && hasRight) {
-      sprite.current = PlatformState.left;
-    } else {
-      sprite.current = PlatformState.single;
+    // If the platform cannot be seen by the player.
+    if (!((sprite.x >= 0 && sprite.x <= gameRef.size.x) ||
+        (sprite.x + sprite.width >= 0 &&
+            sprite.x + sprite.width <= gameRef.size.x))) {
+      if (hasLeft && hasRight) {
+        sprite.current = PlatformState.mid;
+      } else if (hasLeft && !hasRight) {
+        sprite.current = PlatformState.right;
+      } else if (!hasLeft && hasRight) {
+        sprite.current = PlatformState.left;
+      } else {
+        sprite.current = PlatformState.single;
+      }
     }
   }
 }
