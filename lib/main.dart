@@ -29,8 +29,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 import 'package:firo_runner/lose_menu_overlay.dart';
+import 'package:firo_runner/main_menu_overlay.dart';
 
 const COLOR = Color(0xFFDDC0A3);
+const int LOADING_TIME = 2000000;
 
 const LEVEL2 = 10000000;
 const LEVEL3 = 20000000;
@@ -50,24 +52,47 @@ const WIRE_PRIORITY = 25;
 const FIREWORK_PRIORITY = 15;
 const WINDOW_PRIORITY = 10;
 
-const overlayText = TextStyle(
-  fontSize: 30,
-  color: Colors.white,
-);
+// const overlayText = TextStyle(
+//   fontSize: 30,
+//   color: Colors.white,
+// );
+
+const AssetImage mainMenuImage = AssetImage('assets/images/mm3.gif');
+const AssetImage lossImage = AssetImage('assets/images/overlay100.png');
+const AssetImage buttonImage = AssetImage('assets/images/button-new.png');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   final myGame = MyGame();
-  runApp(GameWidget<MyGame>(
-    game: myGame,
-    overlayBuilderMap: {
-      'gameOver': (_, myGame) {
-        return LoseMenuOverlay(game: myGame);
-      },
-    },
-  ));
+  runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: GameWidget<MyGame>(
+        game: myGame,
+        overlayBuilderMap: {
+          // Should be used once before all overlays are called. Flame has a slight
+          // delay when constructing the overlay widgets, so to make the text and
+          // images load together, all the other overlays should be called in the
+          // load section, and removed, and the loading black screen should be kept
+          // up until everything is finished loading.
+          'loading': (_, myGame) {
+            return Center(
+              child: Container(
+                height: myGame.viewport.canvasSize.y,
+                width: myGame.viewport.canvasSize.x,
+                color: Colors.black,
+              ),
+            );
+          },
+          'mainMenu': (_, myGame) {
+            return MainMenuOverlay(game: myGame);
+          },
+          'gameOver': (_, myGame) {
+            return LoseMenuOverlay(game: myGame);
+          },
+        },
+      )));
 }
 
 int getNearestPlatform(int level) {
@@ -110,6 +135,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late Wire wire;
   late TextComponent _distance;
   late TextComponent _coins;
+  int startLoading = 0;
 
   MyGame() : super() {
     viewport.resize(Vector2(1920, 1080));
@@ -125,6 +151,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     platformHolder = PlatformHolder();
     await platformHolder.load();
     coinHolder = CoinHolder();
+    coinHolder.setPersonalGameRef(this);
     await coinHolder.load();
     wireHolder = WireHolder();
     await wireHolder.load();
@@ -142,19 +169,22 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner = Runner();
     await runner.load(loadSpriteAnimation);
 
-    if (!kIsWeb) {
-      playMusic();
-    }
     loaded = true;
     _distance = TextComponent("Distance: 0",
         position: Vector2(size.x - 100, 10), textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _distance.changePriorityWithoutResorting(OVERLAY_PRIORITY);
-    _coins = TextComponent("Coins: 0",
-        position: Vector2(size.x - 10, 10), textRenderer: scoresPaint)
+    _coins = TextComponent(": 0",
+        position: Vector2(size.x - 35, 10), textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _coins.changePriorityWithoutResorting(OVERLAY_PRIORITY);
+    overlays.add("gameOver");
+    overlays.remove('gameOver');
+    overlays.add("mainMenu");
+    overlays.add('loading');
     setUp();
+    gameState.setPaused();
+    startLoading = DateTime.now().microsecondsSinceEpoch;
   }
 
   void playMusic() {
@@ -248,56 +278,56 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   bool shouldReset = false;
 
-  late Socket socket;
-  void dataHandler(data) {
-    print(new String.fromCharCodes(data).trim());
-  }
+  // late Socket socket;
+  // void dataHandler(data) {
+  //   print(new String.fromCharCodes(data).trim());
+  // }
+  //
+  // void errorHandler(error, StackTrace trace) {
+  //   print(error);
+  // }
+  //
+  // void doneHandler() {
+  //   socket.destroy();
+  // }
 
-  void errorHandler(error, StackTrace trace) {
-    print(error);
-  }
-
-  void doneHandler() {
-    socket.destroy();
-  }
-
-  Future<void> connectServer() async {
-    try {
-      Socket.connect('10.0.0.224', 50018).then((Socket sock) {
-        socket = sock;
-        socket.listen(dataHandler,
-            onError: errorHandler, onDone: doneHandler, cancelOnError: false);
-      });
-    } catch (e) {
-      print(e);
-    }
-    // try {
-    //   final response = await http.post(
-    //     Uri.parse('http://10.0.0.224:50017'),
-    //     headers: <String, String>{
-    //       'Content-Type': 'application/json; charset=UTF-8',
-    //     },
-    //     body: jsonEncode(<String, String>{
-    //       'title': "hi",
-    //     }),
-    //   );
-    //   if (response.statusCode == 201) {
-    //     // If the server did return a 201 CREATED response,
-    //     // then parse the JSON.
-    //     print("hello");
-    //     print(response);
-    //     print(response.body);
-    //   } else {
-    //     // If the server did not return a 201 CREATED response,
-    //     // then throw an exception.
-    //     throw Exception('Failed to create album.');
-    //   }
-    //   // var value = await channel.stream.first;
-    //   // print(value);
-    // } catch (e) {
-    //   print(e);
-    // }
-  }
+  // Future<void> connectServer() async {
+  //   try {
+  //     Socket.connect('10.0.0.224', 50018).then((Socket sock) {
+  //       socket = sock;
+  //       socket.listen(dataHandler,
+  //           onError: errorHandler, onDone: doneHandler, cancelOnError: false);
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  //   // try {
+  //   //   final response = await http.post(
+  //   //     Uri.parse('http://10.0.0.224:50017'),
+  //   //     headers: <String, String>{
+  //   //       'Content-Type': 'application/json; charset=UTF-8',
+  //   //     },
+  //   //     body: jsonEncode(<String, String>{
+  //   //       'title': "hi",
+  //   //     }),
+  //   //   );
+  //   //   if (response.statusCode == 201) {
+  //   //     // If the server did return a 201 CREATED response,
+  //   //     // then parse the JSON.
+  //   //     print("hello");
+  //   //     print(response);
+  //   //     print(response.body);
+  //   //   } else {
+  //   //     // If the server did not return a 201 CREATED response,
+  //   //     // then throw an exception.
+  //   //     throw Exception('Failed to create album.');
+  //   //   }
+  //   //   // var value = await channel.stream.first;
+  //   //   // print(value);
+  //   // } catch (e) {
+  //   //   print(e);
+  //   // }
+  // }
 
   Future<void> displayLoss() async {
     if (!(runner.sprite.animation?.done() ?? false) &&
@@ -305,14 +335,20 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
         firstDeath) {
       return;
     }
-    await connectServer();
+    // await connectServer();
     firstDeath = false;
     overlays.add('gameOver');
+  }
+
+  void mainMenu() {
+    overlays.remove('gameOver');
+    overlays.add('mainMenu');
   }
 
   void reset() {
     runner.sprite.animation!.reset();
     overlays.remove('gameOver');
+    overlays.remove('mainMenu');
     shouldReset = false;
     components.clear();
     setUp();
@@ -349,19 +385,29 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   void render(Canvas canvas) {
-    circuitBackground.render(canvas);
-    fireworks.renderText(canvas);
-    super.render(canvas);
-    final fpsCount = fps(10000);
-    fireworksPaint.render(
-      canvas,
-      fpsCount.toString(),
-      Vector2(0, 0),
-    );
+    if (!overlays.isActive('mainMenu')) {
+      circuitBackground.render(canvas);
+      fireworks.renderText(canvas);
+      super.render(canvas);
+      final fpsCount = fps(10000);
+      fireworksPaint.render(
+        canvas,
+        fpsCount.toString(),
+        Vector2(0, 0),
+      );
+      coinHolder.renderCoinScore(canvas);
+    }
   }
 
   @override
   void update(double dt) {
+    if (overlays.isActive('loading') &&
+        (DateTime.now().microsecondsSinceEpoch - startLoading) > LOADING_TIME) {
+      overlays.remove('loading');
+      if (!kIsWeb) {
+        playMusic();
+      }
+    }
     fireworks.update(dt);
     platformHolder.removePast(this);
     coinHolder.removePast(this);
@@ -381,8 +427,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     wallHolder.update(dt);
 
     _distance.text = "Distance: ${gameState.getPlayerDistance()}";
-    _coins.text = "Coins: ${gameState.numCoins}";
-    if (shouldReset && !overlays.isActive('gameOver')) {
+    _coins.text = " ${gameState.numCoins}";
+    if (shouldReset &&
+        !overlays.isActive('gameOver') &&
+        !overlays.isActive('mainMenu')) {
       displayLoss();
     }
   }

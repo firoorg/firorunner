@@ -177,16 +177,11 @@ class Runner extends Component with HasGameRef<MyGame> {
         }
         previousState = runnerState;
         sprite.clearEffects();
-        level = 11;
-        sprite.addEffect(MoveEffect(
-          path: [Vector2(sprite.position.x, gameRef.blockSize * 11)],
-          duration: 2,
-          curve: Curves.bounceOut,
-          onComplete: () {},
-        ));
         runnerState = event;
         sprite.current = RunnerState.die;
+        dead = true;
         gameRef.die();
+        sprite.addEffect(getFallingEffect());
         break;
       case "electrocute":
         if (dead) {
@@ -194,16 +189,11 @@ class Runner extends Component with HasGameRef<MyGame> {
         }
         previousState = runnerState;
         sprite.clearEffects();
-        level = 11;
-        sprite.addEffect(MoveEffect(
-          path: [Vector2(sprite.position.x, gameRef.blockSize * 11)],
-          duration: 1,
-          curve: Curves.bounceOut,
-          onComplete: () {},
-        ));
         runnerState = event;
         sprite.current = RunnerState.electrocute;
+        dead = true;
         gameRef.die();
+        sprite.addEffect(getFallingEffect());
         break;
       case "glitch":
         if (dead) {
@@ -211,15 +201,9 @@ class Runner extends Component with HasGameRef<MyGame> {
         }
         previousState = runnerState;
         sprite.clearEffects();
-        level = 11;
-        sprite.addEffect(MoveEffect(
-          path: [Vector2(sprite.position.x, gameRef.blockSize * 11)],
-          duration: 1,
-          curve: Curves.bounceOut,
-          onComplete: () {},
-        ));
         runnerState = event;
         sprite.current = RunnerState.glitch;
+        dead = true;
         gameRef.die();
         break;
       default:
@@ -283,7 +267,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     }
     switch (input) {
       case "up":
-        if (runnerState == "run") {
+        if (runnerState == "run" || runnerState == "kick") {
           event("jump");
         } else if (runnerState == "float" && previousState == "jump") {
           event("double_jump");
@@ -293,7 +277,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         }
         break;
       case "down":
-        if (runnerState == "run") {
+        if (runnerState == "run" || runnerState == "kick") {
           event("duck");
         } else if (runnerState == "float" && onTopOfPlatform()) {
           sprite.clearEffects();
@@ -304,7 +288,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         }
         break;
       case "right":
-        if (runnerState == "run") {
+        if (runnerState == "run" || runnerState == "kick") {
           event("kick");
         }
         break;
@@ -332,11 +316,13 @@ class Runner extends Component with HasGameRef<MyGame> {
     }
     // If the animation is finished
     if (sprite.animation?.done() ?? false) {
-      sprite.animation!.reset();
-      if (runnerState == "kick") {
-        event("run");
+      if (!dead) {
+        sprite.animation!.reset();
+        if (runnerState == "kick") {
+          event("run");
+        }
+        sprite.current = RunnerState.run;
       }
-      sprite.current = RunnerState.run;
     }
 
     if (runnerState == "float" || runnerState == "double_jump") {
@@ -425,8 +411,11 @@ class Runner extends Component with HasGameRef<MyGame> {
           continue;
         }
         if (intersectState == "none") {
-          Rect above = Rect.fromLTRB(runnerRect.left, runnerRect.top - 1,
-              runnerRect.right, runnerRect.bottom);
+          Rect above = Rect.fromLTRB(
+              runnerRect.left + sprite.width / 3,
+              runnerRect.top - 1,
+              runnerRect.right - sprite.width / 3,
+              runnerRect.bottom);
           String aboveIntersect = bugLevel[i].intersect(above);
           if (aboveIntersect != "none" &&
               (runnerState == "duck" || runnerState == "float")) {
@@ -570,24 +559,29 @@ class Runner extends Component with HasGameRef<MyGame> {
     SpriteAnimation floating =
         SpriteAnimation.spriteList(floats, stepTime: 0.02, loop: true);
 
-    // TODO Falling animations
-    // List<Sprite> falls = [];
-    // for (int i = 1; i <= 38; i++) {
-    //   falls.add(Sprite(await Flame.images.load(
-    //       'runner/run/run00${i < 10 ? "0" + i.toString() : i.toString()}.png')));
-    // }
-    //
-    // SpriteAnimation falling =
-    //     SpriteAnimation.spriteList(falls, stepTime: 0.02, loop: true);
+    List<Sprite> falls = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/run/run00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
 
-    SpriteAnimation falling = await loadSpriteAnimation(
-      'fall-frames.png',
-      SpriteAnimationData.sequenced(
-        amount: 7,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+      falls.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation falling =
+        SpriteAnimation.spriteList(falls, stepTime: 0.02, loop: false);
+
+    // SpriteAnimation falling = await loadSpriteAnimation(
+    //   'fall-frames.png',
+    //   SpriteAnimationData.sequenced(
+    //     amount: 7,
+    //     stepTime: 0.1,
+    //     textureSize: Vector2(512, 512),
+    //   ),
+    // );
 
     List<Sprite> dies = [];
     for (int i = 1; i <= 57; i++) {

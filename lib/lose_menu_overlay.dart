@@ -12,22 +12,29 @@ class LoseMenuOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Center(
       child: Container(
         height: game.viewport.canvasSize.y,
         width: game.viewport.canvasSize.x,
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/overlay100.png'),
+            image: lossImage,
             fit: BoxFit.fill,
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Score: ' + game.gameState.getPlayerScore().toString(),
-              style: overlayText,
+            Material(
+              type: MaterialType.transparency,
+              child: Text(
+                'Score: ${game.gameState.getPlayerScore()}',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: width * 0.05,
+                ),
+              ),
             ),
             const SizedBox(height: 32.0),
             Row(
@@ -40,21 +47,24 @@ class LoseMenuOverlay extends StatelessWidget {
                   elevation: 8.0,
                   child: Container(
                     decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/button.png'),
-                          fit: BoxFit.fill),
+                      image:
+                          DecorationImage(image: buttonImage, fit: BoxFit.fill),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        " Main Menu ",
-                        style: overlayText,
+                        "     Main Menu     ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: width * 0.03,
+                        ),
                       ),
                     ),
                   ),
                   // ),
                   onPressed: () {
                     // Go to the Main Menu
+                    game.mainMenu();
                   },
                 ),
                 const SizedBox(
@@ -67,15 +77,17 @@ class LoseMenuOverlay extends StatelessWidget {
                   elevation: 8.0,
                   child: Container(
                     decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/button.png'),
-                          fit: BoxFit.fill),
+                      image:
+                          DecorationImage(image: buttonImage, fit: BoxFit.fill),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        " Replay ",
-                        style: overlayText,
+                        "    Replay    ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: width * 0.03,
+                        ),
                       ),
                     ),
                   ),
