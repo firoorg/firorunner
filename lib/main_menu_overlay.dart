@@ -54,9 +54,9 @@ class MainMenuOverlay extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "      Start      ",
+                        "      START      ",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.cyan,
                           fontSize: width * 0.03,
                         ),
                       ),
@@ -81,9 +81,9 @@ class MainMenuOverlay extends StatelessWidget {
                 //     child: Padding(
                 //       padding: EdgeInsets.all(8.0),
                 //       child: Text(
-                //         "    Deposit    ",
+                //         "    DEPOSIT    ",
                 //         style: TextStyle(
-                //           color: Colors.white,
+                //           color: Colors.cyan,
                 //           fontSize: width * 0.03,
                 //         ),
                 //       ),
@@ -107,9 +107,9 @@ class MainMenuOverlay extends StatelessWidget {
                 //     child: Padding(
                 //       padding: EdgeInsets.all(8.0),
                 //       child: Text(
-                //         "    Leader Boards    ",
+                //         "    LEADER BOARD    ",
                 //         style: TextStyle(
-                //           color: Colors.white,
+                //           color: Colors.cyan,
                 //           fontSize: width * 0.03,
                 //         ),
                 //       ),

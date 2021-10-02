@@ -87,6 +87,23 @@ class GameState extends Component {
     }
   }
 
+  int getDangerLevel() {
+    int score = getScore();
+    if (score > LEVEL2 / 2 + LEVEL2 / (2 * 4)) {
+      return 5;
+    } else if (score > LEVEL2 / 2) {
+      return 4;
+    } else if (score > LEVEL2 / 2 - LEVEL2 / (2 * 4)) {
+      return 3;
+    } else if (score > LEVEL2 / 2 - 2 * LEVEL2 / (2 * 4)) {
+      return 2;
+    } else if (score > LEVEL2 / 2 - 3 * LEVEL2 / (2 * 4)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
   int getScore() {
     return distance ~/ 10 + numCoins * 1000000;
   }
@@ -103,22 +120,32 @@ class GameState extends Component {
     if (!isPaused) {
       switch (getLevel()) {
         case 7:
-          return gameRef.viewport.canvasSize.x * 0.25;
+          return gameRef.viewport.canvasSize.x * 0.28;
         case 6:
-          return gameRef.viewport.canvasSize.x * 0.20;
+          return gameRef.viewport.canvasSize.x * 0.26;
         case 5:
-          return gameRef.viewport.canvasSize.x * 0.18;
+          return gameRef.viewport.canvasSize.x * 0.24;
         case 4:
-          return gameRef.viewport.canvasSize.x * 0.16;
+          return gameRef.viewport.canvasSize.x * 0.22;
         case 3:
-          return gameRef.viewport.canvasSize.x * 0.14;
+          return gameRef.viewport.canvasSize.x * 0.20;
         case 2:
-          return gameRef.viewport.canvasSize.x * 0.12;
+          return gameRef.viewport.canvasSize.x * 0.18;
         default:
-          return gameRef.viewport.canvasSize.x * 0.1;
+          return gameRef.viewport.canvasSize.x * 0.16;
       }
     } else {
       return 0;
+    }
+  }
+
+  int getRobotLevel() {
+    if (numCoins > COINS_ROBOT_UPGRADE2) {
+      return 3;
+    } else if (numCoins > COINS_ROBOT_UPGRADE1) {
+      return 2;
+    } else {
+      return 1;
     }
   }
 }

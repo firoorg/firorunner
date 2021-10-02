@@ -14,8 +14,14 @@ enum RunnerState {
   run,
   jump,
   duck,
+  duck2,
+  duck3,
   kick,
+  kick2,
+  kick3,
   float,
+  float2,
+  float3,
   fall,
   die,
   electrocute,
@@ -78,6 +84,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     if (gameRef.gameState.isPaused) {
       return;
     }
+    sprite.animation!.reset();
     switch (event) {
       case "jump":
         previousState = runnerState;
@@ -88,7 +95,7 @@ class Runner extends Component with HasGameRef<MyGame> {
             // sprite.position,
             Vector2(sprite.x, (level - 1) * gameRef.blockSize),
           ],
-          duration: 0.25,
+          duration: 0.15,
           curve: Curves.bounceIn,
           onComplete: () {
             updateLevel();
@@ -106,12 +113,22 @@ class Runner extends Component with HasGameRef<MyGame> {
           break;
         }
         runnerState = event;
-        sprite.current = RunnerState.float;
+        switch (gameRef.gameState.getRobotLevel()) {
+          case 3:
+            sprite.current = RunnerState.float3;
+            break;
+          case 2:
+            sprite.current = RunnerState.float2;
+            break;
+          default:
+            sprite.current = RunnerState.float;
+            break;
+        }
         sprite.addEffect(MoveEffect(
           path: [
             Vector2(sprite.x, (level - 2) * gameRef.blockSize),
           ],
-          duration: 0.5,
+          duration: 0.20,
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
@@ -133,7 +150,17 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "kick":
         previousState = runnerState;
         runnerState = event;
-        sprite.current = RunnerState.kick;
+        switch (gameRef.gameState.getRobotLevel()) {
+          case 3:
+            sprite.current = RunnerState.kick3;
+            break;
+          case 2:
+            sprite.current = RunnerState.kick2;
+            break;
+          default:
+            sprite.current = RunnerState.kick;
+            break;
+        }
         break;
       case "run":
         previousState = runnerState;
@@ -143,7 +170,17 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "float":
         previousState = runnerState;
         runnerState = event;
-        sprite.current = RunnerState.float;
+        switch (gameRef.gameState.getRobotLevel()) {
+          case 3:
+            sprite.current = RunnerState.float3;
+            break;
+          case 2:
+            sprite.current = RunnerState.float2;
+            break;
+          default:
+            sprite.current = RunnerState.float;
+            break;
+        }
         sprite.addEffect(MoveEffect(
           path: [sprite.position],
           duration: 1.5,
@@ -161,7 +198,17 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "duck":
         previousState = runnerState;
         runnerState = event;
-        sprite.current = RunnerState.duck;
+        switch (gameRef.gameState.getRobotLevel()) {
+          case 3:
+            sprite.current = RunnerState.duck3;
+            break;
+          case 2:
+            sprite.current = RunnerState.duck2;
+            break;
+          default:
+            sprite.current = RunnerState.duck;
+            break;
+        }
         sprite.addEffect(MoveEffect(
           path: [sprite.position],
           duration: 1.5,
@@ -529,6 +576,36 @@ class Runner extends Component with HasGameRef<MyGame> {
     SpriteAnimation ducking =
         SpriteAnimation.spriteList(ducks, stepTime: 0.02, loop: true);
 
+    List<Sprite> ducks2 = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/duck2/duck200${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      ducks2.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation ducking2 =
+        SpriteAnimation.spriteList(ducks2, stepTime: 0.02, loop: true);
+
+    List<Sprite> ducks3 = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/duck3/duck300${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      ducks3.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation ducking3 =
+        SpriteAnimation.spriteList(ducks3, stepTime: 0.02, loop: true);
+
     List<Sprite> kicks = [];
     for (int i = 1; i <= 38; i++) {
       final composition = ImageComposition()
@@ -543,6 +620,36 @@ class Runner extends Component with HasGameRef<MyGame> {
 
     SpriteAnimation kicking =
         SpriteAnimation.spriteList(kicks, stepTime: 0.02, loop: false);
+
+    List<Sprite> kicks2 = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/attack2/attack200${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      kicks2.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation kicking2 =
+        SpriteAnimation.spriteList(kicks2, stepTime: 0.02, loop: false);
+
+    List<Sprite> kicks3 = [];
+    for (int i = 1; i <= 38; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/attack3/attack300${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      kicks3.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation kicking3 =
+        SpriteAnimation.spriteList(kicks3, stepTime: 0.02, loop: false);
 
     List<Sprite> floats = [];
     for (int i = 1; i <= 44; i++) {
@@ -559,6 +666,36 @@ class Runner extends Component with HasGameRef<MyGame> {
     SpriteAnimation floating =
         SpriteAnimation.spriteList(floats, stepTime: 0.02, loop: true);
 
+    List<Sprite> floats2 = [];
+    for (int i = 1; i <= 44; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(((i - 1) % 38)), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/hover2/hover200${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      floats2.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation floating2 =
+        SpriteAnimation.spriteList(floats2, stepTime: 0.02, loop: true);
+
+    List<Sprite> floats3 = [];
+    for (int i = 1; i <= 44; i++) {
+      final composition = ImageComposition()
+        ..add(satellites.elementAt(((i - 1) % 38)), Vector2(0, 0))
+        ..add(
+            await Flame.images.load(
+                'runner/hover3/hover300${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+      floats3.add(Sprite(await composition.compose()));
+    }
+
+    SpriteAnimation floating3 =
+        SpriteAnimation.spriteList(floats3, stepTime: 0.02, loop: true);
+
     List<Sprite> falls = [];
     for (int i = 1; i <= 38; i++) {
       final composition = ImageComposition()
@@ -573,15 +710,6 @@ class Runner extends Component with HasGameRef<MyGame> {
 
     SpriteAnimation falling =
         SpriteAnimation.spriteList(falls, stepTime: 0.02, loop: false);
-
-    // SpriteAnimation falling = await loadSpriteAnimation(
-    //   'fall-frames.png',
-    //   SpriteAnimationData.sequenced(
-    //     amount: 7,
-    //     stepTime: 0.1,
-    //     textureSize: Vector2(512, 512),
-    //   ),
-    // );
 
     List<Sprite> dies = [];
     for (int i = 1; i <= 57; i++) {
@@ -606,8 +734,14 @@ class Runner extends Component with HasGameRef<MyGame> {
         RunnerState.run: running,
         RunnerState.jump: jumping,
         RunnerState.duck: ducking,
+        RunnerState.duck2: ducking2,
+        RunnerState.duck3: ducking3,
         RunnerState.kick: kicking,
+        RunnerState.kick2: kicking2,
+        RunnerState.kick3: kicking3,
         RunnerState.float: floating,
+        RunnerState.float2: floating2,
+        RunnerState.float3: floating3,
         RunnerState.fall: falling,
         RunnerState.die: dying,
         RunnerState.electrocute: dying,

@@ -50,7 +50,7 @@ class CoinHolder extends Holder {
   }
 
   void renderCoinScore(Canvas c) {
-    sprite.position = Vector2(personalGameRef.size.x - 33, 10);
+    sprite.position = Vector2(personalGameRef.size.x - 70, 10);
     sprite.render(c);
   }
 

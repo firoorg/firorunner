@@ -34,12 +34,15 @@ import 'package:firo_runner/main_menu_overlay.dart';
 const COLOR = Color(0xFFDDC0A3);
 const int LOADING_TIME = 2000000;
 
-const LEVEL2 = 10000000;
-const LEVEL3 = 20000000;
-const LEVEL4 = 30000000;
-const LEVEL5 = 40000000;
-const LEVEL6 = 50000000;
-const LEVEL7 = 60000000;
+const LEVEL2 = 25000000;
+const LEVEL3 = 50000000;
+const LEVEL4 = 75000000;
+const LEVEL5 = 100000000;
+const LEVEL6 = 125000000;
+const LEVEL7 = 150000000;
+
+const COINS_ROBOT_UPGRADE1 = 50;
+const COINS_ROBOT_UPGRADE2 = 100;
 
 const OVERLAY_PRIORITY = 110;
 const RUNNER_PRIORITY = 100;
@@ -170,12 +173,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     await runner.load(loadSpriteAnimation);
 
     loaded = true;
-    _distance = TextComponent("Distance: 0",
+    _distance = TextComponent("Time: 0",
         position: Vector2(size.x - 100, 10), textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _distance.changePriorityWithoutResorting(OVERLAY_PRIORITY);
     _coins = TextComponent(": 0",
-        position: Vector2(size.x - 35, 10), textRenderer: scoresPaint)
+        position: Vector2(size.x - 20, 10), textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _coins.changePriorityWithoutResorting(OVERLAY_PRIORITY);
     overlays.add("gameOver");
@@ -196,24 +199,31 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (shouldReset) {
       return;
     }
+    int dangerLevel = gameState.getDangerLevel();
 
     platformHolder.generatePlatforms(this);
 
-    int wireChosenRegion = random.nextInt(9);
-    if (wireChosenRegion % 3 != 2 &&
-        wireChosenRegion != 6 &&
-        wireChosenRegion != 7) {
-      wireHolder.generateWire(this, wireChosenRegion);
+    if (dangerLevel > 2) {
+      int wireChosenRegion = random.nextInt(9);
+      if (wireChosenRegion % 3 != 2 &&
+          wireChosenRegion != 6 &&
+          wireChosenRegion != 7) {
+        wireHolder.generateWire(this, wireChosenRegion);
+      }
     }
 
-    int bugChosenRegion = random.nextInt(9);
-    if (bugChosenRegion % 3 != 2 && bugChosenRegion % 3 != 0) {
-      bugHolder.generateBug(this, bugChosenRegion);
+    if (dangerLevel > 0) {
+      int bugChosenRegion = random.nextInt(9);
+      if (bugChosenRegion % 3 != 2 && bugChosenRegion % 3 != 0) {
+        bugHolder.generateBug(this, bugChosenRegion);
+      }
     }
 
-    int debrisChosenRegion = random.nextInt(9);
-    if (debrisChosenRegion % 3 == 0 && debrisChosenRegion != 6) {
-      debrisHolder.generateDebris(this, debrisChosenRegion);
+    if (dangerLevel > 1) {
+      int debrisChosenRegion = random.nextInt(9);
+      if (debrisChosenRegion % 3 == 0 && debrisChosenRegion != 6) {
+        debrisHolder.generateDebris(this, debrisChosenRegion);
+      }
     }
 
     int choseCoinLevel = random.nextInt(9);
@@ -221,9 +231,11 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       coinHolder.generateCoin(this, choseCoinLevel);
     }
 
-    int wallChosenRegion = random.nextInt(9);
-    if (wallChosenRegion % 3 == 1 && wallChosenRegion != 7) {
-      wallHolder.generateWall(this, wallChosenRegion);
+    if (dangerLevel > 4) {
+      int wallChosenRegion = random.nextInt(9);
+      if (wallChosenRegion % 3 == 1 && wallChosenRegion != 7) {
+        wallHolder.generateWall(this, wallChosenRegion);
+      }
     }
   }
 
@@ -389,12 +401,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       circuitBackground.render(canvas);
       fireworks.renderText(canvas);
       super.render(canvas);
-      final fpsCount = fps(10000);
-      fireworksPaint.render(
-        canvas,
-        fpsCount.toString(),
-        Vector2(0, 0),
-      );
+      // final fpsCount = fps(10000);
+      // fireworksPaint.render(
+      //   canvas,
+      //   fpsCount.toString(),
+      //   Vector2(0, 0),
+      // );
       coinHolder.renderCoinScore(canvas);
     }
   }
@@ -426,7 +438,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     debrisHolder.update(dt);
     wallHolder.update(dt);
 
-    _distance.text = "Distance: ${gameState.getPlayerDistance()}";
+    _distance.text = "Time: ${gameState.getPlayerDistance()}";
     _coins.text = " ${gameState.numCoins}";
     if (shouldReset &&
         !overlays.isActive('gameOver') &&
@@ -464,36 +476,46 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     yDeltas = List.empty(growable: true);
   }
 
+  bool action = false;
+
   @override
   void onPanUpdate(DragUpdateInfo info) {
     xDeltas.add(info.delta.game.x);
     yDeltas.add(info.delta.game.y);
+    if (xDeltas.length > 2 && !action) {
+      action = true;
+      if (!playingMusic && kIsWeb) {
+        playMusic();
+      }
+      double xDelta = xDeltas.isEmpty
+          ? 0
+          : xDeltas.reduce((value, element) => value + element);
+      double yDelta = yDeltas.isEmpty
+          ? 0
+          : yDeltas.reduce((value, element) => value + element);
+      if (xDelta.abs() > yDelta.abs()) {
+        if (xDelta > 0) {
+          runner.control("right");
+        } else {
+          runner.control("left");
+        }
+      } else if (xDelta.abs() < yDelta.abs()) {
+        if (yDelta > 0) {
+          runner.control("down");
+        } else {
+          runner.control("up");
+        }
+      }
+      xDeltas = List.empty(growable: true);
+      yDeltas = List.empty(growable: true);
+    }
   }
 
   @override
   void onPanEnd(DragEndInfo info) {
-    if (!playingMusic && kIsWeb) {
-      playMusic();
-    }
-    double xDelta = xDeltas.isEmpty
-        ? 0
-        : xDeltas.reduce((value, element) => value + element);
-    double yDelta = yDeltas.isEmpty
-        ? 0
-        : yDeltas.reduce((value, element) => value + element);
-    if (xDelta.abs() > yDelta.abs()) {
-      if (xDelta > 0) {
-        runner.control("right");
-      } else {
-        runner.control("left");
-      }
-    } else if (xDelta.abs() < yDelta.abs()) {
-      if (yDelta > 0) {
-        runner.control("down");
-      } else {
-        runner.control("up");
-      }
-    }
+    action = false;
+    xDeltas = List.empty(growable: true);
+    yDeltas = List.empty(growable: true);
   }
 
   @override

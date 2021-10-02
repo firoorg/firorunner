@@ -53,9 +53,9 @@ class LoseMenuOverlay extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "     Main Menu     ",
+                        "     MAIN MENU     ",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.cyan,
                           fontSize: width * 0.03,
                         ),
                       ),
@@ -83,9 +83,9 @@ class LoseMenuOverlay extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "    Replay    ",
+                        "    REPLAY    ",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.cyan,
                           fontSize: width * 0.03,
                         ),
                       ),
