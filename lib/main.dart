@@ -170,7 +170,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     gameState = GameState();
 
     runner = Runner();
-    await runner.load(loadSpriteAnimation);
+    await runner.load();
 
     loaded = true;
     _distance = TextComponent("Time: 0",
@@ -539,8 +539,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (!playingMusic && kIsWeb) {
       playMusic();
     }
-    print(event.data.logicalKey.keyId);
-    print(event.data.keyLabel);
     if (event is RawKeyDownEvent) {
       action = true;
       keyboardKey = null;

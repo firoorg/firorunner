@@ -61,8 +61,8 @@ flutter:
    - assets/images/runner/run/
    - assets/images/runner/fall/
    - assets/images/runner/satellite/
-   - assets/images/runner/death/
-   - assets/images/runner/deathglitch/
+   - assets/images/runner/death2/
+   - assets/images/runner/death1/
    - assets/images/runner/jump/
    - assets/images/runner/attack1/
    - assets/images/runner/attack2/

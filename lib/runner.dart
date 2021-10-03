@@ -35,7 +35,6 @@ class Runner extends Component with HasGameRef<MyGame> {
   String previousState = "run";
   var runnerPosition = Vector2(0, 0);
   late Vector2 runnerSize;
-  // late Rect runnerRect;
   bool dead = false;
 
   void setUp() {
@@ -69,7 +68,6 @@ class Runner extends Component with HasGameRef<MyGame> {
   @override
   void render(Canvas c) {
     super.render(c);
-    // getSprite().render(c, position: sprite.position, size: sprite.size);
     getSprite().render(c,
         position: Vector2(sprite.position.x - sprite.size.x / 3,
             sprite.position.y - sprite.size.y / 3),
@@ -346,12 +344,6 @@ class Runner extends Component with HasGameRef<MyGame> {
           event("run");
         }
         break;
-      case "center":
-        // if (runnerState == "fall") {
-        //   updateLevel();
-        //   event("float");
-        // }
-        break;
     }
   }
 
@@ -524,210 +516,54 @@ class Runner extends Component with HasGameRef<MyGame> {
     }
   }
 
-  Future load(loadSpriteAnimation) async {
+  Future load() async {
     List<Image> satellites = [];
     for (int i = 1; i <= 38; i++) {
       satellites.add(await Flame.images.load(
           'runner/satellite/satellite00${i < 10 ? "0" + i.toString() : i.toString()}.png'));
     }
 
-    List<Sprite> runs = [];
-    for (int i = 1; i <= 38; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/run/run00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      runs.add(Sprite(await composition.compose()));
-    }
-
     SpriteAnimation running =
-        SpriteAnimation.spriteList(runs, stepTime: 0.02, loop: true);
+        await loadSpriteAnimation("run", 38, satellites: satellites);
 
-    List<Sprite> jumps = [];
-    for (int i = 1; i <= 6; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/jump/jump00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      jumps.add(Sprite(await composition.compose()));
-    }
-
-    SpriteAnimation jumping =
-        SpriteAnimation.spriteList(jumps, stepTime: 0.02, loop: false);
-
-    List<Sprite> ducks = [];
-    for (int i = 1; i <= 38; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/duck1/duck100${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      ducks.add(Sprite(await composition.compose()));
-    }
+    SpriteAnimation jumping = await loadSpriteAnimation("jump", 6,
+        satellites: satellites, loop: false);
 
     SpriteAnimation ducking =
-        SpriteAnimation.spriteList(ducks, stepTime: 0.02, loop: true);
-
-    List<Sprite> ducks2 = [];
-    for (int i = 1; i <= 38; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/duck2/duck200${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      ducks2.add(Sprite(await composition.compose()));
-    }
+        await loadSpriteAnimation("duck1", 38, satellites: satellites);
 
     SpriteAnimation ducking2 =
-        SpriteAnimation.spriteList(ducks2, stepTime: 0.02, loop: true);
-
-    List<Sprite> ducks3 = [];
-    for (int i = 1; i <= 38; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/duck3/duck300${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      ducks3.add(Sprite(await composition.compose()));
-    }
+        await loadSpriteAnimation("duck2", 38, satellites: satellites);
 
     SpriteAnimation ducking3 =
-        SpriteAnimation.spriteList(ducks3, stepTime: 0.02, loop: true);
+        await loadSpriteAnimation("duck3", 38, satellites: satellites);
 
-    List<Sprite> kicks = [];
-    for (int i = 1; i <= 38; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/attack1/attack100${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
+    SpriteAnimation kicking = await loadSpriteAnimation("attack1", 38,
+        satellites: satellites, loop: false);
 
-      kicks.add(Sprite(await composition.compose()));
-    }
+    SpriteAnimation kicking2 = await loadSpriteAnimation("attack2", 38,
+        satellites: satellites, loop: false);
 
-    SpriteAnimation kicking =
-        SpriteAnimation.spriteList(kicks, stepTime: 0.02, loop: false);
-
-    List<Sprite> kicks2 = [];
-    for (int i = 1; i <= 38; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/attack2/attack200${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      kicks2.add(Sprite(await composition.compose()));
-    }
-
-    SpriteAnimation kicking2 =
-        SpriteAnimation.spriteList(kicks2, stepTime: 0.02, loop: false);
-
-    List<Sprite> kicks3 = [];
-    for (int i = 1; i <= 38; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/attack3/attack300${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      kicks3.add(Sprite(await composition.compose()));
-    }
-
-    SpriteAnimation kicking3 =
-        SpriteAnimation.spriteList(kicks3, stepTime: 0.02, loop: false);
-
-    List<Sprite> floats = [];
-    for (int i = 1; i <= 44; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(((i - 1) % 38)), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/hover1/hover100${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      floats.add(Sprite(await composition.compose()));
-    }
+    SpriteAnimation kicking3 = await loadSpriteAnimation("attack3", 38,
+        satellites: satellites, loop: false);
 
     SpriteAnimation floating =
-        SpriteAnimation.spriteList(floats, stepTime: 0.02, loop: true);
-
-    List<Sprite> floats2 = [];
-    for (int i = 1; i <= 44; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(((i - 1) % 38)), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/hover2/hover200${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      floats2.add(Sprite(await composition.compose()));
-    }
+        await loadSpriteAnimation("hover1", 44, satellites: satellites);
 
     SpriteAnimation floating2 =
-        SpriteAnimation.spriteList(floats2, stepTime: 0.02, loop: true);
-
-    List<Sprite> floats3 = [];
-    for (int i = 1; i <= 44; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(((i - 1) % 38)), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/hover3/hover300${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      floats3.add(Sprite(await composition.compose()));
-    }
+        await loadSpriteAnimation("hover2", 44, satellites: satellites);
 
     SpriteAnimation floating3 =
-        SpriteAnimation.spriteList(floats3, stepTime: 0.02, loop: true);
+        await loadSpriteAnimation("hover3", 44, satellites: satellites);
 
-    List<Sprite> falls = [];
-    for (int i = 1; i <= 20; i++) {
-      final composition = ImageComposition()
-        ..add(satellites.elementAt(((i - 1) % 20)), Vector2(0, 0))
-        ..add(
-            await Flame.images.load(
-                'runner/fall/fall00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-            Vector2(0, 0));
-
-      falls.add(Sprite(await composition.compose()));
-    }
-
-    SpriteAnimation falling =
-        SpriteAnimation.spriteList(falls, stepTime: 0.02, loop: false);
-
-    List<Sprite> dies = [];
-    for (int i = 1; i <= 57; i++) {
-      dies.add(Sprite(await Flame.images.load(
-          'runner/death/death200${i < 10 ? "0" + i.toString() : i.toString()}.png')));
-    }
+    SpriteAnimation falling = await loadSpriteAnimation("fall", 20,
+        satellites: satellites, loop: false);
 
     SpriteAnimation dying =
-        SpriteAnimation.spriteList(dies, stepTime: 0.02, loop: false);
-
-    List<Sprite> dyingGlitches = [];
-    for (int i = 1; i <= 81; i++) {
-      dyingGlitches.add(Sprite(await Flame.images.load(
-          'runner/deathglitch/death100${i < 10 ? "0" + i.toString() : i.toString()}.png')));
-    }
+        await loadSpriteAnimation("death2", 57, loop: false);
 
     SpriteAnimation dyingGlitch =
-        SpriteAnimation.spriteList(dyingGlitches, stepTime: 0.02, loop: false);
+        await loadSpriteAnimation("death1", 81, loop: false);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -751,6 +587,26 @@ class Runner extends Component with HasGameRef<MyGame> {
     );
 
     changePriorityWithoutResorting(RUNNER_PRIORITY);
+  }
+
+  Future<SpriteAnimation> loadSpriteAnimation(String name, int howManyFrames,
+      {List<Image>? satellites, bool loop = true}) async {
+    List<Sprite> sprites = [];
+    for (int i = 1; i <= howManyFrames; i++) {
+      final composition = ImageComposition();
+      if (satellites != null) {
+        composition.add(
+            satellites.elementAt(((i - 1) % satellites.length)), Vector2(0, 0));
+      }
+      composition.add(
+          await Flame.images.load(
+              'runner/$name/${name}00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+          Vector2(0, 0));
+
+      sprites.add(Sprite(await composition.compose()));
+    }
+
+    return SpriteAnimation.spriteList(sprites, stepTime: 0.02, loop: loop);
   }
 
   void resize(Vector2 newSize, double xRatio, double yRatio) {
