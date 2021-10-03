@@ -697,12 +697,12 @@ class Runner extends Component with HasGameRef<MyGame> {
         SpriteAnimation.spriteList(floats3, stepTime: 0.02, loop: true);
 
     List<Sprite> falls = [];
-    for (int i = 1; i <= 38; i++) {
+    for (int i = 1; i <= 20; i++) {
       final composition = ImageComposition()
-        ..add(satellites.elementAt(i - 1), Vector2(0, 0))
+        ..add(satellites.elementAt(((i - 1) % 20)), Vector2(0, 0))
         ..add(
             await Flame.images.load(
-                'runner/run/run00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+                'runner/fall/fall00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
             Vector2(0, 0));
 
       falls.add(Sprite(await composition.compose()));

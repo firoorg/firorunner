@@ -191,7 +191,11 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   }
 
   void playMusic() {
-    FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
+    if (overlays.isActive('mainMenu')) {
+      FlameAudio.bgm.play('Infinite_Menu.mp3');
+    } else {
+      FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
+    }
     playingMusic = true;
   }
 
@@ -355,6 +359,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   void mainMenu() {
     overlays.remove('gameOver');
     overlays.add('mainMenu');
+    FlameAudio.bgm.stop();
+    FlameAudio.bgm.play('Infinite_Menu.mp3');
   }
 
   void reset() {
@@ -535,33 +541,41 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     }
     print(event.data.logicalKey.keyId);
     print(event.data.keyLabel);
-    if (event is RawKeyUpEvent) {
+    if (event is RawKeyDownEvent) {
+      action = true;
       keyboardKey = null;
-      switch (event.data.keyLabel) {
-        case "w":
+      switch (event.data.logicalKey.keyId) {
+        case 4294968068:
+        case 119:
+        case 87:
+          // case "w":
           runner.control("up");
           break;
-        case "a":
+        case 4294968066:
+        case 97:
+        case 65:
+          // case "a":
           runner.control("left");
           break;
-        case "s":
+        case 4294968065:
+        case 115:
+        case 83:
+          // case "s":
           runner.control("down");
           break;
-        case "d":
+        case 4294968067:
+        case 100:
+        case 68:
+          // case "d":
           runner.control("right");
           break;
         default:
-          if (event.data.logicalKey.keyId == 32) {
-            runner.control("down");
-          }
           break;
       }
     }
-    if (event is RawKeyDownEvent && event.data.logicalKey.keyId == 32) {
-      if (keyboardKey == null) {
-        runner.control("center");
-      }
-      keyboardKey = "spacebar";
+
+    if (event is RawKeyUpEvent) {
+      action = false;
     }
   }
 }

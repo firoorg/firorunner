@@ -120,19 +120,19 @@ class GameState extends Component {
     if (!isPaused) {
       switch (getLevel()) {
         case 7:
-          return gameRef.viewport.canvasSize.x * 0.28;
+          return gameRef.viewport.canvasSize.x * 0.30;
         case 6:
-          return gameRef.viewport.canvasSize.x * 0.26;
+          return gameRef.viewport.canvasSize.x * 0.28;
         case 5:
-          return gameRef.viewport.canvasSize.x * 0.24;
+          return gameRef.viewport.canvasSize.x * 0.26;
         case 4:
-          return gameRef.viewport.canvasSize.x * 0.22;
+          return gameRef.viewport.canvasSize.x * 0.24;
         case 3:
-          return gameRef.viewport.canvasSize.x * 0.20;
+          return gameRef.viewport.canvasSize.x * 0.22;
         case 2:
-          return gameRef.viewport.canvasSize.x * 0.18;
+          return gameRef.viewport.canvasSize.x * 0.20;
         default:
-          return gameRef.viewport.canvasSize.x * 0.16;
+          return gameRef.viewport.canvasSize.x * 0.18;
       }
     } else {
       return 0;

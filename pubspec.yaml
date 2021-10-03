@@ -59,6 +59,7 @@ flutter:
    - assets/audio/
    - assets/audio/sfx/
    - assets/images/runner/run/
+   - assets/images/runner/fall/
    - assets/images/runner/satellite/
    - assets/images/runner/death/
    - assets/images/runner/deathglitch/

@@ -1,3 +1,4 @@
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 
 import 'main.dart';
@@ -66,6 +67,8 @@ class MainMenuOverlay extends StatelessWidget {
                   onPressed: () {
                     // Go to the Main Menu
                     game.reset();
+                    FlameAudio.bgm.stop();
+                    FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
                   },
                 ),
                 // MaterialButton(
