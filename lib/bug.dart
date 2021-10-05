@@ -6,26 +6,12 @@ enum BugState { normal, breaking }
 
 class Bug extends MovingObject {
   Bug(MyGame gameRef) : super(gameRef) {
-    var bug = gameRef.bugHolder.getBug("normal");
-    var breakingImage = gameRef.bugHolder.getBug("breaking");
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      bug,
-      SpriteAnimationData.sequenced(
-        amount: 8,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+    List<Sprite> bug = gameRef.bugHolder.getBug("normal");
+    List<Sprite> breakingImage = gameRef.bugHolder.getBug("breaking");
+    SpriteAnimation normal = SpriteAnimation.spriteList(bug, stepTime: 0.1);
 
-    SpriteAnimation breaking = SpriteAnimation.fromFrameData(
-      breakingImage,
-      SpriteAnimationData.sequenced(
-        amount: 13,
-        stepTime: 0.01,
-        textureSize: Vector2(512, 512),
-        loop: false,
-      ),
-    );
+    SpriteAnimation breaking =
+        SpriteAnimation.spriteList(breakingImage, stepTime: 0.01, loop: false);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {

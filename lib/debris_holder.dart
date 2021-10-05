@@ -1,5 +1,6 @@
 import 'package:firo_runner/holder.dart';
 import 'package:firo_runner/platform.dart';
+import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
 
@@ -7,20 +8,20 @@ import 'package:firo_runner/debris.dart';
 import 'package:firo_runner/main.dart';
 
 class DebrisHolder extends Holder {
-  late Image debris;
+  late List<Sprite> debris;
 
   @override
   Future load() async {
-    debris = await Flame.images.load("debris-frames.png");
+    debris = await loadListSprites("debris", "debris", 21);
   }
 
-  getDebris() {
+  List<Sprite> getDebris() {
     return debris;
   }
 
   bool generateDebris(MyGame gameRef, int level,
       {bool force = false, double xPosition = 0}) {
-    if (objects[level].length > 1) {
+    if (objects[level].isNotEmpty) {
       return false;
     }
 

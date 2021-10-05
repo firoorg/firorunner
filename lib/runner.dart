@@ -8,6 +8,7 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/animation.dart';
 
 enum RunnerState {
@@ -36,6 +37,8 @@ class Runner extends Component with HasGameRef<MyGame> {
   var runnerPosition = Vector2(0, 0);
   late Vector2 runnerSize;
   bool dead = false;
+  late var boost = null;
+  late var friend = null;
 
   void setUp() {
     dead = false;
@@ -78,7 +81,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     level = (sprite.position.y / gameRef.blockSize).round();
   }
 
-  void event(String event) {
+  Future<void> event(String event) async {
     if (gameRef.gameState.isPaused) {
       return;
     }
@@ -106,7 +109,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           break;
         }
         previousState = runnerState;
-        sprite.clearEffects();
+        clearEffects();
         if (level - 1 < 0) {
           break;
         }
@@ -130,6 +133,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
+            clearEffects();
             if (onTopOfPlatform()) {
               this.event("run");
             } else {
@@ -140,7 +144,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         break;
       case "fall":
         previousState = runnerState;
-        sprite.clearEffects();
+        clearEffects();
         runnerState = event;
         sprite.current = RunnerState.fall;
         sprite.addEffect(getFallingEffect());
@@ -179,12 +183,14 @@ class Runner extends Component with HasGameRef<MyGame> {
             sprite.current = RunnerState.float;
             break;
         }
+        boost = await FlameAudio.audioCache.play('sfx/jet_boost.mp3');
         sprite.addEffect(MoveEffect(
           path: [sprite.position],
           duration: 1.5,
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
+            boost.stop();
             if (onTopOfPlatform()) {
               this.event("run");
             } else {
@@ -220,11 +226,13 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        await FlameAudio.audioCache.play('sfx/fall_death.mp3');
         previousState = runnerState;
-        sprite.clearEffects();
+        clearEffects();
         runnerState = event;
         sprite.current = RunnerState.die;
         dead = true;
+        friend.stop();
         gameRef.die();
         sprite.addEffect(getFallingEffect());
         break;
@@ -232,11 +240,13 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        await FlameAudio.audioCache.play('sfx/fall_death.mp3');
         previousState = runnerState;
-        sprite.clearEffects();
+        clearEffects();
         runnerState = event;
         sprite.current = RunnerState.electrocute;
         dead = true;
+        friend.stop();
         gameRef.die();
         sprite.addEffect(getFallingEffect());
         break;
@@ -244,11 +254,13 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
+        await FlameAudio.play('sfx/glitch_death.mp3');
         previousState = runnerState;
-        sprite.clearEffects();
+        clearEffects();
         runnerState = event;
         sprite.current = RunnerState.glitch;
         dead = true;
+        friend.stop();
         gameRef.die();
         break;
       default:
@@ -317,7 +329,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         } else if (runnerState == "float" && previousState == "jump") {
           event("double_jump");
         } else if (runnerState == "duck") {
-          sprite.clearEffects();
+          clearEffects();
           event("run");
         }
         break;
@@ -325,10 +337,10 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (runnerState == "run" || runnerState == "kick") {
           event("duck");
         } else if (runnerState == "float" && onTopOfPlatform()) {
-          sprite.clearEffects();
+          clearEffects();
           event("run");
         } else if (runnerState == "float") {
-          sprite.clearEffects();
+          clearEffects();
           event("fall");
         }
         break;
@@ -340,7 +352,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "left":
         if (runnerState == "kick") {
           sprite.animation!.reset();
-          sprite.clearEffects();
+          clearEffects();
           event("run");
         }
         break;
@@ -367,7 +379,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     if (runnerState == "float" || runnerState == "double_jump") {
       if (onTopOfPlatform()) {
         updateLevel();
-        sprite.clearEffects();
+        clearEffects();
         event("run");
       }
     }
@@ -416,7 +428,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     return belowPlatform;
   }
 
-  void intersecting() {
+  Future<void> intersecting() async {
     if (gameRef.gameState.isPaused) {
       return;
     }
@@ -427,6 +439,7 @@ class Runner extends Component with HasGameRef<MyGame> {
       for (int i = 0; i < coinLevel.length;) {
         if (coinLevel[i].intersect(runnerRect) != "none") {
           gameRef.gameState.numCoins++;
+          await FlameAudio.audioCache.play('sfx/coin_catch.mp3');
           gameRef.coinHolder.remove(coinLevel, i);
           continue;
         }
@@ -464,6 +477,7 @@ class Runner extends Component with HasGameRef<MyGame> {
             return;
           }
         } else if (intersectState == "left" && runnerState == "kick") {
+          await FlameAudio.audioCache.play('sfx/bug_chomp.mp3');
           bugLevel[i].sprite.current = BugState.breaking;
           gameRef.coinHolder.generateCoin(gameRef, level,
               force: true, xPosition: bugLevel[i].sprite.x + gameRef.blockSize);
@@ -487,6 +501,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         } else if (runnerState == "duck" && intersectState != "above") {
           continue;
         } else {
+          await FlameAudio.audioCache.play('sfx/obstacle_death.mp3');
           event("die");
         }
       }
@@ -503,6 +518,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (intersectState == "none") {
           continue;
         } else {
+          await FlameAudio.audioCache.play('sfx/obstacle_death.mp3');
           event("die");
         }
       }
@@ -512,6 +528,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         (runnerState == "run" ||
             runnerState == "kick" ||
             runnerState == "duck")) {
+      clearEffects();
       event("fall");
     }
   }
@@ -616,6 +633,13 @@ class Runner extends Component with HasGameRef<MyGame> {
     sprite.size.y = gameRef.blockSize;
     if (sprite.effects.isNotEmpty) {
       sprite.effects.first.onComplete!();
+    }
+  }
+
+  void clearEffects({bool keepSounds = false}) {
+    sprite.clearEffects();
+    if (!keepSounds) {
+      boost.stop();
     }
   }
 }

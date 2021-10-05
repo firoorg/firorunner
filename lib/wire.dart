@@ -7,15 +7,8 @@ enum WireState { normal }
 
 class Wire extends MovingObject {
   Wire(MyGame gameRef) : super(gameRef) {
-    var wire = gameRef.wireHolder.getWire();
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      wire,
-      SpriteAnimationData.sequenced(
-        amount: 12,
-        stepTime: 0.05,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+    List<Sprite> wire = gameRef.wireHolder.getWire();
+    SpriteAnimation normal = SpriteAnimation.spriteList(wire, stepTime: 0.05);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {

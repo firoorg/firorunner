@@ -21,41 +21,21 @@ class Platform extends MovingObject {
 
     int version = random.nextInt(2);
 
-    SpriteAnimation left = SpriteAnimation.fromFrameData(
-      version == 0 ? gameRef.platformHolder.l1 : gameRef.platformHolder.l2,
-      SpriteAnimationData.sequenced(
-        amount: 5,
-        stepTime: 0.12,
-        textureSize: Vector2(1000, 807),
-      ),
-    );
+    SpriteAnimation left = SpriteAnimation.spriteList(
+        version == 0 ? gameRef.platformHolder.l1 : gameRef.platformHolder.l2,
+        stepTime: 0.12);
 
-    SpriteAnimation mid = SpriteAnimation.fromFrameData(
-      version == 0 ? gameRef.platformHolder.m1 : gameRef.platformHolder.m2,
-      SpriteAnimationData.sequenced(
-        amount: 5,
-        stepTime: 0.12,
-        textureSize: Vector2(1000, 807),
-      ),
-    );
+    SpriteAnimation mid = SpriteAnimation.spriteList(
+        version == 0 ? gameRef.platformHolder.m1 : gameRef.platformHolder.m2,
+        stepTime: 0.12);
 
-    SpriteAnimation right = SpriteAnimation.fromFrameData(
-      version == 0 ? gameRef.platformHolder.r1 : gameRef.platformHolder.r2,
-      SpriteAnimationData.sequenced(
-        amount: 5,
-        stepTime: 0.12,
-        textureSize: Vector2(1000, 807),
-      ),
-    );
+    SpriteAnimation right = SpriteAnimation.spriteList(
+        version == 0 ? gameRef.platformHolder.r1 : gameRef.platformHolder.r2,
+        stepTime: 0.12);
 
-    SpriteAnimation single = SpriteAnimation.fromFrameData(
-      version == 0 ? gameRef.platformHolder.o1 : gameRef.platformHolder.o2,
-      SpriteAnimationData.sequenced(
-        amount: 5,
-        stepTime: 0.12,
-        textureSize: Vector2(1000, 807),
-      ),
-    );
+    SpriteAnimation single = SpriteAnimation.spriteList(
+        version == 0 ? gameRef.platformHolder.o1 : gameRef.platformHolder.o2,
+        stepTime: 0.12);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -71,9 +51,8 @@ class Platform extends MovingObject {
 
     setSize(
       gameRef.blockSize *
-          (gameRef.platformHolder.l1.width /
-              gameRef.platformHolder.l1.height /
-              5),
+          (gameRef.platformHolder.l1[0].image.width /
+              gameRef.platformHolder.l1[0].image.height),
       gameRef.blockSize,
     );
   }

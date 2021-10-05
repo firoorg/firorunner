@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:firo_runner/moving_object.dart';
 
 import 'package:firo_runner/main.dart';
+import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
+import 'package:flame/flame.dart';
 
 class Holder {
   Random random = Random();
@@ -63,5 +65,17 @@ class Holder {
         p.resize(newSize, xRatio, yRatio);
       }
     }
+  }
+
+  Future<List<Sprite>> loadListSprites(
+      String folderName, String extraName, int howManyFrames) async {
+    List<Sprite> sprites = [];
+    for (int i = 0; i < howManyFrames; i++) {
+      sprites.add(Sprite(
+        await Flame.images.load('$folderName/${extraName}_$i.png'),
+      ));
+    }
+
+    return sprites;
   }
 }

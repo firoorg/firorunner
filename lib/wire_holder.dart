@@ -1,26 +1,25 @@
 import 'package:firo_runner/holder.dart';
 import 'package:firo_runner/platform.dart';
-import 'package:flame/flame.dart';
+import 'package:flame/components.dart';
 
 import 'package:firo_runner/wire.dart';
 import 'package:firo_runner/main.dart';
-import 'package:flame/extensions.dart';
 
 class WireHolder extends Holder {
-  late Image wire;
+  late List<Sprite> wire;
 
   @override
   Future load() async {
-    wire = await Flame.images.load("wire-frames.png");
+    wire = await loadListSprites("wire", "wire", 12);
   }
 
-  getWire() {
+  List<Sprite> getWire() {
     return wire;
   }
 
   bool generateWire(MyGame gameRef, int level,
       {bool force = false, double xPosition = 0}) {
-    if (objects[level].length > 1) {
+    if (objects[level].isNotEmpty) {
       return false;
     }
 

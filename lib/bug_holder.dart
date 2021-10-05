@@ -1,22 +1,21 @@
 import 'package:firo_runner/holder.dart';
 import 'package:firo_runner/platform.dart';
-import 'package:flame/extensions.dart';
-import 'package:flame/flame.dart';
+import 'package:flame/components.dart';
 
 import 'package:firo_runner/bug.dart';
 import 'package:firo_runner/main.dart';
 
 class BugHolder extends Holder {
-  late Image bug;
-  late Image breaking;
+  late List<Sprite> bug;
+  late List<Sprite> breaking;
 
   @override
   Future load() async {
-    bug = await Flame.images.load("bug-frames.png");
-    breaking = await Flame.images.load("bug-break-frames.png");
+    bug = await loadListSprites("bug", "bug", 8);
+    breaking = await loadListSprites("bug", "bug_break", 13);
   }
 
-  getBug(String state) {
+  List<Sprite> getBug(String state) {
     switch (state) {
       case "normal":
         return bug;
@@ -27,7 +26,7 @@ class BugHolder extends Holder {
 
   bool generateBug(MyGame gameRef, int level,
       {bool force = false, double xPosition = 0}) {
-    if (objects[level].length > 2) {
+    if (objects[level].isNotEmpty) {
       return false;
     }
 

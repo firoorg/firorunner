@@ -149,6 +149,19 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     // debugMode = true;
     FlameAudio.bgm.initialize();
 
+    await FlameAudio.audioCache.loadAll([
+      'sfx/bug_chomp.mp3',
+      'sfx/coin_catch.mp3',
+      'sfx/fall_death.mp3',
+      'sfx/glitch_death.mp3',
+      'sfx/jet_boost.mp3',
+      'sfx/menu_button.mp3',
+      'sfx/obstacle_death.mp3',
+      'sfx/robot_friend_beep.mp3',
+      'Infinite_Menu.mp3',
+      'Infinite_Spankage_M.mp3',
+    ]);
+
     circuitBackground = CircuitBackground(this);
     await circuitBackground.load();
     platformHolder = PlatformHolder();

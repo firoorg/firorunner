@@ -1,6 +1,5 @@
 import 'package:firo_runner/holder.dart';
 import 'package:flame/components.dart';
-import 'package:flame/flame.dart';
 
 import 'package:firo_runner/coin.dart';
 import 'package:firo_runner/main.dart';
@@ -8,21 +7,14 @@ import 'package:flame/extensions.dart';
 import 'package:firo_runner/platform.dart';
 
 class CoinHolder extends Holder {
-  late Image coin;
+  late List<Sprite> coin;
   late SpriteAnimationGroupComponent sprite;
   late MyGame personalGameRef;
 
   @override
   Future load() async {
-    coin = await Flame.images.load("coin-frames.png");
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      coin,
-      SpriteAnimationData.sequenced(
-        amount: 12,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+    coin = await loadListSprites("coin", "coin", 12);
+    SpriteAnimation normal = SpriteAnimation.spriteList(coin, stepTime: 0.1);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -54,7 +46,7 @@ class CoinHolder extends Holder {
     sprite.render(c);
   }
 
-  Image getCoin() {
+  List<Sprite> getCoin() {
     return coin;
   }
 

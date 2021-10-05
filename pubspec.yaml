@@ -73,6 +73,13 @@ flutter:
    - assets/images/runner/hover1/
    - assets/images/runner/hover2/
    - assets/images/runner/hover3/
+   - assets/images/bug/
+   - assets/images/coin/
+   - assets/images/debris/
+   - assets/images/firework/
+   - assets/images/platform/
+   - assets/images/wall/
+   - assets/images/wire/
 
   fonts:
     - family: Codystar

@@ -33,17 +33,10 @@ class Firework extends Component {
 
   Future load() async {
     random = Random();
-    Image firework = await Flame.images.load("fireworks-frames.png");
+    List<Sprite> firework = await loadListSprites("firework", "firework", 10);
 
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      firework,
-      SpriteAnimationData.sequenced(
-        amount: 10,
-        stepTime: 0.25,
-        textureSize: Vector2(512, 512),
-        loop: false,
-      ),
-    );
+    SpriteAnimation normal =
+        SpriteAnimation.spriteList(firework, stepTime: 0.25, loop: false);
 
     sprite1 = SpriteAnimationGroupComponent(
       animations: {
@@ -127,5 +120,17 @@ class Firework extends Component {
     sprite2.y *= yRatio;
     sprite2.width *= xRatio;
     sprite2.height *= yRatio;
+  }
+
+  Future<List<Sprite>> loadListSprites(
+      String folderName, String extraName, int howManyFrames) async {
+    List<Sprite> sprites = [];
+    for (int i = 0; i < howManyFrames; i++) {
+      sprites.add(Sprite(
+        await Flame.images.load('$folderName/${extraName}_$i.png'),
+      ));
+    }
+
+    return sprites;
   }
 }

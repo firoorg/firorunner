@@ -1,19 +1,18 @@
 import 'package:firo_runner/holder.dart';
 import 'package:firo_runner/main.dart';
 import 'package:firo_runner/moving_object.dart';
-import 'package:flame/flame.dart';
+import 'package:flame/components.dart';
 import 'package:firo_runner/platform.dart';
-import 'package:flame/extensions.dart';
 
 class PlatformHolder extends Holder {
-  late Image l1;
-  late Image l2;
-  late Image m1;
-  late Image m2;
-  late Image r1;
-  late Image r2;
-  late Image o1;
-  late Image o2;
+  late List<Sprite> l1;
+  late List<Sprite> l2;
+  late List<Sprite> m1;
+  late List<Sprite> m2;
+  late List<Sprite> r1;
+  late List<Sprite> r2;
+  late List<Sprite> o1;
+  late List<Sprite> o2;
   bool noTopObstaclesForNext = false;
   bool noMiddleObstaclesForNext = false;
   int timeSinceLastTopHole = 0;
@@ -21,14 +20,14 @@ class PlatformHolder extends Holder {
 
   @override
   Future load() async {
-    l1 = await Flame.images.load('platform-left-nowire-frames.png');
-    l2 = await Flame.images.load('platform-left-wire-frames.png');
-    m1 = await Flame.images.load('platform-mid-nowire-frames.png');
-    m2 = await Flame.images.load('platform-mid-wire-frames.png');
-    r1 = await Flame.images.load('platform-right-nowire-frames.png');
-    r2 = await Flame.images.load('platform-right-wire-frames.png');
-    o1 = await Flame.images.load('platform-single-nowire-frames.png');
-    o2 = await Flame.images.load('platform-single-wire-frames.png');
+    l1 = await loadListSprites("platform", "platform-left-nowire-frames", 5);
+    l2 = await loadListSprites("platform", "platform-left-wire-frames", 5);
+    m1 = await loadListSprites("platform", "platform-mid-nowire-frames", 5);
+    m2 = await loadListSprites("platform", "platform-mid-wire-frames", 5);
+    r1 = await loadListSprites("platform", "platform-right-nowire-frames", 5);
+    r2 = await loadListSprites("platform", "platform-right-wire-frames", 5);
+    o1 = await loadListSprites("platform", "platform-single-nowire-frames", 5);
+    o2 = await loadListSprites("platform", "platform-single-wire-frames", 5);
   }
 
   @override

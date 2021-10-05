@@ -6,15 +6,8 @@ enum DebrisState { normal }
 
 class Debris extends MovingObject {
   Debris(MyGame gameRef) : super(gameRef) {
-    var debris = gameRef.debrisHolder.getDebris();
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      debris,
-      SpriteAnimationData.sequenced(
-        amount: 21,
-        stepTime: 0.1,
-        textureSize: Vector2(360, 1000),
-      ),
-    );
+    List<Sprite> debris = gameRef.debrisHolder.getDebris();
+    SpriteAnimation normal = SpriteAnimation.spriteList(debris, stepTime: 0.1);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -27,9 +20,8 @@ class Debris extends MovingObject {
 
     setSize(
       gameRef.blockSize *
-          (gameRef.debrisHolder.debris.width /
-              gameRef.debrisHolder.debris.height /
-              21) *
+          (gameRef.debrisHolder.debris[0].image.width /
+              gameRef.debrisHolder.debris[0].image.height) *
           1.5,
       gameRef.blockSize * 1.5,
     );

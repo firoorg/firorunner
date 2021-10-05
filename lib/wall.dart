@@ -8,15 +8,8 @@ class Wall extends MovingObject {
   int direction = -1;
   late int bottomPlatformLevel;
   Wall(MyGame gameRef) : super(gameRef) {
-    var wall = gameRef.wallHolder.getWall();
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      wall,
-      SpriteAnimationData.sequenced(
-        amount: 5,
-        stepTime: 0.1,
-        textureSize: Vector2(163, 1000),
-      ),
-    );
+    List<Sprite> wall = gameRef.wallHolder.getWall();
+    SpriteAnimation normal = SpriteAnimation.spriteList(wall, stepTime: 0.1);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -29,7 +22,8 @@ class Wall extends MovingObject {
 
     setSize(
       gameRef.blockSize *
-          (gameRef.wallHolder.wall.width / gameRef.wallHolder.wall.height / 5) *
+          (gameRef.wallHolder.wall[0].image.width /
+              gameRef.wallHolder.wall[0].image.height) *
           2.0,
       gameRef.blockSize * 0.35,
     );

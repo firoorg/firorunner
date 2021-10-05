@@ -6,15 +6,8 @@ enum CoinState { normal }
 
 class Coin extends MovingObject {
   Coin(MyGame gameRef) : super(gameRef) {
-    var coin = gameRef.coinHolder.getCoin();
-    SpriteAnimation normal = SpriteAnimation.fromFrameData(
-      coin,
-      SpriteAnimationData.sequenced(
-        amount: 12,
-        stepTime: 0.1,
-        textureSize: Vector2(512, 512),
-      ),
-    );
+    List<Sprite> coin = gameRef.coinHolder.getCoin();
+    SpriteAnimation normal = SpriteAnimation.spriteList(coin, stepTime: 0.1);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -25,11 +18,11 @@ class Coin extends MovingObject {
 
     sprite.changePriorityWithoutResorting(COIN_PRIORITY);
 
-    var platform = gameRef.platformHolder.l1;
+    var platform = gameRef.platformHolder.l1[0].image;
 
     setSize(
-      gameRef.blockSize * (platform.width / platform.height / 14),
-      gameRef.blockSize * (platform.width / platform.height / 14),
+      gameRef.blockSize * (platform.width / platform.height / 2.8),
+      gameRef.blockSize * (platform.width / platform.height / 2.8),
     );
   }
 }

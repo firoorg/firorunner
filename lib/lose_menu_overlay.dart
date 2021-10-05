@@ -1,3 +1,4 @@
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 
 import 'main.dart';
@@ -92,7 +93,9 @@ class LoseMenuOverlay extends StatelessWidget {
                     ),
                   ),
                   // ),
-                  onPressed: () {
+                  onPressed: () async {
+                    game.runner.friend = await FlameAudio.audioCache
+                        .loop('sfx/robot_friend_beep.mp3');
                     game.reset();
                   },
                 ),

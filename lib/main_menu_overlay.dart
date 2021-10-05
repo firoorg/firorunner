@@ -64,11 +64,14 @@ class MainMenuOverlay extends StatelessWidget {
                     ),
                   ),
                   // ),
-                  onPressed: () {
+                  onPressed: () async {
                     // Go to the Main Menu
+                    FlameAudio.audioCache.play('sfx/menu_button.mp3');
                     game.reset();
                     FlameAudio.bgm.stop();
                     FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
+                    game.runner.friend = await FlameAudio.audioCache
+                        .loop('sfx/robot_friend_beep.mp3');
                   },
                 ),
                 // MaterialButton(

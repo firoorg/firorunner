@@ -1,26 +1,25 @@
 import 'package:firo_runner/holder.dart';
 import 'package:firo_runner/platform.dart';
-import 'package:flame/extensions.dart';
-import 'package:flame/flame.dart';
+import 'package:flame/components.dart';
 
 import 'package:firo_runner/wall.dart';
 import 'package:firo_runner/main.dart';
 
 class WallHolder extends Holder {
-  late Image wall;
+  late List<Sprite> wall;
 
   @override
   Future load() async {
-    wall = await Flame.images.load("wall-frames.png");
+    wall = await loadListSprites("wall", "wall", 5);
   }
 
-  getWall() {
+  List<Sprite> getWall() {
     return wall;
   }
 
   bool generateWall(MyGame gameRef, int level,
       {bool force = false, double xPosition = 0}) {
-    if (objects[level].length > 1) {
+    if (objects[level].isNotEmpty) {
       return false;
     }
 
