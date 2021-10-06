@@ -10,6 +10,7 @@ import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/animation.dart';
+import 'package:audioplayers/src/api/player_mode.dart';
 
 enum RunnerState {
   run,
@@ -37,7 +38,7 @@ class Runner extends Component with HasGameRef<MyGame> {
   var runnerPosition = Vector2(0, 0);
   late Vector2 runnerSize;
   bool dead = false;
-  late var boost = null;
+  late Future boost;
   late var friend = null;
 
   void setUp() {
@@ -81,7 +82,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     level = (sprite.position.y / gameRef.blockSize).round();
   }
 
-  Future<void> event(String event) async {
+  void event(String event) {
     if (gameRef.gameState.isPaused) {
       return;
     }
@@ -109,7 +110,7 @@ class Runner extends Component with HasGameRef<MyGame> {
           break;
         }
         previousState = runnerState;
-        clearEffects();
+        clearEffects(keepSounds: true);
         if (level - 1 < 0) {
           break;
         }
@@ -152,6 +153,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "kick":
         previousState = runnerState;
         runnerState = event;
+        boost = FlameAudio.audioCache
+            .play('sfx/laser.mp3', volume: 1.0, mode: PlayerMode.LOW_LATENCY);
         switch (gameRef.gameState.getRobotLevel()) {
           case 3:
             sprite.current = RunnerState.kick3;
@@ -172,6 +175,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "float":
         previousState = runnerState;
         runnerState = event;
+        boost = FlameAudio.audioCache.play('sfx/jet_boost.mp3',
+            volume: 0.25, mode: PlayerMode.LOW_LATENCY);
         switch (gameRef.gameState.getRobotLevel()) {
           case 3:
             sprite.current = RunnerState.float3;
@@ -183,14 +188,13 @@ class Runner extends Component with HasGameRef<MyGame> {
             sprite.current = RunnerState.float;
             break;
         }
-        boost = await FlameAudio.audioCache.play('sfx/jet_boost.mp3');
         sprite.addEffect(MoveEffect(
           path: [sprite.position],
           duration: 1.5,
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
-            boost.stop();
+            // boost.stop();
             if (onTopOfPlatform()) {
               this.event("run");
             } else {
@@ -202,6 +206,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       case "duck":
         previousState = runnerState;
         runnerState = event;
+        boost = FlameAudio.audioCache
+            .play('sfx/shield.mp3', volume: 0.25, mode: PlayerMode.LOW_LATENCY);
         switch (gameRef.gameState.getRobotLevel()) {
           case 3:
             sprite.current = RunnerState.duck3;
@@ -218,6 +224,10 @@ class Runner extends Component with HasGameRef<MyGame> {
           duration: 1.5,
           curve: Curves.linear,
           onComplete: () {
+            if (boost != null) {
+              boost.then((value) => value.stop());
+            }
+            // boost.stop();
             this.event("run");
           },
         ));
@@ -226,7 +236,8 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
-        await FlameAudio.audioCache.play('sfx/fall_death.mp3');
+        FlameAudio.audioCache.play('sfx/fall_death_speed.mp3',
+            volume: 0.5, mode: PlayerMode.LOW_LATENCY);
         previousState = runnerState;
         clearEffects();
         runnerState = event;
@@ -240,7 +251,8 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
-        await FlameAudio.audioCache.play('sfx/fall_death.mp3');
+        FlameAudio.audioCache.play('sfx/fall_death_speed.mp3',
+            volume: 0.5, mode: PlayerMode.LOW_LATENCY);
         previousState = runnerState;
         clearEffects();
         runnerState = event;
@@ -254,7 +266,8 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (dead) {
           return;
         }
-        await FlameAudio.play('sfx/glitch_death.mp3');
+        FlameAudio.audioCache.play('sfx/glitch_death.mp3',
+            volume: 0.5, mode: PlayerMode.LOW_LATENCY);
         previousState = runnerState;
         clearEffects();
         runnerState = event;
@@ -292,6 +305,8 @@ class Runner extends Component with HasGameRef<MyGame> {
             onComplete: () {
               updateLevel();
               if (onTopOfPlatform()) {
+                FlameAudio.audioCache
+                    .play('sfx/land.mp3', mode: PlayerMode.LOW_LATENCY);
                 event("run");
               } else {
                 event("fall");
@@ -309,6 +324,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       curve: Curves.ease,
       onComplete: () {
         updateLevel();
+        FlameAudio.audioCache
+            .play('sfx/land.mp3', mode: PlayerMode.LOW_LATENCY);
         if (onTopOfPlatform()) {
           event("run");
         } else {
@@ -380,6 +397,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       if (onTopOfPlatform()) {
         updateLevel();
         clearEffects();
+        FlameAudio.audioCache
+            .play('sfx/land.mp3', mode: PlayerMode.LOW_LATENCY);
         event("run");
       }
     }
@@ -428,7 +447,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     return belowPlatform;
   }
 
-  Future<void> intersecting() async {
+  void intersecting() {
     if (gameRef.gameState.isPaused) {
       return;
     }
@@ -439,7 +458,8 @@ class Runner extends Component with HasGameRef<MyGame> {
       for (int i = 0; i < coinLevel.length;) {
         if (coinLevel[i].intersect(runnerRect) != "none") {
           gameRef.gameState.numCoins++;
-          await FlameAudio.audioCache.play('sfx/coin_catch.mp3');
+          FlameAudio.audioCache.play('sfx/coin_catch.mp3',
+              volume: 0.25, mode: PlayerMode.LOW_LATENCY);
           gameRef.coinHolder.remove(coinLevel, i);
           continue;
         }
@@ -477,7 +497,8 @@ class Runner extends Component with HasGameRef<MyGame> {
             return;
           }
         } else if (intersectState == "left" && runnerState == "kick") {
-          await FlameAudio.audioCache.play('sfx/bug_chomp.mp3');
+          FlameAudio.audioCache
+              .play('sfx/bug_death1.mp3', mode: PlayerMode.LOW_LATENCY);
           bugLevel[i].sprite.current = BugState.breaking;
           gameRef.coinHolder.generateCoin(gameRef, level,
               force: true, xPosition: bugLevel[i].sprite.x + gameRef.blockSize);
@@ -501,7 +522,8 @@ class Runner extends Component with HasGameRef<MyGame> {
         } else if (runnerState == "duck" && intersectState != "above") {
           continue;
         } else {
-          await FlameAudio.audioCache.play('sfx/obstacle_death.mp3');
+          FlameAudio.audioCache
+              .play('sfx/obstacle_death.mp3', mode: PlayerMode.LOW_LATENCY);
           event("die");
         }
       }
@@ -518,7 +540,8 @@ class Runner extends Component with HasGameRef<MyGame> {
         if (intersectState == "none") {
           continue;
         } else {
-          await FlameAudio.audioCache.play('sfx/obstacle_death.mp3');
+          FlameAudio.audioCache
+              .play('sfx/obstacle_death.mp3', mode: PlayerMode.LOW_LATENCY);
           event("die");
         }
       }
@@ -534,6 +557,8 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   Future load() async {
+    boost = FlameAudio.audioCache
+        .play('sfx/laser.mp3', volume: 0.0, mode: PlayerMode.LOW_LATENCY);
     List<Image> satellites = [];
     for (int i = 1; i <= 38; i++) {
       satellites.add(await Flame.images.load(
@@ -580,7 +605,7 @@ class Runner extends Component with HasGameRef<MyGame> {
         await loadSpriteAnimation("death2", 57, loop: false);
 
     SpriteAnimation dyingGlitch =
-        await loadSpriteAnimation("death1", 81, loop: false);
+        await loadSpriteAnimation("death1", 82, loop: false);
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -638,8 +663,9 @@ class Runner extends Component with HasGameRef<MyGame> {
 
   void clearEffects({bool keepSounds = false}) {
     sprite.clearEffects();
-    if (!keepSounds) {
-      boost.stop();
+    if (!keepSounds && boost != null) {
+      // boost.stop();
+      boost.then((value) => value.stop());
     }
   }
 }

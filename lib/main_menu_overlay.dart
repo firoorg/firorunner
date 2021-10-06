@@ -1,6 +1,7 @@
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 
+import 'package:audioplayers/src/api/player_mode.dart';
 import 'main.dart';
 
 class MainMenuOverlay extends StatelessWidget {
@@ -66,12 +67,15 @@ class MainMenuOverlay extends StatelessWidget {
                   // ),
                   onPressed: () async {
                     // Go to the Main Menu
-                    FlameAudio.audioCache.play('sfx/menu_button.mp3');
+                    FlameAudio.audioCache.play('sfx/menu_button.mp3',
+                        mode: PlayerMode.LOW_LATENCY);
                     game.reset();
                     FlameAudio.bgm.stop();
                     FlameAudio.bgm.play('Infinite_Spankage_M.mp3');
-                    game.runner.friend = await FlameAudio.audioCache
-                        .loop('sfx/robot_friend_beep.mp3');
+                    game.runner.friend = await FlameAudio.audioCache.loop(
+                        'sfx/robot_friend_beep.mp3',
+                        volume: 0.25,
+                        mode: PlayerMode.LOW_LATENCY);
                   },
                 ),
                 // MaterialButton(
@@ -98,6 +102,7 @@ class MainMenuOverlay extends StatelessWidget {
                 //   // ),
                 //   onPressed: () {
                 //     // Show QR code
+                //     await FlameAudio.audioCache.play('sfx/button_click.mp3', mode: PlayerMode.LOW_LATENCY);
                 //   },
                 // ),
                 // MaterialButton(
@@ -124,6 +129,7 @@ class MainMenuOverlay extends StatelessWidget {
                 //   // ),
                 //   onPressed: () {
                 //     // Show QR code
+                //     await FlameAudio.audioCache.play('sfx/button_click.mp3', mode: PlayerMode.LOW_LATENCY);
                 //   },
                 // ),
               ],

@@ -4,6 +4,8 @@ import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
+import 'package:flame_audio/flame_audio.dart';
+import 'package:audioplayers/src/api/player_mode.dart';
 
 enum FireworkState { normal }
 
@@ -108,6 +110,8 @@ class Firework extends Component {
     message = messages.elementAt(random.nextInt(messages.length));
     sprite1.animation!.reset();
     sprite2.animation!.reset();
+    FlameAudio.audioCache
+        .play("sfx/fireworks.mp3", volume: 0.75, mode: PlayerMode.LOW_LATENCY);
   }
 
   void resize(Vector2 newSize, double xRatio, double yRatio) {

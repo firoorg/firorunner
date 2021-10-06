@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'main.dart';
 
+import 'package:audioplayers/src/api/player_mode.dart';
+
 class LoseMenuOverlay extends StatelessWidget {
   const LoseMenuOverlay({
     Key? key,
@@ -63,8 +65,10 @@ class LoseMenuOverlay extends StatelessWidget {
                     ),
                   ),
                   // ),
-                  onPressed: () {
+                  onPressed: () async {
                     // Go to the Main Menu
+                    await FlameAudio.audioCache.play('sfx/button_click.mp3',
+                        mode: PlayerMode.LOW_LATENCY);
                     game.mainMenu();
                   },
                 ),
@@ -94,6 +98,8 @@ class LoseMenuOverlay extends StatelessWidget {
                   ),
                   // ),
                   onPressed: () async {
+                    await FlameAudio.audioCache.play('sfx/button_click.mp3',
+                        mode: PlayerMode.LOW_LATENCY);
                     game.runner.friend = await FlameAudio.audioCache
                         .loop('sfx/robot_friend_beep.mp3');
                     game.reset();
