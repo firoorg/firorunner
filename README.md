@@ -4,7 +4,7 @@ An infitite runner game powered by Firo.
 
 ## Getting Started
 
-To build follow tutorials on setting up a flutter development enviornment.
+To build follow [tutorials](https://youtu.be/x0uinJvhNxI?t=1114) on setting up a flutter development enviornment.
 
 Once you can build a default flutter application, you should be able to build the program.
 
