@@ -26,6 +26,8 @@ dependencies:
   flame: "^1.0.0-releasecandidate.11"
   flame_audio: "^1.0.0-rc.1"
   http: ^0.13.3
+  qr_flutter: ^4.0.0
+  shared_preferences: ^2.0.8
 
 
   # The following adds the Cupertino Icons font to your application.

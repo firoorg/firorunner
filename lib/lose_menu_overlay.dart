@@ -88,22 +88,27 @@ class LoseMenuOverlay extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "    REPLAY    ",
+                        "    REPLAY${game.competitive ? "   ${game.tries}" : ""}    ",
                         style: TextStyle(
-                          color: Colors.cyan,
+                          color: game.competitive && game.tries <= 0
+                              ? Colors.grey
+                              : Colors.cyan,
                           fontSize: width * 0.03,
                         ),
                       ),
                     ),
                   ),
                   // ),
-                  onPressed: () async {
-                    await FlameAudio.audioCache.play('sfx/button_click.mp3',
-                        mode: PlayerMode.LOW_LATENCY);
-                    game.runner.friend = await FlameAudio.audioCache
-                        .loop('sfx/robot_friend_beep.mp3');
-                    game.reset();
-                  },
+                  onPressed: game.competitive && game.tries <= 0
+                      ? null
+                      : () async {
+                          await FlameAudio.audioCache.play(
+                              'sfx/button_click.mp3',
+                              mode: PlayerMode.LOW_LATENCY);
+                          game.runner.friend = await FlameAudio.audioCache
+                              .loop('sfx/robot_friend_beep.mp3');
+                          game.reset();
+                        },
                 ),
               ],
             ),

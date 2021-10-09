@@ -1,17 +1,18 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:firo_runner/bug_holder.dart';
 import 'package:firo_runner/circuit_background.dart';
 import 'package:firo_runner/coin_holder.dart';
 import 'package:firo_runner/debris_holder.dart';
+import 'package:firo_runner/deposit.dart';
 import 'package:firo_runner/firework.dart';
 import 'package:firo_runner/game_state.dart';
+import 'package:firo_runner/leader_board.dart';
 import 'package:firo_runner/moving_object.dart';
 import 'package:firo_runner/platform.dart';
 import 'package:firo_runner/platform_holder.dart';
+import 'package:firo_runner/sign_in_overlay.dart';
 import 'package:firo_runner/wall_holder.dart';
 import 'package:firo_runner/wire.dart';
 import 'package:firo_runner/wire_holder.dart';
@@ -30,6 +31,14 @@ import 'package:http/http.dart' as http;
 
 import 'package:firo_runner/lose_menu_overlay.dart';
 import 'package:firo_runner/main_menu_overlay.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// TODO Set NO_TOURNAMENT to false, and then set the SERVER and PORT for the
+// firo runner server instance.
+const NO_TOURNAMENT = false;
+
+const SERVER = "http://10.0.0.224";
+const PORT = "50067";
 
 const COLOR = Color(0xFFDDC0A3);
 const int LOADING_TIME = 2000000;
@@ -88,6 +97,15 @@ void main() async {
               ),
             );
           },
+          'leaderboard': (_, myGame) {
+            return LeaderBoardOverlay(game: myGame);
+          },
+          'deposit': (_, myGame) {
+            return DepositOverlay(game: myGame);
+          },
+          'signin': (_, myGame) {
+            return SignInOverlay(game: myGame);
+          },
           'mainMenu': (_, myGame) {
             return MainMenuOverlay(game: myGame);
           },
@@ -118,6 +136,12 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     config: const TextPaintConfig(fontSize: 16.0, color: COLOR),
   );
 
+  String leaderboard = "";
+  String address = "";
+  String username = "";
+  int tries = 0;
+  bool competitive = false;
+
   late CircuitBackground circuitBackground;
   late PlatformHolder platformHolder;
   late CoinHolder coinHolder;
@@ -146,7 +170,18 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
-    // debugMode = true;
+    if (!NO_TOURNAMENT) {
+      final prefs = await SharedPreferences.getInstance();
+      username = prefs.getString('username') ?? "";
+      tries = prefs.getInt('tries') ?? 0;
+      String result = await connectServer("gettries", "user=$username");
+      try {
+        tries = int.parse(result);
+        prefs.setInt('tries', tries);
+      } catch (e) {
+        print(e);
+      }
+    }
     FlameAudio.bgm.initialize();
 
     await FlameAudio.audioCache.loadAll([
@@ -312,56 +347,30 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   bool shouldReset = false;
 
-  // late Socket socket;
-  // void dataHandler(data) {
-  //   print(new String.fromCharCodes(data).trim());
-  // }
-  //
-  // void errorHandler(error, StackTrace trace) {
-  //   print(error);
-  // }
-  //
-  // void doneHandler() {
-  //   socket.destroy();
-  // }
-
-  // Future<void> connectServer() async {
-  //   try {
-  //     Socket.connect('10.0.0.224', 50018).then((Socket sock) {
-  //       socket = sock;
-  //       socket.listen(dataHandler,
-  //           onError: errorHandler, onDone: doneHandler, cancelOnError: false);
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  //   // try {
-  //   //   final response = await http.post(
-  //   //     Uri.parse('http://10.0.0.224:50017'),
-  //   //     headers: <String, String>{
-  //   //       'Content-Type': 'application/json; charset=UTF-8',
-  //   //     },
-  //   //     body: jsonEncode(<String, String>{
-  //   //       'title': "hi",
-  //   //     }),
-  //   //   );
-  //   //   if (response.statusCode == 201) {
-  //   //     // If the server did return a 201 CREATED response,
-  //   //     // then parse the JSON.
-  //   //     print("hello");
-  //   //     print(response);
-  //   //     print(response.body);
-  //   //   } else {
-  //   //     // If the server did not return a 201 CREATED response,
-  //   //     // then throw an exception.
-  //   //     throw Exception('Failed to create album.');
-  //   //   }
-  //   //   // var value = await channel.stream.first;
-  //   //   // print(value);
-  //   // } catch (e) {
-  //   //   print(e);
-  //   // }
-  // }
+  Future<String> connectServer(String command, String arguments) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$SERVER:$PORT/$command?$arguments"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        // If the server did return a 200,
+        // then parse the JSON.
+        return response.body;
+      } else {
+        // If the server did not return a 201 CREATED response,
+        // then throw an exception.
+        throw Exception('Failed to connect to Firo Runner server.');
+      }
+      // var value = await channel.stream.first;
+      // print(value);
+    } catch (e) {
+      print(e);
+      return "";
+    }
+  }
 
   Future<void> displayLoss() async {
     if (!(runner.sprite.animation?.done() ?? false) &&
@@ -369,7 +378,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
         firstDeath) {
       return;
     }
-    // await connectServer();
     firstDeath = false;
     overlays.add('gameOver');
   }
@@ -390,8 +398,23 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     setUp();
   }
 
-  void die() {
+  Future<void> die() async {
     gameState.setPaused();
+    if (!NO_TOURNAMENT) {
+      final prefs = await SharedPreferences.getInstance();
+      if (username != "" && competitive) {
+        await connectServer(
+            "newscore", "user=$username&score=${gameState.getPlayerScore()}");
+      }
+      tries = prefs.getInt('tries') ?? 0;
+      String result = await connectServer("gettries", "user=$username");
+      try {
+        tries = int.parse(result);
+        prefs.setInt('tries', tries);
+      } catch (e) {
+        print(e);
+      }
+    }
     shouldReset = true;
   }
 
@@ -425,12 +448,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       circuitBackground.render(canvas);
       fireworks.renderText(canvas);
       super.render(canvas);
-      // final fpsCount = fps(10000);
-      // fireworksPaint.render(
-      //   canvas,
-      //   fpsCount.toString(),
-      //   Vector2(0, 0),
-      // );
       coinHolder.renderCoinScore(canvas);
     }
   }

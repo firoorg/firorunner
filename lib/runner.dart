@@ -557,8 +557,6 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   Future load() async {
-    boost = FlameAudio.audioCache
-        .play('sfx/laser.mp3', volume: 0.0, mode: PlayerMode.LOW_LATENCY);
     List<Image> satellites = [];
     for (int i = 1; i <= 38; i++) {
       satellites.add(await Flame.images.load(
