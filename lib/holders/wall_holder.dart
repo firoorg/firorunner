@@ -1,25 +1,23 @@
-import 'package:firo_runner/holder.dart';
-import 'package:firo_runner/platform.dart';
+import 'package:firo_runner/holders/holder.dart';
+import 'package:firo_runner/moving_objects/platform.dart';
 import 'package:flame/components.dart';
-import 'package:flame/extensions.dart';
-import 'package:flame/flame.dart';
 
-import 'package:firo_runner/debris.dart';
+import 'package:firo_runner/moving_objects/wall.dart';
 import 'package:firo_runner/main.dart';
 
-class DebrisHolder extends Holder {
-  late List<Sprite> debris;
+class WallHolder extends Holder {
+  late List<Sprite> wall;
 
   @override
   Future load() async {
-    debris = await loadListSprites("debris", "debris", 21);
+    wall = await loadListSprites("wall", "wall", 5);
   }
 
-  List<Sprite> getDebris() {
-    return debris;
+  List<Sprite> getWall() {
+    return wall;
   }
 
-  bool generateDebris(MyGame gameRef, int level,
+  bool generateWall(MyGame gameRef, int level,
       {bool force = false, double xPosition = 0}) {
     if (objects[level].isNotEmpty) {
       return false;
@@ -45,20 +43,20 @@ class DebrisHolder extends Holder {
         return false;
       }
 
-      Debris debris = Debris(gameRef);
-      debris.setPosition(
-          xCoordinate, gameRef.blockSize * level - gameRef.blockSize / 3);
+      Wall wall = Wall(gameRef);
+      wall.setPosition(xCoordinate, gameRef.blockSize * level);
+      wall.bottomPlatformLevel = level + 1;
 
-      if (gameRef.isTooNearOtherObstacles(debris.sprite.toRect())) {
+      if (gameRef.isTooNearOtherObstacles(wall.sprite.toRect())) {
         return false;
       }
 
-      objects[level].add(debris);
-      gameRef.add(debris.sprite);
+      objects[level].add(wall);
+      gameRef.add(wall.sprite);
       if (platform != null) {
         platform.removeChildren.add(() {
-          objects[level].remove(debris);
-          debris.remove();
+          objects[level].remove(wall);
+          wall.remove();
         });
       }
       return false;

@@ -2,7 +2,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'main.dart';
+import '../main.dart';
 import 'package:audioplayers/src/api/player_mode.dart';
 
 /// This is the stateful widget that the main application instantiates.

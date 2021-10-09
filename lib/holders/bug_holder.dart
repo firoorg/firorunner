@@ -1,8 +1,8 @@
-import 'package:firo_runner/holder.dart';
-import 'package:firo_runner/platform.dart';
+import 'package:firo_runner/holders/holder.dart';
+import 'package:firo_runner/moving_objects/platform.dart';
 import 'package:flame/components.dart';
 
-import 'package:firo_runner/bug.dart';
+import 'package:firo_runner/moving_objects/bug.dart';
 import 'package:firo_runner/main.dart';
 
 class BugHolder extends Holder {

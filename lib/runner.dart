@@ -1,6 +1,6 @@
 import 'package:flame/extensions.dart';
-import 'package:firo_runner/bug.dart';
-import 'package:firo_runner/moving_object.dart';
+import 'package:firo_runner/moving_objects/bug.dart';
+import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/flame.dart';

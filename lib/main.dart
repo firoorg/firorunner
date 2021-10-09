@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:firo_runner/bug_holder.dart';
-import 'package:firo_runner/circuit_background.dart';
-import 'package:firo_runner/coin_holder.dart';
-import 'package:firo_runner/debris_holder.dart';
-import 'package:firo_runner/deposit.dart';
+import 'package:firo_runner/holders/bug_holder.dart';
+import 'package:firo_runner/moving_objects/circuit_background.dart';
+import 'package:firo_runner/holders/coin_holder.dart';
+import 'package:firo_runner/holders/debris_holder.dart';
+import 'package:firo_runner/overlays/deposit_overlay.dart';
 import 'package:firo_runner/firework.dart';
 import 'package:firo_runner/game_state.dart';
-import 'package:firo_runner/leader_board.dart';
-import 'package:firo_runner/moving_object.dart';
-import 'package:firo_runner/platform.dart';
-import 'package:firo_runner/platform_holder.dart';
-import 'package:firo_runner/sign_in_overlay.dart';
-import 'package:firo_runner/wall_holder.dart';
-import 'package:firo_runner/wire.dart';
-import 'package:firo_runner/wire_holder.dart';
+import 'package:firo_runner/overlays/leader_board_overlay.dart';
+import 'package:firo_runner/moving_objects/moving_object.dart';
+import 'package:firo_runner/moving_objects/platform.dart';
+import 'package:firo_runner/holders/platform_holder.dart';
+import 'package:firo_runner/overlays/sign_in_overlay.dart';
+import 'package:firo_runner/holders/wall_holder.dart';
+import 'package:firo_runner/moving_objects/wire.dart';
+import 'package:firo_runner/holders/wire_holder.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
@@ -29,8 +29,8 @@ import 'package:firo_runner/runner.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
-import 'package:firo_runner/lose_menu_overlay.dart';
-import 'package:firo_runner/main_menu_overlay.dart';
+import 'package:firo_runner/overlays/lose_menu_overlay.dart';
+import 'package:firo_runner/overlays/main_menu_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO Set NO_TOURNAMENT to false, and then set the SERVER and PORT for the

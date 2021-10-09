@@ -1,4 +1,4 @@
-import 'package:firo_runner/moving_object.dart';
+import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';

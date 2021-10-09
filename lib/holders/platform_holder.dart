@@ -1,8 +1,8 @@
-import 'package:firo_runner/holder.dart';
+import 'package:firo_runner/holders/holder.dart';
 import 'package:firo_runner/main.dart';
-import 'package:firo_runner/moving_object.dart';
+import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:flame/components.dart';
-import 'package:firo_runner/platform.dart';
+import 'package:firo_runner/moving_objects/platform.dart';
 
 class PlatformHolder extends Holder {
   late List<Sprite> l1;

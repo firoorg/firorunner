@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:audioplayers/src/api/player_mode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
+import '../main.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class MainMenuOverlay extends StatelessWidget {

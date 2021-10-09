@@ -1,10 +1,10 @@
-import 'package:firo_runner/holder.dart';
+import 'package:firo_runner/holders/holder.dart';
 import 'package:flame/components.dart';
 
-import 'package:firo_runner/coin.dart';
+import 'package:firo_runner/moving_objects/coin.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/extensions.dart';
-import 'package:firo_runner/platform.dart';
+import 'package:firo_runner/moving_objects/platform.dart';
 
 class CoinHolder extends Holder {
   late List<Sprite> coin;

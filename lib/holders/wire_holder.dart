@@ -1,8 +1,8 @@
-import 'package:firo_runner/holder.dart';
-import 'package:firo_runner/platform.dart';
+import 'package:firo_runner/holders/holder.dart';
+import 'package:firo_runner/moving_objects/platform.dart';
 import 'package:flame/components.dart';
 
-import 'package:firo_runner/wire.dart';
+import 'package:firo_runner/moving_objects/wire.dart';
 import 'package:firo_runner/main.dart';
 
 class WireHolder extends Holder {

@@ -1,7 +1,7 @@
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 
-import 'main.dart';
+import '../main.dart';
 
 import 'package:audioplayers/src/api/player_mode.dart';
 
