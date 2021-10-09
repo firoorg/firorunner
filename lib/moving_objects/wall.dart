@@ -29,6 +29,8 @@ class Wall extends MovingObject {
     );
   }
 
+  // Override the update method so that this object can also move vertically
+  // as an obstacle.
   @override
   void update(double dt) {
     super.update(dt);

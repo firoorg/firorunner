@@ -24,6 +24,7 @@ class BugHolder extends Holder {
     }
   }
 
+  // Generate a bug on the indicated level if it is possible.
   bool generateBug(MyGame gameRef, int level,
       {bool force = false, double xPosition = 0}) {
     if (objects[level].isNotEmpty) {

@@ -8,13 +8,6 @@ class LeaderBoardOverlay extends StatelessWidget {
     required this.game,
   }) : super(key: key);
 
-  final Color textColor = Colors.cyan;
-  final Color cardColor = const Color(0xff262b3f);
-  final Color borderColor = const Color(0xdfd675e1);
-  final Color titleColor = const Color(0xff68d9cc);
-
-  // final Color textColor = Colors.black;
-
   final MyGame game;
 
   List<Card> getLeaderboard(double width) {

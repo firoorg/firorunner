@@ -12,9 +12,6 @@ class SignInOverlay extends StatefulWidget {
     required this.game,
   }) : super(key: key);
 
-  final Color cardColor = Colors.white;
-  final Color textColor = Colors.black;
-
   final MyGame game;
 
   @override
@@ -75,9 +72,6 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
                               hintText: 'Enter your receiving Firo address.',
                             ),
                             validator: (String? value) {
-                              // if (value == null || value.isEmpty) {
-                              //   return 'Please enter your receiving Firo address.';
-                              // } else
                               if (value == null || value.isEmpty) {
                                 print("logging in instead of signing up.");
                                 return null;

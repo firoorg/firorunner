@@ -25,6 +25,8 @@ class Wire extends MovingObject {
     );
   }
 
+  // Override the intersect method so that the hitbox is smaller for the wires,
+  // this will be more fair to the player.
   @override
   String intersect(Rect other) {
     Rect currentRect = sprite.toRect();

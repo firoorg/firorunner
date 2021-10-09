@@ -88,8 +88,8 @@ class Platform extends MovingObject {
       left = platformLevel.elementAt(index - 1).sprite.position;
     }
 
-    bool hasLeft = (left.x - sprite.position.x).abs() < 1.9 * sprite.size.x;
-    bool hasRight = (sprite.position.x - right.x).abs() < 1.9 * sprite.size.x;
+    bool hasLeft = (left.x - sprite.position.x).abs() < 2.5 * sprite.size.x;
+    bool hasRight = (sprite.position.x - right.x).abs() < 2.5 * sprite.size.x;
 
     // If the platform cannot be seen by the player.
     if (!((sprite.x >= 0 && sprite.x <= gameRef.size.x) ||

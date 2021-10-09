@@ -9,6 +9,7 @@ import 'package:audioplayers/src/api/player_mode.dart';
 
 enum FireworkState { normal }
 
+// Class that shoots off fireworks whenever the game speeds up.
 class Firework extends Component {
   MyGame gameRef;
   late SpriteAnimationGroupComponent sprite1;

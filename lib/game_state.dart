@@ -1,11 +1,13 @@
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
+// Class the holds the game state and several functions related to score and
+// speed.
 class GameState extends Component {
   int start = 0;
   bool isPaused = false;
   int numCoins = 0;
-  int distance = 0;
+  int time = 0;
   late MyGame gameRef;
   int previousLevel = 1;
 
@@ -13,7 +15,7 @@ class GameState extends Component {
   void update(double dt) {
     super.update(dt);
     if (!isPaused) {
-      distance = DateTime.now().microsecondsSinceEpoch - start;
+      time = DateTime.now().microsecondsSinceEpoch - start;
       if (previousLevel != getLevel()) {
         previousLevel = getLevel();
         gameRef.fireworks.reset();
@@ -28,7 +30,7 @@ class GameState extends Component {
   void setUp(MyGame gameRef) {
     this.gameRef = gameRef;
     numCoins = 0;
-    distance = 0;
+    time = 0;
     previousLevel = 1;
     start = DateTime.now().microsecondsSinceEpoch;
     isPaused = false;
@@ -38,24 +40,26 @@ class GameState extends Component {
     isPaused = true;
   }
 
+  // This is the level of the game.
   int getLevel() {
-    if (distance > LEVEL7) {
+    if (time > LEVEL7) {
       return 7;
-    } else if (distance > LEVEL6) {
+    } else if (time > LEVEL6) {
       return 6;
-    } else if (distance > LEVEL5) {
+    } else if (time > LEVEL5) {
       return 5;
-    } else if (distance > LEVEL4) {
+    } else if (time > LEVEL4) {
       return 4;
-    } else if (distance > LEVEL3) {
+    } else if (time > LEVEL3) {
       return 3;
-    } else if (distance > LEVEL2) {
+    } else if (time > LEVEL2) {
       return 2;
     } else {
       return 1;
     }
   }
 
+  // This determines the stages of the games and its animations.
   int getScoreLevel() {
     int score = getScore();
     if (score > LEVEL7) {
@@ -87,6 +91,8 @@ class GameState extends Component {
     }
   }
 
+  // Gets the danger level of the game, this determines the appearance of
+  // obstacles in the beginning of the game.
   int getDangerLevel() {
     int score = getScore();
     if (score > LEVEL2 / 2 + LEVEL2 / (2 * 4)) {
@@ -104,18 +110,23 @@ class GameState extends Component {
     }
   }
 
+  // This score is used to determine the danger level of the game,
+  // and progression.
   int getScore() {
-    return distance ~/ 10 + numCoins * 1000000;
+    return time ~/ 10 + numCoins * 1000000;
   }
 
+  // This is the real score that the player sees.
   int getPlayerScore() {
     return getScore() ~/ 10000;
   }
 
-  int getPlayerDistance() {
-    return distance ~/ 1000000;
+  // Gets how long the player has been playing the game.
+  int getPlayerTime() {
+    return time ~/ 1000000;
   }
 
+  // Get the relative pixel velocity at the current moment.
   double getVelocity() {
     if (!isPaused) {
       switch (getLevel()) {
@@ -139,6 +150,7 @@ class GameState extends Component {
     }
   }
 
+  // Returns the level of the Robot, used to determine what animations it uses.
   int getRobotLevel() {
     if (numCoins > COINS_ROBOT_UPGRADE2) {
       return 3;

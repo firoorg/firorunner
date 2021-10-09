@@ -78,10 +78,12 @@ class Runner extends Component with HasGameRef<MyGame> {
         size: sprite.size * 1.6);
   }
 
+  // update which level the runner should be at.
   void updateLevel() {
     level = (sprite.position.y / gameRef.blockSize).round();
   }
 
+  // process the event that the runner is in.
   void event(String event) {
     if (gameRef.gameState.isPaused) {
       return;
@@ -194,7 +196,6 @@ class Runner extends Component with HasGameRef<MyGame> {
           curve: Curves.ease,
           onComplete: () {
             updateLevel();
-            // boost.stop();
             if (onTopOfPlatform()) {
               this.event("run");
             } else {
@@ -227,7 +228,6 @@ class Runner extends Component with HasGameRef<MyGame> {
             if (boost != null) {
               boost.then((value) => value.stop());
             }
-            // boost.stop();
             this.event("run");
           },
         ));
@@ -281,6 +281,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     }
   }
 
+  // Get the falling effect for falling and deaths.
   MoveEffect getFallingEffect() {
     for (int i = level; i < 9; i++) {
       if (i % 3 != 2) {
@@ -335,6 +336,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     );
   }
 
+  // Platform agnostic control input to determine the runners actions.
   void control(String input) {
     if (gameRef.gameState.isPaused) {
       return;
@@ -407,6 +409,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     sprite.update(dt);
   }
 
+  // Check whether or not the runner is on top of a platform.
   bool onTopOfPlatform() {
     Rect runnerRect = sprite.toRect();
     bool onTopOfPlatform = false;
@@ -425,6 +428,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     return onTopOfPlatform;
   }
 
+  // Check if the runner is directly below a platform.
   bool belowPlatform() {
     Rect runnerRect = Rect.fromLTRB(
         sprite.toRect().left,
@@ -447,6 +451,8 @@ class Runner extends Component with HasGameRef<MyGame> {
     return belowPlatform;
   }
 
+  // Check to see if the runner is intersecting any of the game objects, and
+  // trigger the appropriate events.
   void intersecting() {
     if (gameRef.gameState.isPaused) {
       return;
@@ -556,6 +562,7 @@ class Runner extends Component with HasGameRef<MyGame> {
     }
   }
 
+  // Load all of the runners animations.
   Future load() async {
     List<Image> satellites = [];
     for (int i = 1; i <= 38; i++) {
@@ -662,7 +669,6 @@ class Runner extends Component with HasGameRef<MyGame> {
   void clearEffects({bool keepSounds = false}) {
     sprite.clearEffects();
     if (!keepSounds && boost != null) {
-      // boost.stop();
       boost.then((value) => value.stop());
     }
   }

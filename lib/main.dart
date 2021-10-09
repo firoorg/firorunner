@@ -36,13 +36,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO Set NO_TOURNAMENT to false, and then set the SERVER and PORT for the
 // firo runner server instance.
 const NO_TOURNAMENT = false;
-
 const SERVER = "http://10.0.0.224";
 const PORT = "50067";
 
-const COLOR = Color(0xFFDDC0A3);
+const FIREWORK_COLOR = Color(0xFFDDC0A3);
 const int LOADING_TIME = 2000000;
 
+// Variables that determine the score cutoff when each new level starts.
 const LEVEL2 = 25000000;
 const LEVEL3 = 50000000;
 const LEVEL4 = 75000000;
@@ -50,9 +50,11 @@ const LEVEL5 = 100000000;
 const LEVEL6 = 125000000;
 const LEVEL7 = 150000000;
 
+// Variables that determine when to use the new robot animations.
 const COINS_ROBOT_UPGRADE1 = 50;
 const COINS_ROBOT_UPGRADE2 = 100;
 
+// Draw priority for objects, not meant to be changed.
 const OVERLAY_PRIORITY = 110;
 const RUNNER_PRIORITY = 100;
 const BUG_PRIORITY = 75;
@@ -64,14 +66,17 @@ const WIRE_PRIORITY = 25;
 const FIREWORK_PRIORITY = 15;
 const WINDOW_PRIORITY = 10;
 
-// const overlayText = TextStyle(
-//   fontSize: 30,
-//   color: Colors.white,
-// );
-
+// Preloading images for the overlays.
 const AssetImage mainMenuImage = AssetImage('assets/images/mm3.gif');
 const AssetImage lossImage = AssetImage('assets/images/overlay100.png');
 const AssetImage buttonImage = AssetImage('assets/images/button-new.png');
+
+// Colors of the overlay Themes.
+const Color textColor = Colors.cyan;
+const Color cardColor = Color(0xff262b3f);
+const Color borderColor = Color(0xdfd675e1);
+const Color titleColor = Color(0xff68d9cc);
+const Color inactiveColor = Colors.grey;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -116,6 +121,7 @@ void main() async {
       )));
 }
 
+// Grab the nearest platform.
 int getNearestPlatform(int level) {
   return level <= 0
       ? 0
@@ -129,11 +135,11 @@ int getNearestPlatform(int level) {
 class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   TextPaint fireworksPaint = TextPaint(
     config: const TextPaintConfig(
-        fontSize: 48.0, fontFamily: 'Codystar', color: COLOR),
+        fontSize: 48.0, fontFamily: 'Codystar', color: FIREWORK_COLOR),
   );
 
   TextPaint scoresPaint = TextPaint(
-    config: const TextPaintConfig(fontSize: 16.0, color: COLOR),
+    config: const TextPaintConfig(fontSize: 16.0, color: FIREWORK_COLOR),
   );
 
   String leaderboard = "";
@@ -168,8 +174,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     viewport.resize(Vector2(1920, 1080));
   }
 
+  // Load the game and all of its assets, may take a couple of seconds.
   @override
   Future<void> onLoad() async {
+    // If playing in tournament mode, load all information from server.
     if (!NO_TOURNAMENT) {
       final prefs = await SharedPreferences.getInstance();
       username = prefs.getString('username') ?? "";
@@ -184,6 +192,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     }
     FlameAudio.bgm.initialize();
 
+    // preload all audio assets.
     await FlameAudio.audioCache.loadAll([
       'sfx/coin_catch.mp3',
       'sfx/glitch_death.mp3',
@@ -202,6 +211,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       'Infinite_Spankage_M.mp3',
     ]);
 
+    // Load each object.
     circuitBackground = CircuitBackground(this);
     await circuitBackground.load();
     platformHolder = PlatformHolder();
@@ -225,6 +235,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner = Runner();
     await runner.load();
 
+    // Set up game UI
     loaded = true;
     _distance = TextComponent("Time: 0",
         position: Vector2(size.x - 100, 10), textRenderer: scoresPaint)
@@ -234,15 +245,28 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
         position: Vector2(size.x - 20, 10), textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _coins.changePriorityWithoutResorting(OVERLAY_PRIORITY);
+
+    // add all overlays first since the first time they are added there is a
+    // delay, so calling it earlier makes a smoother experience.
+    overlays.add("leaderboard");
+    overlays.remove('leaderboard');
+    overlays.add("deposit");
+    overlays.remove('deposit');
+    overlays.add("signin");
+    overlays.remove('signin');
     overlays.add("gameOver");
     overlays.remove('gameOver');
     overlays.add("mainMenu");
     overlays.add('loading');
+
+    // set up the game and pause it.
     setUp();
     gameState.setPaused();
     startLoading = DateTime.now().microsecondsSinceEpoch;
   }
 
+  // Choose which music to play. Useful since web browser does not let you play
+  // music until the user interacts with the website.
   void playMusic() {
     if (overlays.isActive('mainMenu')) {
       FlameAudio.bgm.play('Infinite_Menu.mp3');
@@ -252,6 +276,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     playingMusic = true;
   }
 
+  // Fill the screen with platforms and all of the obstacles.
   void fillScreen() {
     if (shouldReset) {
       return;
@@ -296,6 +321,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     }
   }
 
+  // Check if an obstacle is being placed too near another obstacle,
+  // to ensure fairness for the player.
   bool isTooNearOtherObstacles(Rect rect) {
     Rect obstacleBounds = Rect.fromLTRB(
         3 * rect.left - 2 * (rect.left + blockSize) - 1,
@@ -347,6 +374,8 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
   bool shouldReset = false;
 
+  // Connect to the server in online mode to get information and to participate
+  // in the weekly tournament.
   Future<String> connectServer(String command, String arguments) async {
     try {
       final response = await http.post(
@@ -372,6 +401,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     }
   }
 
+  // Put the loss screen up.
   Future<void> displayLoss() async {
     if (!(runner.sprite.animation?.done() ?? false) &&
         runner.sprite.animation!.loop == false &&
@@ -382,6 +412,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     overlays.add('gameOver');
   }
 
+  // Put the main menu screen up.
   void mainMenu() {
     overlays.remove('gameOver');
     overlays.add('mainMenu');
@@ -389,6 +420,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     FlameAudio.bgm.play('Infinite_Menu.mp3');
   }
 
+  // reset the game.
   void reset() {
     runner.sprite.animation!.reset();
     overlays.remove('gameOver');
@@ -398,8 +430,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     setUp();
   }
 
+  // process after a death.
   Future<void> die() async {
     gameState.setPaused();
+    // if in a tournament mode update information.
     if (!NO_TOURNAMENT) {
       final prefs = await SharedPreferences.getInstance();
       if (username != "" && competitive) {
@@ -418,6 +452,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     shouldReset = true;
   }
 
+  // set up the game for another run.
   void setUp() {
     add(runner);
     fireworks.setUp();
@@ -479,7 +514,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     debrisHolder.update(dt);
     wallHolder.update(dt);
 
-    _distance.text = "Time: ${gameState.getPlayerDistance()}";
+    _distance.text = "Time: ${gameState.getPlayerTime()}";
     _coins.text = " ${gameState.numCoins}";
     if (shouldReset &&
         !overlays.isActive('gameOver') &&

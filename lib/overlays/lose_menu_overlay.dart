@@ -34,7 +34,7 @@ class LoseMenuOverlay extends StatelessWidget {
               child: Text(
                 'Score: ${game.gameState.getPlayerScore()}',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: textColor,
                   fontSize: width * 0.05,
                 ),
               ),
@@ -45,8 +45,6 @@ class LoseMenuOverlay extends StatelessWidget {
               children: [
                 MaterialButton(
                   padding: const EdgeInsets.all(8.0),
-                  textColor: Colors.white,
-                  splashColor: Colors.greenAccent,
                   elevation: 8.0,
                   child: Container(
                     decoration: const BoxDecoration(
@@ -58,7 +56,7 @@ class LoseMenuOverlay extends StatelessWidget {
                       child: Text(
                         "     MAIN MENU     ",
                         style: TextStyle(
-                          color: Colors.cyan,
+                          color: textColor,
                           fontSize: width * 0.03,
                         ),
                       ),
@@ -77,8 +75,6 @@ class LoseMenuOverlay extends StatelessWidget {
                 ),
                 MaterialButton(
                   padding: const EdgeInsets.all(8.0),
-                  textColor: Colors.white,
-                  splashColor: Colors.greenAccent,
                   elevation: 8.0,
                   child: Container(
                     decoration: const BoxDecoration(
@@ -91,8 +87,8 @@ class LoseMenuOverlay extends StatelessWidget {
                         "    REPLAY${game.competitive ? "   ${game.tries}" : ""}    ",
                         style: TextStyle(
                           color: game.competitive && game.tries <= 0
-                              ? Colors.grey
-                              : Colors.cyan,
+                              ? inactiveColor
+                              : textColor,
                           fontSize: width * 0.03,
                         ),
                       ),

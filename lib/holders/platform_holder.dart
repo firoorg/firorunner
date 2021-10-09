@@ -37,10 +37,14 @@ class PlatformHolder extends Holder {
     super.setUp();
   }
 
+  // Removes obstacles from around openings in the floor so that the game is
+  // not unfair to the player.
   void removeUnfairObstacles(
       MyGame gameRef, Platform currentPlatform, int from, int to) {
     for (int i = from; i <= to; i++) {
       if (i == 0) {
+        // First level has a harder difficulty curve, and no platforms are on
+        // level -1, so objects have to be removed differently.
         List<MovingObject> bugLevel = gameRef.bugHolder.objects[0];
         for (MovingObject bug in gameRef.bugHolder.objects[0]) {
           if (bug.sprite.x >= currentPlatform.sprite.x &&
@@ -58,6 +62,7 @@ class PlatformHolder extends Holder {
           }
         }
       } else {
+        // All other objects on the other levels can be removed simply.
         int nearestPlatform = getNearestPlatform(i);
         for (MovingObject platform in objects[nearestPlatform]) {
           if (platform.sprite.x >= currentPlatform.sprite.x &&
@@ -71,6 +76,8 @@ class PlatformHolder extends Holder {
     }
   }
 
+  // Generate all the platforms in the game.
+  // Including top openings, and bottom structures.
   void generatePlatforms(MyGame gameRef) {
     while (!generatePlatform(gameRef, 2)) {
       timeSinceLastTopHole++;
@@ -118,6 +125,7 @@ class PlatformHolder extends Holder {
     }
   }
 
+  // Create a platform object.
   bool generatePlatform(MyGame gameRef, int level, {double xPosition = 0}) {
     double xCoordinate = xPosition;
     if (objects[level].isNotEmpty && xPosition == 0) {
@@ -143,17 +151,7 @@ class PlatformHolder extends Holder {
     }
   }
 
-  double getFlushX() {
-    MovingObject platform =
-        objects[2].firstWhere((element) => element.sprite.x > 0, orElse: () {
-      return objects[5].firstWhere((element) => element.sprite.x > 0,
-          orElse: () {
-        return objects[8].firstWhere((element) => element.sprite.x > 0);
-      });
-    });
-    return platform.sprite.x;
-  }
-
+  // Choose a random platform that is off screen from the player.
   Platform? getPlatformOffScreen(int level) {
     for (int i = 0; i < objects[level].length; i++) {
       Platform p = objects[level][i] as Platform;

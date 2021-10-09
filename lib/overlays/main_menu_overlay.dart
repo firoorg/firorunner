@@ -2,9 +2,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:audioplayers/src/api/player_mode.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class MainMenuOverlay extends StatelessWidget {
   const MainMenuOverlay({
@@ -51,8 +49,6 @@ class MainMenuOverlay extends StatelessWidget {
                   children: [
                     MaterialButton(
                       padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                      textColor: Colors.white,
-                      splashColor: Colors.greenAccent,
                       elevation: 8.0,
                       child: Container(
                         decoration: const BoxDecoration(
@@ -64,7 +60,7 @@ class MainMenuOverlay extends StatelessWidget {
                           child: Text(
                             "      START      ",
                             style: TextStyle(
-                              color: Colors.cyan,
+                              color: textColor,
                               fontSize: width * 0.025,
                             ),
                           ),
@@ -98,8 +94,6 @@ class MainMenuOverlay extends StatelessWidget {
                         children: [
                           MaterialButton(
                             padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                            textColor: Colors.white,
-                            splashColor: Colors.greenAccent,
                             elevation: 8.0,
                             child: Container(
                               decoration: const BoxDecoration(
@@ -107,13 +101,13 @@ class MainMenuOverlay extends StatelessWidget {
                                     image: buttonImage, fit: BoxFit.fill),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   "    DEPOSIT    ",
                                   style: TextStyle(
                                     color: game.username == ""
-                                        ? Colors.grey
-                                        : Colors.cyan,
+                                        ? inactiveColor
+                                        : textColor,
                                     fontSize: width * 0.025,
                                   ),
                                 ),
@@ -132,8 +126,6 @@ class MainMenuOverlay extends StatelessWidget {
                           ),
                           MaterialButton(
                             padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                            textColor: Colors.white,
-                            splashColor: Colors.greenAccent,
                             elevation: 8.0,
                             child: Container(
                               decoration: const BoxDecoration(
@@ -147,8 +139,8 @@ class MainMenuOverlay extends StatelessWidget {
                                   style: TextStyle(
                                     color:
                                         game.username == "" || game.tries == 0
-                                            ? Colors.grey
-                                            : Colors.cyan,
+                                            ? inactiveColor
+                                            : textColor,
                                     fontSize: width * 0.025,
                                   ),
                                 ),
@@ -187,8 +179,6 @@ class MainMenuOverlay extends StatelessWidget {
                         children: [
                           MaterialButton(
                             padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                            textColor: Colors.white,
-                            splashColor: Colors.greenAccent,
                             elevation: 8.0,
                             child: Container(
                               decoration: const BoxDecoration(
@@ -196,11 +186,11 @@ class MainMenuOverlay extends StatelessWidget {
                                     image: buttonImage, fit: BoxFit.fill),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   "    ${game.username == "" ? "SIGN IN" : game.username}    ",
                                   style: TextStyle(
-                                    color: Colors.cyan,
+                                    color: textColor,
                                     fontSize: width * 0.025,
                                   ),
                                 ),
@@ -214,8 +204,6 @@ class MainMenuOverlay extends StatelessWidget {
                           ),
                           MaterialButton(
                             padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                            textColor: Colors.white,
-                            splashColor: Colors.greenAccent,
                             elevation: 8.0,
                             child: Container(
                               decoration: const BoxDecoration(
@@ -223,11 +211,11 @@ class MainMenuOverlay extends StatelessWidget {
                                     image: buttonImage, fit: BoxFit.fill),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   "     LEADER BOARD     ",
                                   style: TextStyle(
-                                    color: Colors.cyan,
+                                    color: textColor,
                                     fontSize: width * 0.025,
                                   ),
                                 ),

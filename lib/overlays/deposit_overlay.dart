@@ -9,10 +9,6 @@ class DepositOverlay extends StatelessWidget {
     required this.game,
   }) : super(key: key);
 
-  final Color textColor = Colors.cyan;
-  final Color cardColor = const Color(0xff262b3f);
-  final Color titleColor = const Color(0xff68d9cc);
-
   final MyGame game;
 
   List<Widget> getDepositAddress(double width) {
@@ -29,7 +25,7 @@ class DepositOverlay extends StatelessWidget {
       child: Card(
         color: cardColor,
         shape: RoundedRectangleBorder(
-            side: BorderSide(color: titleColor, width: 3),
+            side: const BorderSide(color: titleColor, width: 3),
             borderRadius: BorderRadius.circular(10.0)),
         child: Padding(
           padding: EdgeInsets.all(width * 0.01),

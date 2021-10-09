@@ -24,6 +24,7 @@ enum OverlayState {
   seventh,
 }
 
+// Class for the moving background.
 class CircuitBackground extends MovingObject {
   late Image background;
 
