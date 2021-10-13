@@ -36,8 +36,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO Set NO_TOURNAMENT to false, and then set the SERVER and PORT for the
 // firo runner server instance.
 const NO_TOURNAMENT = false;
-const SERVER = "http://10.0.0.224";
-const PORT = "50067";
+const SERVER = "https://game.firorunner.com";
+const PORT = "443";
 
 const FIREWORK_COLOR = Color(0xFFDDC0A3);
 const int LOADING_TIME = 2000000;
