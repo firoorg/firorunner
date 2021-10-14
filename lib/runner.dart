@@ -8,6 +8,7 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
+import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/animation.dart';
 import 'package:audioplayers/src/api/player_mode.dart';
@@ -570,47 +571,62 @@ class Runner extends Component with HasGameRef<MyGame> {
           'runner/satellite/satellite00${i < 10 ? "0" + i.toString() : i.toString()}.png'));
     }
 
-    SpriteAnimation running =
-        await loadSpriteAnimation("run", 38, satellites: satellites);
+    SpriteAnimation running = await loadSpriteAnimation("run", 38,
+        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
 
     SpriteAnimation jumping = await loadSpriteAnimation("jump", 6,
-        satellites: satellites, loop: false);
+        satellites: satellites,
+        loop: false,
+        sheets: 1,
+        frameSize: Vector2(512, 512));
 
-    SpriteAnimation ducking =
-        await loadSpriteAnimation("duck1", 38, satellites: satellites);
+    SpriteAnimation ducking = await loadSpriteAnimation("duck1", 38,
+        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
 
-    SpriteAnimation ducking2 =
-        await loadSpriteAnimation("duck2", 38, satellites: satellites);
+    SpriteAnimation ducking2 = await loadSpriteAnimation("duck2", 38,
+        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
 
-    SpriteAnimation ducking3 =
-        await loadSpriteAnimation("duck3", 38, satellites: satellites);
+    SpriteAnimation ducking3 = await loadSpriteAnimation("duck3", 38,
+        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
 
     SpriteAnimation kicking = await loadSpriteAnimation("attack1", 38,
-        satellites: satellites, loop: false);
+        satellites: satellites,
+        loop: false,
+        sheets: 3,
+        frameSize: Vector2(512, 512));
 
     SpriteAnimation kicking2 = await loadSpriteAnimation("attack2", 38,
-        satellites: satellites, loop: false);
+        satellites: satellites,
+        loop: false,
+        sheets: 3,
+        frameSize: Vector2(512, 512));
 
     SpriteAnimation kicking3 = await loadSpriteAnimation("attack3", 38,
-        satellites: satellites, loop: false);
+        satellites: satellites,
+        loop: false,
+        sheets: 3,
+        frameSize: Vector2(512, 512));
 
-    SpriteAnimation floating =
-        await loadSpriteAnimation("hover1", 44, satellites: satellites);
+    SpriteAnimation floating = await loadSpriteAnimation("hover1", 44,
+        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
 
-    SpriteAnimation floating2 =
-        await loadSpriteAnimation("hover2", 44, satellites: satellites);
+    SpriteAnimation floating2 = await loadSpriteAnimation("hover2", 44,
+        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
 
-    SpriteAnimation floating3 =
-        await loadSpriteAnimation("hover3", 44, satellites: satellites);
+    SpriteAnimation floating3 = await loadSpriteAnimation("hover3", 44,
+        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
 
     SpriteAnimation falling = await loadSpriteAnimation("fall", 20,
-        satellites: satellites, loop: false);
+        satellites: satellites,
+        loop: false,
+        sheets: 2,
+        frameSize: Vector2(512, 512));
 
-    SpriteAnimation dying =
-        await loadSpriteAnimation("death2", 57, loop: false);
+    SpriteAnimation dying = await loadSpriteAnimation("death2", 57,
+        loop: false, sheets: 4, frameSize: Vector2(512, 512));
 
-    SpriteAnimation dyingGlitch =
-        await loadSpriteAnimation("death1", 82, loop: false);
+    SpriteAnimation dyingGlitch = await loadSpriteAnimation("death1", 82,
+        loop: false, sheets: 6, frameSize: Vector2(512, 512));
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
@@ -637,20 +653,56 @@ class Runner extends Component with HasGameRef<MyGame> {
   }
 
   Future<SpriteAnimation> loadSpriteAnimation(String name, int howManyFrames,
-      {List<Image>? satellites, bool loop = true}) async {
+      {List<Image>? satellites,
+      bool loop = true,
+      int sheets = 0,
+      Vector2? frameSize}) async {
     List<Sprite> sprites = [];
-    for (int i = 1; i <= howManyFrames; i++) {
-      final composition = ImageComposition();
-      if (satellites != null) {
-        composition.add(
-            satellites.elementAt(((i - 1) % satellites.length)), Vector2(0, 0));
-      }
-      composition.add(
-          await Flame.images.load(
-              'runner/$name/${name}00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
-          Vector2(0, 0));
+    if (sheets != 0 && frameSize != null) {
+      int currentSprite = 0;
+      for (int index = 0; index < sheets; index++) {
+        Image sheet = await Flame.images.load('runner/$name/$name-$index.png');
+        final composition = ImageComposition();
+        composition.add(sheet, Vector2(0, 0));
+        if (satellites != null) {
+          int columns = sheet.width ~/ frameSize.x;
+          int rows = sheet.height ~/ frameSize.y;
+          int satelliteSprite = currentSprite;
+          for (int i = 0;
+              (i < rows * columns) && satelliteSprite < howManyFrames;
+              i++) {
+            composition.add(
+                satellites.elementAt(((i) % satellites.length)),
+                Vector2(
+                    (i % columns) * frameSize.x, (i ~/ columns) * frameSize.y));
+            satelliteSprite++;
+          }
+        }
+        SpriteSheet spriteSheet =
+            SpriteSheet(image: await composition.compose(), srcSize: frameSize);
 
-      sprites.add(Sprite(await composition.compose()));
+        for (int i = 0;
+            (i < spriteSheet.rows * spriteSheet.columns) &&
+                currentSprite < howManyFrames;
+            i++) {
+          sprites.add(spriteSheet.getSpriteById(i));
+          currentSprite++;
+        }
+      }
+    } else {
+      for (int i = 1; i <= howManyFrames; i++) {
+        final composition = ImageComposition();
+        if (satellites != null) {
+          composition.add(satellites.elementAt(((i - 1) % satellites.length)),
+              Vector2(0, 0));
+        }
+        composition.add(
+            await Flame.images.load(
+                'runner/$name/${name}00${i < 10 ? "0" + i.toString() : i.toString()}.png'),
+            Vector2(0, 0));
+
+        sprites.add(Sprite(await composition.compose()));
+      }
     }
 
     return SpriteAnimation.spriteList(sprites, stepTime: 0.02, loop: loop);

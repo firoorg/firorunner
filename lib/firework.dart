@@ -4,6 +4,7 @@ import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
+import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:audioplayers/src/api/player_mode.dart';
 
@@ -36,7 +37,8 @@ class Firework extends Component {
 
   Future load() async {
     random = Random();
-    List<Sprite> firework = await loadListSprites("firework", "firework", 10);
+    List<Sprite> firework = await loadListSprites("firework", "firework", 10,
+        sheets: 1, frameSize: Vector2(512, 512));
 
     SpriteAnimation normal =
         SpriteAnimation.spriteList(firework, stepTime: 0.25, loop: false);
@@ -128,14 +130,31 @@ class Firework extends Component {
   }
 
   Future<List<Sprite>> loadListSprites(
-      String folderName, String extraName, int howManyFrames) async {
+      String folderName, String extraName, int howManyFrames,
+      {int sheets = 0, Vector2? frameSize}) async {
     List<Sprite> sprites = [];
-    for (int i = 0; i < howManyFrames; i++) {
-      sprites.add(Sprite(
-        await Flame.images.load('$folderName/${extraName}_$i.png'),
-      ));
-    }
+    if (sheets != 0 && frameSize != null) {
+      int currentSprite = 0;
+      for (int index = 0; index < sheets; index++) {
+        Image sheet =
+            await Flame.images.load('$folderName/$extraName-$index.png');
+        SpriteSheet spriteSheet = SpriteSheet(image: sheet, srcSize: frameSize);
 
+        for (int i = 0;
+            (i < spriteSheet.rows * spriteSheet.columns) &&
+                currentSprite < howManyFrames;
+            i++) {
+          sprites.add(spriteSheet.getSpriteById(i));
+          currentSprite++;
+        }
+      }
+    } else {
+      for (int i = 0; i < howManyFrames; i++) {
+        sprites.add(Sprite(
+          await Flame.images.load('$folderName/${extraName}_$i.png'),
+        ));
+      }
+    }
     return sprites;
   }
 }

@@ -12,7 +12,8 @@ class DebrisHolder extends Holder {
 
   @override
   Future load() async {
-    debris = await loadListSprites("debris", "debris", 21);
+    debris = await loadListSprites("debris", "debris", 21,
+        sheets: 1, frameSize: Vector2(360, 1000));
   }
 
   List<Sprite> getDebris() {

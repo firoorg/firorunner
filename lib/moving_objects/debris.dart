@@ -20,8 +20,8 @@ class Debris extends MovingObject {
 
     setSize(
       gameRef.blockSize *
-          (gameRef.debrisHolder.debris[0].image.width /
-              gameRef.debrisHolder.debris[0].image.height) *
+          (gameRef.debrisHolder.debris[0].srcSize.x /
+              gameRef.debrisHolder.debris[0].srcSize.y) *
           1.5,
       gameRef.blockSize * 1.5,
     );

@@ -20,14 +20,22 @@ class PlatformHolder extends Holder {
 
   @override
   Future load() async {
-    l1 = await loadListSprites("platform", "platform-left-nowire-frames", 5);
-    l2 = await loadListSprites("platform", "platform-left-wire-frames", 5);
-    m1 = await loadListSprites("platform", "platform-mid-nowire-frames", 5);
-    m2 = await loadListSprites("platform", "platform-mid-wire-frames", 5);
-    r1 = await loadListSprites("platform", "platform-right-nowire-frames", 5);
-    r2 = await loadListSprites("platform", "platform-right-wire-frames", 5);
-    o1 = await loadListSprites("platform", "platform-single-nowire-frames", 5);
-    o2 = await loadListSprites("platform", "platform-single-wire-frames", 5);
+    l1 = await loadListSprites("platform", "platform-left-nowire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
+    l2 = await loadListSprites("platform", "platform-left-wire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
+    m1 = await loadListSprites("platform", "platform-mid-nowire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
+    m2 = await loadListSprites("platform", "platform-mid-wire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
+    r1 = await loadListSprites("platform", "platform-right-nowire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
+    r2 = await loadListSprites("platform", "platform-right-wire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
+    o1 = await loadListSprites("platform", "platform-single-nowire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
+    o2 = await loadListSprites("platform", "platform-single-wire-frames", 5,
+        sheets: 1, frameSize: Vector2(1000, 807));
   }
 
   @override

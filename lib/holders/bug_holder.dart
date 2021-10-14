@@ -11,8 +11,10 @@ class BugHolder extends Holder {
 
   @override
   Future load() async {
-    bug = await loadListSprites("bug", "bug", 8);
-    breaking = await loadListSprites("bug", "bug_break", 13);
+    bug = await loadListSprites("bug", "bug", 8,
+        sheets: 1, frameSize: Vector2(512, 512));
+    breaking = await loadListSprites("bug", "bug_break", 13,
+        sheets: 1, frameSize: Vector2(512, 512));
   }
 
   List<Sprite> getBug(String state) {

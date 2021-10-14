@@ -51,8 +51,8 @@ class Platform extends MovingObject {
 
     setSize(
       gameRef.blockSize *
-          (gameRef.platformHolder.l1[0].image.width /
-              gameRef.platformHolder.l1[0].image.height),
+          (gameRef.platformHolder.l1[0].srcSize.x /
+              gameRef.platformHolder.l1[0].srcSize.y),
       gameRef.blockSize,
     );
   }

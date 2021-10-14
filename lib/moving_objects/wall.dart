@@ -22,8 +22,8 @@ class Wall extends MovingObject {
 
     setSize(
       gameRef.blockSize *
-          (gameRef.wallHolder.wall[0].image.width /
-              gameRef.wallHolder.wall[0].image.height) *
+          (gameRef.wallHolder.wall[0].srcSize.x /
+              gameRef.wallHolder.wall[0].srcSize.y) *
           2.0,
       gameRef.blockSize * 0.35,
     );

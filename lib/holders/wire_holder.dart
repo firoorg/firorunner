@@ -10,7 +10,8 @@ class WireHolder extends Holder {
 
   @override
   Future load() async {
-    wire = await loadListSprites("wire", "wire", 12);
+    wire = await loadListSprites("wire", "wire", 12,
+        sheets: 1, frameSize: Vector2(512, 512));
   }
 
   List<Sprite> getWire() {

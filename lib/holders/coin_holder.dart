@@ -13,7 +13,8 @@ class CoinHolder extends Holder {
 
   @override
   Future load() async {
-    coin = await loadListSprites("coin", "coin", 12);
+    coin = await loadListSprites("coin", "coin", 12,
+        sheets: 1, frameSize: Vector2(512, 512));
     SpriteAnimation normal = SpriteAnimation.spriteList(coin, stepTime: 0.1);
 
     sprite = SpriteAnimationGroupComponent(

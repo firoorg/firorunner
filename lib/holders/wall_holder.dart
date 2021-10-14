@@ -10,7 +10,8 @@ class WallHolder extends Holder {
 
   @override
   Future load() async {
-    wall = await loadListSprites("wall", "wall", 5);
+    wall = await loadListSprites("wall", "wall", 5,
+        sheets: 1, frameSize: Vector2(163, 1000));
   }
 
   List<Sprite> getWall() {

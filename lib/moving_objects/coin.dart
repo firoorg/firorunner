@@ -18,11 +18,11 @@ class Coin extends MovingObject {
 
     sprite.changePriorityWithoutResorting(COIN_PRIORITY);
 
-    var platform = gameRef.platformHolder.l1[0].image;
+    var platform = gameRef.platformHolder.l1[0].srcSize;
 
     setSize(
-      gameRef.blockSize * (platform.width / platform.height / 2.8),
-      gameRef.blockSize * (platform.width / platform.height / 2.8),
+      gameRef.blockSize * (platform.x / platform.y / 2.8),
+      gameRef.blockSize * (platform.x / platform.y / 2.8),
     );
   }
 }
