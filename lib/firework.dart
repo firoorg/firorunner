@@ -20,19 +20,19 @@ class Firework extends Component {
   late Random random;
   String message = "";
   List<String> messages = [
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
-    "Speed Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
+    "Speeding Up!",
   ];
 
   Future load() async {

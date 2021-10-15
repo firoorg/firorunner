@@ -12,6 +12,7 @@ import 'package:firo_runner/overlays/leader_board_overlay.dart';
 import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:firo_runner/moving_objects/platform.dart';
 import 'package:firo_runner/holders/platform_holder.dart';
+import 'package:firo_runner/overlays/loading_overlay.dart';
 import 'package:firo_runner/overlays/sign_in_overlay.dart';
 import 'package:firo_runner/holders/wall_holder.dart';
 import 'package:firo_runner/moving_objects/wire.dart';
@@ -86,6 +87,9 @@ void main() async {
   runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       home: GameWidget<MyGame>(
+        loadingBuilder: (BuildContext context) {
+          return const LoadingOverlay();
+        },
         game: myGame,
         overlayBuilderMap: {
           // Should be used once before all overlays are called. Flame has a slight
