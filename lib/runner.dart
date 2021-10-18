@@ -565,68 +565,47 @@ class Runner extends Component with HasGameRef<MyGame> {
 
   // Load all of the runners animations.
   Future load() async {
-    List<Image> satellites = [];
-    for (int i = 1; i <= 38; i++) {
-      satellites.add(await Flame.images.load(
-          'runner/satellite/satellite00${i < 10 ? "0" + i.toString() : i.toString()}.png'));
-    }
-
     SpriteAnimation running = await loadSpriteAnimation("run", 38,
-        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
+        sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation jumping = await loadSpriteAnimation("jump", 6,
-        satellites: satellites,
-        loop: false,
-        sheets: 1,
-        frameSize: Vector2(512, 512));
+        loop: false, sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation ducking = await loadSpriteAnimation("duck1", 38,
-        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
+        sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation ducking2 = await loadSpriteAnimation("duck2", 38,
-        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
+        sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation ducking3 = await loadSpriteAnimation("duck3", 38,
-        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
+        sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation kicking = await loadSpriteAnimation("attack1", 38,
-        satellites: satellites,
-        loop: false,
-        sheets: 3,
-        frameSize: Vector2(512, 512));
+        loop: false, sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation kicking2 = await loadSpriteAnimation("attack2", 38,
-        satellites: satellites,
-        loop: false,
-        sheets: 3,
-        frameSize: Vector2(512, 512));
+        loop: false, sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation kicking3 = await loadSpriteAnimation("attack3", 38,
-        satellites: satellites,
-        loop: false,
-        sheets: 3,
-        frameSize: Vector2(512, 512));
+        loop: false, sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation floating = await loadSpriteAnimation("hover1", 44,
-        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
+        sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation floating2 = await loadSpriteAnimation("hover2", 44,
-        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
+        sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation floating3 = await loadSpriteAnimation("hover3", 44,
-        satellites: satellites, sheets: 3, frameSize: Vector2(512, 512));
+        sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation falling = await loadSpriteAnimation("fall", 20,
-        satellites: satellites,
-        loop: false,
-        sheets: 2,
-        frameSize: Vector2(512, 512));
+        loop: false, sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation dying = await loadSpriteAnimation("death2", 57,
-        loop: false, sheets: 4, frameSize: Vector2(512, 512));
+        loop: false, sheets: 1, frameSize: Vector2(256, 256));
 
     SpriteAnimation dyingGlitch = await loadSpriteAnimation("death1", 82,
-        loop: false, sheets: 6, frameSize: Vector2(512, 512));
+        loop: false, sheets: 2, frameSize: Vector2(256, 256));
 
     sprite = SpriteAnimationGroupComponent(
       animations: {
