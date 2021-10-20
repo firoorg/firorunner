@@ -526,7 +526,9 @@ class Runner extends Component with HasGameRef<MyGame> {
         String intersectState = debrisLevel[i].intersect(slim);
         if (intersectState == "none") {
           continue;
-        } else if (runnerState == "duck" && intersectState != "above") {
+        } else if (runnerState == "duck" ||
+            runnerState == "fall" ||
+            runnerState == "double_jump" && intersectState != "above") {
           continue;
         } else {
           FlameAudio.audioCache

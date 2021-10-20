@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "An infitite runner game powered by Firo.",
+    "description": "An infinite runner game powered by Firo.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

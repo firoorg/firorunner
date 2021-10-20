@@ -1,6 +1,6 @@
 # firo_runner
 
-An infitite runner game powered by Firo.
+An infinite runner game powered by Firo.
 
 ## Getting Started
 
