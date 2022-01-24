@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
-set(BINARY_NAME "firo_runner")
-set(APPLICATION_ID "com.firogames.firo_runner")
+set(BINARY_NAME "Firo Runner")
+set(APPLICATION_ID "com.cypherstack.firorunner")
 
 cmake_policy(SET CMP0063 NEW)
 

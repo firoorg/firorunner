@@ -36,7 +36,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO Set NO_TOURNAMENT to false, and then set the SERVER and PORT for the
 // firo runner server instance.
-const NO_TOURNAMENT = false;
+const NO_TOURNAMENT = true;
 const SERVER = "https://game.firorunner.com";
 const PORT = "443";
 

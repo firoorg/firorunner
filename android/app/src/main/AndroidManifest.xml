@@ -2,7 +2,7 @@
     package="com.firogames.firo_runner">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="firo_runner"
+        android:label="Firo Runner"
         android:icon="@mipmap/launcher_icon">
 
        <activity
