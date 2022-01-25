@@ -260,8 +260,9 @@ class CircuitBackground extends MovingObject {
     overlayB.current = OverlayState.first;
     background1Position = Vector2(0, 0);
     background1Size = Vector2(
-        gameRef.viewport.canvasSize.y * (background.width / background.height),
-        gameRef.viewport.canvasSize.y);
+        gameRef.camera.viewport.canvasSize!.y *
+            (background.width / background.height),
+        gameRef.camera.viewport.canvasSize!.y);
     windowA.position = background1Position;
     windowA.size = background1Size;
     overlayA.position = background1Position;
@@ -270,8 +271,9 @@ class CircuitBackground extends MovingObject {
     background2Position =
         Vector2(background1Position.x + background1Size.x - 1, 0);
     background2Size = Vector2(
-        gameRef.viewport.canvasSize.y * (background.width / background.height),
-        gameRef.viewport.canvasSize.y);
+        gameRef.camera.viewport.canvasSize!.y *
+            (background.width / background.height),
+        gameRef.camera.viewport.canvasSize!.y);
     windowB.position = background2Position;
     windowB.size = background2Size;
     overlayB.position = background2Position;
@@ -360,20 +362,8 @@ class CircuitBackground extends MovingObject {
   void render(Canvas canvas) {
     background1.render(canvas,
         size: background1Size, position: background1Position);
-    canvas.save();
-    overlayA.render(canvas);
-    canvas.restore();
-    canvas.save();
-    windowA.render(canvas);
-    canvas.restore();
     background2.render(canvas,
         size: background2Size, position: background2Position);
-    canvas.save();
-    overlayB.render(canvas);
-    canvas.restore();
-    canvas.save();
-    windowB.render(canvas);
-    canvas.restore();
   }
 
   @override

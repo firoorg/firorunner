@@ -53,8 +53,8 @@ class Firework extends Component {
     sprite1.changePriorityWithoutResorting(FIREWORK_PRIORITY);
     sprite1.update(100);
 
-    sprite1.size =
-        Vector2(gameRef.viewport.canvasSize.y, gameRef.viewport.canvasSize.y);
+    sprite1.size = Vector2(gameRef.camera.viewport.canvasSize!.y,
+        gameRef.camera.viewport.canvasSize!.y);
     sprite1.position = Vector2(0, 0);
 
     sprite2 = SpriteAnimationGroupComponent(
@@ -66,10 +66,10 @@ class Firework extends Component {
 
     sprite2.changePriorityWithoutResorting(FIREWORK_PRIORITY);
 
-    sprite2.size =
-        Vector2(gameRef.viewport.canvasSize.y, gameRef.viewport.canvasSize.y);
+    sprite2.size = Vector2(gameRef.camera.viewport.canvasSize!.y,
+        gameRef.camera.viewport.canvasSize!.y);
     sprite2.position =
-        Vector2(gameRef.viewport.canvasSize.x - sprite2.size.x, 0);
+        Vector2(gameRef.camera.viewport.canvasSize!.x - sprite2.size.x, 0);
     sprite2.update(100);
   }
 

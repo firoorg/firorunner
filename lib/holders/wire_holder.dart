@@ -45,11 +45,13 @@ class WireHolder extends Holder {
       }
 
       Wire wire = Wire(gameRef);
-      wire.sprite.renderFlipX = true;
+      wire.sprite.flipHorizontally();
       if (level % 3 == 0) {
-        wire.sprite.renderFlipY = true;
+        wire.sprite.anchor = Anchor.center;
+        wire.sprite.flipVertically();
+
         wire.setPosition(
-            xCoordinate, gameRef.blockSize * level - 2 * gameRef.blockSize / 7);
+            xCoordinate, gameRef.blockSize * level + 2 * gameRef.blockSize / 7);
       } else {
         wire.setPosition(
             xCoordinate, gameRef.blockSize * level + gameRef.blockSize / 10);

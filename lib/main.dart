@@ -21,8 +21,7 @@ import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:flame/gestures.dart';
-import 'package:flame/keyboard.dart';
+import 'package:flame/input.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -100,8 +99,8 @@ void main() async {
           'loading': (_, myGame) {
             return Center(
               child: Container(
-                height: myGame.viewport.canvasSize.y,
-                width: myGame.viewport.canvasSize.x,
+                height: myGame.camera.viewport.canvasSize!.y,
+                width: myGame.camera.viewport.canvasSize!.x,
                 color: Colors.black,
               ),
             );
@@ -136,14 +135,14 @@ int getNearestPlatform(int level) {
               : 8;
 }
 
-class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
+class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
   TextPaint fireworksPaint = TextPaint(
-    config: const TextPaintConfig(
+    style: const TextStyle(
         fontSize: 48.0, fontFamily: 'Codystar', color: FIREWORK_COLOR),
   );
 
   TextPaint scoresPaint = TextPaint(
-    config: const TextPaintConfig(fontSize: 16.0, color: FIREWORK_COLOR),
+    style: const TextStyle(fontSize: 16.0, color: FIREWORK_COLOR),
   );
 
   String leaderboard = "";
@@ -175,7 +174,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   int startLoading = 0;
 
   MyGame() : super() {
-    viewport.resize(Vector2(1920, 1080));
+    camera.viewport.resize(Vector2(1920, 1080));
   }
 
   // Load the game and all of its assets, may take a couple of seconds.
@@ -236,17 +235,21 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
     gameState = GameState();
 
-    runner = Runner();
+    runner = Runner(this);
     await runner.load();
 
     // Set up game UI
     loaded = true;
-    _distance = TextComponent("Time: 0",
-        position: Vector2(size.x - 100, 10), textRenderer: scoresPaint)
+    _distance = TextComponent(
+        text: "Time: 0",
+        position: Vector2(size.x - 100, 10),
+        textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _distance.changePriorityWithoutResorting(OVERLAY_PRIORITY);
-    _coins = TextComponent(": 0",
-        position: Vector2(size.x - 20, 10), textRenderer: scoresPaint)
+    _coins = TextComponent(
+        text: ": 0",
+        position: Vector2(size.x - 20, 10),
+        textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _coins.changePriorityWithoutResorting(OVERLAY_PRIORITY);
 
@@ -430,7 +433,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     overlays.remove('gameOver');
     overlays.remove('mainMenu');
     shouldReset = false;
-    components.clear();
+    children.clear();
     setUp();
   }
 
@@ -460,9 +463,17 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   void setUp() {
     add(runner);
     fireworks.setUp();
-    runner.sprite.clearEffects();
+    runner.sprite.children.clear();
     runner.sprite.current = RunnerState.run;
+    remove(circuitBackground.windowA);
+    remove(circuitBackground.windowB);
+    remove(circuitBackground.overlayA);
+    remove(circuitBackground.overlayB);
     circuitBackground.setUp();
+    add(circuitBackground.windowA);
+    add(circuitBackground.windowB);
+    add(circuitBackground.overlayA);
+    add(circuitBackground.overlayB);
     platformHolder.setUp();
     coinHolder.setUp();
     wireHolder.setUp();
@@ -528,13 +539,13 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   }
 
   @override
-  void onResize(Vector2 canvasSize) {
-    Vector2 oldSize = viewport.canvasSize;
-    super.onResize(canvasSize);
+  void onGameResize(Vector2 canvasSize) {
+    Vector2? oldSize = camera.viewport.canvasSize;
+    super.onGameResize(canvasSize);
     blockSize = canvasSize.y / 9;
     if (loaded) {
-      double xRatio = canvasSize.x / oldSize.x;
-      double yRatio = canvasSize.y / oldSize.y;
+      double xRatio = canvasSize.x / oldSize!.x;
+      double yRatio = canvasSize.y / oldSize!.y;
       circuitBackground.resize(canvasSize, xRatio, yRatio);
       runner.resize(canvasSize, xRatio, yRatio);
       platformHolder.resize(canvasSize, xRatio, yRatio);
@@ -609,7 +620,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   // Keyboard controls.
   var keyboardKey;
   @override
-  void onKeyEvent(RawKeyEvent event) {
+  KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> set) {
     if (!playingMusic && kIsWeb) {
       playMusic();
     }
@@ -649,5 +660,6 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     if (event is RawKeyUpEvent) {
       action = false;
     }
+    return KeyEventResult.handled;
   }
 }

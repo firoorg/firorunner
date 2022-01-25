@@ -50,8 +50,8 @@ class DepositOverlay extends StatelessWidget {
       child: InkWell(
         child: Center(
           child: Container(
-            height: game.viewport.canvasSize.y,
-            width: game.viewport.canvasSize.x,
+            height: game.camera.viewport.canvasSize!.y,
+            width: game.camera.viewport.canvasSize!.x,
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: lossImage,

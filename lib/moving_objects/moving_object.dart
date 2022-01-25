@@ -35,7 +35,7 @@ class MovingObject {
   }
 
   void remove() {
-    sprite.remove();
+    sprite.shouldRemove = true;
   }
 
   // See where this object intersects another object if at all.

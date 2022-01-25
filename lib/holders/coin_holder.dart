@@ -43,8 +43,10 @@ class CoinHolder extends Holder {
   }
 
   void renderCoinScore(Canvas c) {
-    sprite.position = Vector2(personalGameRef.size.x - 70, 10);
-    sprite.render(c);
+    sprite.animation?.getSprite().render(c,
+        position:
+            Vector2(personalGameRef.camera.viewport.canvasSize!.x - 70, 10),
+        size: Vector2(20, 20));
   }
 
   List<Sprite> getCoin() {

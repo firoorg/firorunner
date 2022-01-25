@@ -32,8 +32,8 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
       child: InkWell(
         child: Center(
           child: Container(
-            height: widget.game.viewport.canvasSize.y,
-            width: widget.game.viewport.canvasSize.x,
+            height: widget.game.camera.viewport.canvasSize!.y,
+            width: widget.game.camera.viewport.canvasSize!.x,
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: lossImage,

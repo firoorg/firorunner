@@ -18,8 +18,8 @@ class LoseMenuOverlay extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     return Center(
       child: Container(
-        height: game.viewport.canvasSize.y,
-        width: game.viewport.canvasSize.x,
+        height: game.camera.viewport.canvasSize!.y,
+        width: game.camera.viewport.canvasSize!.x,
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: lossImage,
