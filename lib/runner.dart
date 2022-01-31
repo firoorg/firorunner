@@ -114,6 +114,7 @@ class Runner extends Component {
             Curves.bounceIn,
           ),
         );
+        gameRef.addToMoveSet("j");
         effect.onFinishCallback = () {
           updateLevel();
           this.event("float");
@@ -149,6 +150,7 @@ class Runner extends Component {
             Curves.ease,
           ),
         );
+        gameRef.addToMoveSet("J");
         effect.onFinishCallback = () {
           updateLevel();
           clearEffects();
@@ -165,6 +167,7 @@ class Runner extends Component {
         previousState = runnerState;
         clearEffects();
         runnerState = event;
+        gameRef.addToMoveSet("f");
         sprite.current = RunnerState.fall;
         sprite.add(getFallingEffect());
         break;
@@ -184,11 +187,13 @@ class Runner extends Component {
             sprite.current = RunnerState.kick;
             break;
         }
+        gameRef.addToMoveSet("s");
         break;
       case "run":
         previousState = runnerState;
         runnerState = event;
         sprite.current = RunnerState.run;
+        gameRef.addToMoveSet("r");
         break;
       case "float":
         previousState = runnerState;
@@ -206,6 +211,7 @@ class Runner extends Component {
             sprite.current = RunnerState.float;
             break;
         }
+        gameRef.addToMoveSet("h");
         MoveEffect effect = MoveEffect.to(
           sprite.position,
           CurvedEffectController(
@@ -240,6 +246,7 @@ class Runner extends Component {
             sprite.current = RunnerState.duck;
             break;
         }
+        gameRef.addToMoveSet("S");
         MoveEffect effect = MoveEffect.to(
           sprite.position,
           CurvedEffectController(
@@ -260,6 +267,7 @@ class Runner extends Component {
         if (dead) {
           return;
         }
+        gameRef.addToMoveSet("e");
         FlameAudio.audioCache.play('sfx/fall_death_speed.mp3',
             volume: 0.5, mode: PlayerMode.LOW_LATENCY);
         previousState = runnerState;
@@ -275,6 +283,7 @@ class Runner extends Component {
         if (dead) {
           return;
         }
+        gameRef.addToMoveSet("e");
         FlameAudio.audioCache.play('sfx/fall_death_speed.mp3',
             volume: 0.5, mode: PlayerMode.LOW_LATENCY);
         previousState = runnerState;
@@ -290,6 +299,7 @@ class Runner extends Component {
         if (dead) {
           return;
         }
+        gameRef.addToMoveSet("e");
         FlameAudio.audioCache.play('sfx/glitch_death.mp3',
             volume: 0.5, mode: PlayerMode.LOW_LATENCY);
         previousState = runnerState;
@@ -346,7 +356,7 @@ class Runner extends Component {
     MoveEffect effect = MoveEffect.to(
       Vector2(sprite.x, 8 * gameRef.blockSize),
       CurvedEffectController(
-        0.2 * (8 - level),
+        (0.2 * (8 - level) <= 0 ? 0.01 : 0.2 * (8 - level)),
         Curves.ease,
       ),
     );
@@ -490,9 +500,11 @@ class Runner extends Component {
     Rect runnerRect = sprite.toRect();
     bool onTopOfPlatform = this.onTopOfPlatform();
 
+    Rect smallRunner = Rect.fromLTRB(runnerRect.left, runnerRect.top + 1,
+        runnerRect.right, runnerRect.bottom - 1);
     for (List<MovingObject> coinLevel in gameRef.coinHolder.objects) {
       for (int i = 0; i < coinLevel.length;) {
-        if (coinLevel[i].intersect(runnerRect) != "none") {
+        if (coinLevel[i].intersect(smallRunner) != "none") {
           gameRef.gameState.numCoins++;
           FlameAudio.audioCache.play('sfx/coin_catch.mp3',
               volume: 0.25, mode: PlayerMode.LOW_LATENCY);

@@ -91,25 +91,6 @@ class GameState extends Component {
     }
   }
 
-  // Gets the danger level of the game, this determines the appearance of
-  // obstacles in the beginning of the game.
-  int getDangerLevel() {
-    int score = getScore();
-    if (score > LEVEL2 / 2 + LEVEL2 / (2 * 4)) {
-      return 5;
-    } else if (score > LEVEL2 / 2) {
-      return 4;
-    } else if (score > LEVEL2 / 2 - LEVEL2 / (2 * 4)) {
-      return 3;
-    } else if (score > LEVEL2 / 2 - 2 * LEVEL2 / (2 * 4)) {
-      return 2;
-    } else if (score > LEVEL2 / 2 - 3 * LEVEL2 / (2 * 4)) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-
   // This score is used to determine the danger level of the game,
   // and progression.
   int getScore() {

@@ -58,20 +58,6 @@ class Platform extends MovingObject {
   }
 
   @override
-  void remove() {
-    removeChildrenObjects();
-    super.remove();
-  }
-
-  void removeChildrenObjects() {
-    if (removeChildren.isNotEmpty) {
-      for (Function removeChild in removeChildren) {
-        removeChild();
-      }
-    }
-  }
-
-  @override
   void update(double dt) {
     List<MovingObject> platformLevel = gameRef.platformHolder.objects[row];
     int index = platformLevel.indexOf(this);

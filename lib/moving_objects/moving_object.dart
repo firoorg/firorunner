@@ -8,6 +8,7 @@ import 'package:flame/components.dart';
 // animations and positioning.
 class MovingObject {
   late SpriteAnimationGroupComponent sprite;
+  late int column;
   MyGame gameRef;
 
   MovingObject(this.gameRef);
@@ -32,6 +33,10 @@ class MovingObject {
   // Get the rightmost pixel position of this sprite.
   double getRightEnd() {
     return sprite.position.x + sprite.width;
+  }
+
+  void setColumn(int c) {
+    column = c;
   }
 
   void remove() {

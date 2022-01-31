@@ -6,13 +6,16 @@ import 'package:firo_runner/main.dart';
 import 'package:flame/extensions.dart';
 import 'package:firo_runner/moving_objects/platform.dart';
 
+import '../course.dart';
+
 class CoinHolder extends Holder {
   late List<Sprite> coin;
   late SpriteAnimationGroupComponent sprite;
   late MyGame personalGameRef;
 
   @override
-  Future load() async {
+  Future load(MyGame gameRef) async {
+    super.load(gameRef);
     coin = await loadListSprites("coin", "coin", 12,
         sheets: 1, frameSize: Vector2(512, 512));
     SpriteAnimation normal = SpriteAnimation.spriteList(coin, stepTime: 0.1);
@@ -53,45 +56,43 @@ class CoinHolder extends Holder {
     return coin;
   }
 
-  bool generateCoin(MyGame gameRef, int level,
-      {bool force = false, double xPosition = 0}) {
-    if (total() > 5 && !force) {
-      return false;
-    }
-
-    if (objects[level].isNotEmpty && !force) {
-      return false;
-    }
-
-    if (random.nextInt(100) > 25 && !force) {
-      return true;
+  // Generate all the platforms in the game.
+  // Including top openings, and bottom structures.
+  void generateCoins(bool start) {
+    Platform platform = Platform(gameRef);
+    if ((objects == null ||
+            objects.length != 9 ||
+            gameRef.runnerColumn + BUFFER < lastPlaced) &&
+        !start) {
+      return;
     } else {
-      int nearestPlatform = getNearestPlatform(level);
-
-      Platform? platform =
-          gameRef.platformHolder.getPlatformOffScreen(nearestPlatform);
-      double xCoordinate = -100;
-
-      if (force) {
-        xCoordinate = xPosition;
-      } else if (level == 0) {
-        xCoordinate = gameRef.size.x;
-      } else if (platform != null) {
-        xCoordinate = platform.sprite.x;
-      } else {
-        return false;
+      int colBegin = lastPlaced + 1;
+      for (var r = 0; r < 9; r++) {
+        for (var c = colBegin; c < COL && c < colBegin + BUFFER; c++) {
+          if (gameRef.course[r][c] == 'c') {
+            generateCoin(gameRef, r,
+                xPosition:
+                    (c - gameRef.runnerColumn + 3) * platform.sprite.width,
+                column: c);
+          }
+          lastPlaced = c;
+        }
       }
-
-      Coin coin = Coin(gameRef);
-      coin.setPosition(xCoordinate, gameRef.blockSize * level);
-
-      if (gameRef.isTooNearOtherObstacles(coin.sprite.toRect()) && !force) {
-        return false;
-      }
-
-      objects[level].add(coin);
-      gameRef.add(coin.sprite);
+      return;
     }
+  }
+
+  bool generateCoin(MyGame gameRef, int level,
+      {bool force = false, double xPosition = 0, int column = -1}) {
+    Coin coin = Coin(gameRef);
+    if (column >= 0) {
+      coin.setColumn(column);
+    }
+    coin.setPosition(xPosition, gameRef.blockSize * level);
+
+    objects[level].add(coin);
+    gameRef.add(coin.sprite);
+
     return false;
   }
 }

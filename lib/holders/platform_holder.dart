@@ -1,3 +1,4 @@
+import 'package:firo_runner/course.dart';
 import 'package:firo_runner/holders/holder.dart';
 import 'package:firo_runner/main.dart';
 import 'package:firo_runner/moving_objects/moving_object.dart';
@@ -19,7 +20,8 @@ class PlatformHolder extends Holder {
   int timeSinceLastBottomHole = 0;
 
   @override
-  Future load() async {
+  Future load(MyGame gameRef) async {
+    super.load(gameRef);
     List<Sprite> allPlatforms = await loadListSprites(
         "platform", "platforms", 40,
         sheets: 1, frameSize: Vector2(318, 256));
@@ -40,118 +42,75 @@ class PlatformHolder extends Holder {
     super.setUp();
   }
 
-  // Removes obstacles from around openings in the floor so that the game is
-  // not unfair to the player.
-  void removeUnfairObstacles(
-      MyGame gameRef, Platform currentPlatform, int from, int to) {
-    for (int i = from; i <= to; i++) {
-      if (i == 0) {
-        // First level has a harder difficulty curve, and no platforms are on
-        // level -1, so objects have to be removed differently.
-        List<MovingObject> bugLevel = gameRef.bugHolder.objects[0];
-        for (MovingObject bug in gameRef.bugHolder.objects[0]) {
-          if (bug.sprite.x >= currentPlatform.sprite.x &&
-              bug.sprite.x <
-                  currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
-            gameRef.bugHolder.remove(bugLevel, bugLevel.indexOf(bug));
+  // Generate all the platforms in the game.
+  // Including top openings, and bottom structures.
+  void generatePlatforms(bool start) {
+    Platform platform = Platform(gameRef);
+    if ((objects == null ||
+            objects.length != 9 ||
+            gameRef.runnerColumn + BUFFER < gameRef.renderColumn) &&
+        !start) {
+      return;
+    } else {
+      int colBegin = lastPlaced + 1;
+      for (var r = 2; r < 9; r = r + 3) {
+        for (var c = colBegin; c < COL && c < colBegin + BUFFER; c++) {
+          if (gameRef.course[r][c] == 'p') {
+            generatePlatform(gameRef, r,
+                xPosition:
+                    (c - gameRef.runnerColumn + 3) * platform.sprite.width -
+                        gameRef.offset,
+                column: c);
           }
-        }
-        List<MovingObject> wireLevel = gameRef.wireHolder.objects[0];
-        for (MovingObject wire in gameRef.wireHolder.objects[0]) {
-          if (wire.sprite.x >= currentPlatform.sprite.x &&
-              wire.sprite.x <
-                  currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
-            gameRef.wireHolder.remove(wireLevel, wireLevel.indexOf(wire));
-          }
-        }
-      } else {
-        // All other objects on the other levels can be removed simply.
-        int nearestPlatform = getNearestPlatform(i);
-        for (MovingObject platform in objects[nearestPlatform]) {
-          if (platform.sprite.x >= currentPlatform.sprite.x &&
-              platform.sprite.x <
-                  currentPlatform.sprite.x + 4 * currentPlatform.sprite.width) {
-            (platform as Platform).removeChildrenObjects();
-            platform.prohibitObstacles = true;
-          }
+          lastPlaced = c;
+          gameRef.renderColumn = lastPlaced;
         }
       }
+      return;
     }
   }
 
-  // Generate all the platforms in the game.
-  // Including top openings, and bottom structures.
-  void generatePlatforms(MyGame gameRef) {
-    while (!generatePlatform(gameRef, 2)) {
-      timeSinceLastTopHole++;
-    }
-    while (!generatePlatform(gameRef, 5)) {
-      timeSinceLastBottomHole++;
-    }
-
-    int topChance =
-        random.nextInt(timeSinceLastTopHole > 0 ? timeSinceLastTopHole : 1);
-    int bottomChance = random
-        .nextInt(timeSinceLastBottomHole > 0 ? timeSinceLastBottomHole : 1);
-
-    if (topChance > 50) {
-      removeUnfairObstacles(
-          gameRef, objects[2][objects[2].length - 4] as Platform, 0, 4);
-      // Create an opening in the top.
-      remove(objects[2], objects[2].length - 2);
-      remove(objects[2], objects[2].length - 2);
-
-      timeSinceLastTopHole = 0;
-      noTopObstaclesForNext = true;
-    }
-    if (bottomChance > 30) {
-      Platform start = objects[5].elementAt(objects[5].length - 10) as Platform;
-      generatePlatform(gameRef, 8, xPosition: start.sprite.position.x);
-      for (int i = 0; i < 8; i++) {
-        generatePlatform(gameRef, 8);
-      }
-      int lastToRemove = objects[5].length - 3;
-      int firstToRemove = objects[5].length - 10;
-
-      removeUnfairObstacles(
-          gameRef, objects[5][lastToRemove - 1] as Platform, 3, 7);
-      remove(objects[5], lastToRemove);
-      remove(objects[5], lastToRemove);
-
-      removeUnfairObstacles(
-          gameRef, objects[5][firstToRemove - 1] as Platform, 3, 7);
-      remove(objects[5], firstToRemove);
-      remove(objects[5], firstToRemove);
-
-      timeSinceLastBottomHole = 0;
-      noMiddleObstaclesForNext = true;
-    }
+  // Remove and object from this holder.
+  @override
+  void remove(List<MovingObject> levelHolder, int j) {
+    int runCol = (((levelHolder[j] as Platform).sprite.position.x -
+                            gameRef.runner.runnerPosition.x)
+                        .abs() /
+                    (levelHolder[j] as Platform).sprite.width +
+                (levelHolder[j] as Platform).column)
+            .ceil() +
+        1;
+    double offset = ((levelHolder[j] as Platform).sprite.position.x).abs() %
+        (levelHolder[j] as Platform).sprite.width;
+    gameRef.offset = offset;
+    gameRef.runnerColumn = runCol;
+    super.remove(levelHolder, j);
   }
 
   // Create a platform object.
-  bool generatePlatform(MyGame gameRef, int level, {double xPosition = 0}) {
+  bool generatePlatform(MyGame gameRef, int level,
+      {double xPosition = 0, int column = -1}) {
     double xCoordinate = xPosition;
     if (objects[level].isNotEmpty && xPosition == 0) {
       xCoordinate = objects[level].last.getRightEnd();
     }
 
-    if (xCoordinate > gameRef.size.x + 2000) {
-      return true;
-    } else {
-      Platform platform = Platform(gameRef);
-      platform.setPosition(xCoordinate, gameRef.blockSize * level);
-      platform.row = level;
-      gameRef.add(platform.sprite);
-      objects[level].add(platform);
-      if (level == 2 && noTopObstaclesForNext) {
-        platform.prohibitObstacles = true;
-        noTopObstaclesForNext = false;
-      } else if (level == 5 && noMiddleObstaclesForNext) {
-        platform.prohibitObstacles = true;
-        noMiddleObstaclesForNext = false;
-      }
-      return false;
+    Platform platform = Platform(gameRef);
+    platform.setPosition(xCoordinate, gameRef.blockSize * level);
+    if (column >= 0) {
+      platform.setColumn(column);
     }
+    platform.row = level;
+    gameRef.add(platform.sprite);
+    objects[level].add(platform);
+    if (level == 2 && noTopObstaclesForNext) {
+      platform.prohibitObstacles = true;
+      noTopObstaclesForNext = false;
+    } else if (level == 5 && noMiddleObstaclesForNext) {
+      platform.prohibitObstacles = true;
+      noMiddleObstaclesForNext = false;
+    }
+    return false;
   }
 
   // Choose a random platform that is off screen from the player.

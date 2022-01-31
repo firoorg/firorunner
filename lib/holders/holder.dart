@@ -10,11 +10,15 @@ import 'package:flame/sprite.dart';
 
 class Holder {
   Random random = Random();
+  int lastPlaced = -1;
+  late MyGame gameRef;
 
   late List<List<MovingObject>> objects = [];
 
   // Load method to be overridden by classes that extend this.
-  Future load() async {}
+  Future load(MyGame gameRef) async {
+    this.gameRef = gameRef;
+  }
 
   // Basic method to reset the state of the holder object.
   void setUp() {
@@ -27,6 +31,7 @@ class Holder {
     for (int i = 0; i < 9; i++) {
       objects.add([]);
     }
+    lastPlaced = -1;
   }
 
   // Get the total amount of objects currently in the logical game.

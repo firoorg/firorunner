@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:firo_runner/holders/bug_holder.dart';
@@ -32,6 +33,7 @@ import 'package:http/http.dart' as http;
 import 'package:firo_runner/overlays/lose_menu_overlay.dart';
 import 'package:firo_runner/overlays/main_menu_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firo_runner/course.dart';
 
 // TODO Set NO_TOURNAMENT to false, and then set the SERVER and PORT for the
 // firo runner server instance.
@@ -173,6 +175,12 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
   late TextComponent _coins;
   int startLoading = 0;
 
+  double offset = 0;
+  late dynamic course;
+  int runnerColumn = 3;
+  int renderColumn = 0;
+  late List<List> moveSet;
+
   MyGame() : super() {
     camera.viewport.resize(Vector2(1920, 1080));
   }
@@ -218,18 +226,18 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     circuitBackground = CircuitBackground(this);
     await circuitBackground.load();
     platformHolder = PlatformHolder();
-    await platformHolder.load();
+    await platformHolder.load(this);
     coinHolder = CoinHolder();
     coinHolder.setPersonalGameRef(this);
-    await coinHolder.load();
+    await coinHolder.load(this);
     wireHolder = WireHolder();
-    await wireHolder.load();
+    await wireHolder.load(this);
     bugHolder = BugHolder();
-    await bugHolder.load();
+    await bugHolder.load(this);
     debrisHolder = DebrisHolder();
-    await debrisHolder.load();
+    await debrisHolder.load(this);
     wallHolder = WallHolder();
-    await wallHolder.load();
+    await wallHolder.load(this);
     fireworks = Firework(this);
     await fireworks.load();
 
@@ -267,7 +275,7 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     overlays.add('loading');
 
     // set up the game and pause it.
-    setUp();
+    setUp(random.nextInt(100000));
     gameState.setPaused();
     startLoading = DateTime.now().microsecondsSinceEpoch;
   }
@@ -288,44 +296,13 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     if (shouldReset) {
       return;
     }
-    int dangerLevel = gameState.getDangerLevel();
 
-    platformHolder.generatePlatforms(this);
-
-    if (dangerLevel > 2) {
-      int wireChosenRegion = random.nextInt(9);
-      if (wireChosenRegion % 3 != 2 &&
-          wireChosenRegion != 6 &&
-          wireChosenRegion != 7) {
-        wireHolder.generateWire(this, wireChosenRegion);
-      }
-    }
-
-    if (dangerLevel > 0) {
-      int bugChosenRegion = random.nextInt(9);
-      if (bugChosenRegion % 3 != 2 && bugChosenRegion % 3 != 0) {
-        bugHolder.generateBug(this, bugChosenRegion);
-      }
-    }
-
-    if (dangerLevel > 1) {
-      int debrisChosenRegion = random.nextInt(9);
-      if (debrisChosenRegion % 3 == 0 && debrisChosenRegion != 6) {
-        debrisHolder.generateDebris(this, debrisChosenRegion);
-      }
-    }
-
-    int choseCoinLevel = random.nextInt(9);
-    if (choseCoinLevel % 3 != 2 && choseCoinLevel != 6) {
-      coinHolder.generateCoin(this, choseCoinLevel);
-    }
-
-    if (dangerLevel > 4) {
-      int wallChosenRegion = random.nextInt(9);
-      if (wallChosenRegion % 3 == 1 && wallChosenRegion != 7) {
-        wallHolder.generateWall(this, wallChosenRegion);
-      }
-    }
+    platformHolder.generatePlatforms(false);
+    wireHolder.generateWires(false);
+    bugHolder.generateBugs(false);
+    debrisHolder.generateDebris_(false);
+    wallHolder.generateWalls(false);
+    coinHolder.generateCoins(false);
   }
 
   // Check if an obstacle is being placed too near another obstacle,
@@ -434,11 +411,22 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     overlays.remove('mainMenu');
     shouldReset = false;
     children.clear();
-    setUp();
+    if (competitive) {
+      // TODO get random integer from server and set seed
+      int seed = 10;
+      setUp(seed);
+    } else {
+      setUp(random.nextInt(100000));
+    }
   }
 
   // process after a death.
   Future<void> die() async {
+    Map m = Map();
+    m['distance'] = runnerColumn;
+    m['coins'] = gameState.numCoins;
+    m['moves'] = this.moveSet;
+    // print(json.encode(m));
     gameState.setPaused();
     // if in a tournament mode update information.
     if (!NO_TOURNAMENT) {
@@ -460,7 +448,10 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
   }
 
   // set up the game for another run.
-  void setUp() {
+  void setUp(int seed) {
+    moveSet = [
+      [4, 0, "r"]
+    ];
     add(runner);
     fireworks.setUp();
     runner.sprite.children.clear();
@@ -487,9 +478,28 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     add(_coins);
     add(_distance);
 
+    var twoDList = makeCourse(seed);
+    // Print out list to watch
+    for (var i = 0; i < 9; i++) {
+      print(twoDList[i]);
+    }
+    course = twoDList;
+    offset = 0;
+    runnerColumn = 3;
+    renderColumn = 0;
+    platformHolder.generatePlatforms(true);
+    wireHolder.generateWires(true);
+    bugHolder.generateBugs(true);
+    debrisHolder.generateDebris_(true);
+    wallHolder.generateWalls(true);
+    coinHolder.generateCoins(true);
     fillScreen();
     platformHolder.objects[2][0].sprite.current = PlatformState.left;
     platformHolder.objects[5][0].sprite.current = PlatformState.left;
+  }
+
+  void addToMoveSet(String action) {
+    moveSet.add([runner.level, runnerColumn, action]);
   }
 
   @override
