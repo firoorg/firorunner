@@ -37,7 +37,7 @@ import 'package:firo_runner/course.dart';
 
 // TODO Set NO_TOURNAMENT to false, and then set the SERVER and PORT for the
 // firo runner server instance.
-const NO_TOURNAMENT = true;
+const NO_TOURNAMENT = false;
 const SERVER = "https://game.firorunner.com";
 const PORT = "443";
 
@@ -383,15 +383,13 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
         print(response.body);
         return json.decode(response.body);
       } else {
-        // If the server did not return a 201 CREATED response,
-        // then throw an exception.
-        throw Exception('Failed to connect to Firo Runner server.');
+        return {"error": "error"};
       }
       // var value = await channel.stream.first;
       // print(value);
     } catch (e) {
       print(e);
-      return "";
+      return {"error": "error"};
     }
   }
 
