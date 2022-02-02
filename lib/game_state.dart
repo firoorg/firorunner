@@ -42,17 +42,18 @@ class GameState extends Component {
 
   // This is the level of the game.
   int getLevel() {
-    if (time > LEVEL7) {
+    int score = getScore();
+    if (score > LEVEL7) {
       return 7;
-    } else if (time > LEVEL6) {
+    } else if (score > LEVEL6) {
       return 6;
-    } else if (time > LEVEL5) {
+    } else if (score > LEVEL5) {
       return 5;
-    } else if (time > LEVEL4) {
+    } else if (score > LEVEL4) {
       return 4;
-    } else if (time > LEVEL3) {
+    } else if (score > LEVEL3) {
       return 3;
-    } else if (time > LEVEL2) {
+    } else if (score > LEVEL2) {
       return 2;
     } else {
       return 1;
@@ -94,12 +95,7 @@ class GameState extends Component {
   // This score is used to determine the danger level of the game,
   // and progression.
   int getScore() {
-    return time ~/ 10 + numCoins * 1000000;
-  }
-
-  // This is the real score that the player sees.
-  int getPlayerScore() {
-    return getScore() ~/ 10000;
+    return gameRef.runnerColumn + numCoins * 2;
   }
 
   // Gets how long the player has been playing the game.

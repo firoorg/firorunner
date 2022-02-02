@@ -12,9 +12,9 @@ class LeaderBoardOverlay extends StatelessWidget {
 
   List<Card> getLeaderboard(double width) {
     List<Card> leaders = [];
-    List<String> list = game.leaderboard.split("\n");
+    List<String> list = game.leaderboard;
 
-    if (list.isEmpty || list.length % 2 != 1 || list.length == 1) {
+    if (list.isEmpty || list.length % 2 == 1 || list.length == 1) {
       leaders.add(
         Card(
           color: cardColor,
@@ -44,7 +44,6 @@ class LeaderBoardOverlay extends StatelessWidget {
       );
       return leaders;
     }
-
     leaders.add(
       Card(
         color: cardColor,
@@ -85,7 +84,7 @@ class LeaderBoardOverlay extends StatelessWidget {
         ),
       ),
     );
-    for (int i = 0; i < list.length - 2; i = i + 2) {
+    for (int i = 0; i < list.length; i = i + 2) {
       String name = list.elementAt(i);
       String score = list.elementAt(i + 1);
       leaders.add(

@@ -86,43 +86,58 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
                             padding: const EdgeInsets.symmetric(vertical: 16.0),
                             child: ElevatedButton(
                               onPressed: () async {
-                                // // Validate will return true if the form is valid, or false if
-                                // // the form is invalid.
-                                FlameAudio.audioCache.play(
-                                    'sfx/button_click.mp3',
-                                    mode: PlayerMode.LOW_LATENCY);
-                                if (!_formKey.currentState!.validate()) {
-                                  return;
-                                }
-
-                                // Process data.
-                                String account = accountController.text;
-                                String key = keyController.text;
-
-                                String username = await widget.game.connectServer(
-                                    "newuser",
-                                    "user=$account&receive=${key == "" ? "dud" : key}");
-
-                                if (username.toLowerCase().contains("error")) {
-                                  print("There was an error");
-                                } else {
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.setString('username', username);
-                                  widget.game.username =
-                                      prefs.getString('username') ?? "";
-                                  try {
-                                    String result = await widget.game
-                                        .connectServer(
-                                            "gettries", "user=$username");
-                                    widget.game.tries = int.parse(result);
-                                    prefs.setInt('tries', widget.game.tries);
-                                  } catch (e) {
-                                    print(e);
+                                try {
+                                  // // Validate will return true if the form is valid, or false if
+                                  // // the form is invalid.
+                                  FlameAudio.audioCache.play(
+                                      'sfx/button_click.mp3',
+                                      mode: PlayerMode.LOW_LATENCY);
+                                  if (!_formKey.currentState!.validate()) {
+                                    return;
                                   }
-                                }
 
-                                widget.game.overlays.remove('signin');
+                                  // Process data.
+                                  String account = accountController.text;
+                                  String key = keyController.text;
+
+                                  final Map<String, dynamic> obj = {
+                                    "user": account,
+                                    "receive": key == "" ? "dud" : key,
+                                  };
+                                  var result = await widget.game
+                                      .connectServer("newuser", "", obj);
+                                  String username = result['user'];
+
+                                  if (username
+                                      .toLowerCase()
+                                      .contains("error")) {
+                                    print("There was an error");
+                                  } else {
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    prefs.setString('username', username);
+                                    widget.game.username =
+                                        prefs.getString('username') ?? "";
+                                    try {
+                                      final Map<String, dynamic> obj = {
+                                        "user": account,
+                                      };
+                                      dynamic result = await widget.game
+                                          .connectServer("gettries", "", obj);
+                                      if (result['Error'] != null) {
+                                        widget.game.tries =
+                                            int.parse(result['Tries']);
+                                        prefs.setInt(
+                                            'tries', widget.game.tries);
+                                      }
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  }
+                                  widget.game.overlays.remove('signin');
+                                } catch (e) {
+                                  print(e);
+                                }
                               },
                               child: const Text('Sign In'),
                             ),

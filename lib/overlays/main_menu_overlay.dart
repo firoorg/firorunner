@@ -116,12 +116,20 @@ class MainMenuOverlay extends StatelessWidget {
                             onPressed: game.username == ""
                                 ? null
                                 : () async {
-                                    game.address = await game.connectServer(
-                                        "deposit", "user=${game.username}");
-                                    FlameAudio.audioCache.play(
-                                        'sfx/button_click.mp3',
-                                        mode: PlayerMode.LOW_LATENCY);
-                                    game.overlays.add("deposit");
+                                    try {
+                                      final Map<String, dynamic> obj = {
+                                        "user": game.username,
+                                      };
+                                      var result = await game.connectServer(
+                                          "deposit", "", obj);
+                                      game.address = result['address'];
+                                      FlameAudio.audioCache.play(
+                                          'sfx/button_click.mp3',
+                                          mode: PlayerMode.LOW_LATENCY);
+                                      game.overlays.add("deposit");
+                                    } catch (e) {
+                                      print(e);
+                                    }
                                   },
                           ),
                           MaterialButton(
@@ -135,10 +143,10 @@ class MainMenuOverlay extends StatelessWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  "       TOURNAMENT   ${game.tries}       ",
+                                  "       TOURNAMENT   ${game.tries < 0 ? 0 : game.tries}       ",
                                   style: TextStyle(
                                     color:
-                                        game.username == "" || game.tries == 0
+                                        game.username == "" || game.tries <= 0
                                             ? inactiveColor
                                             : textColor,
                                     fontSize: width * 0.025,
@@ -146,7 +154,7 @@ class MainMenuOverlay extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            onPressed: game.username == "" || game.tries == 0
+                            onPressed: game.username == "" || game.tries <= 0
                                 ? null
                                 : () async {
                                     // Go to the Main Menu
@@ -222,8 +230,21 @@ class MainMenuOverlay extends StatelessWidget {
                               ),
                             ),
                             onPressed: () async {
-                              game.leaderboard = await game.connectServer(
-                                  "leaderboard", "user=value");
+                              try {
+                                final Map<String, dynamic> obj = {
+                                  "user": "value",
+                                };
+                                dynamic result = await game.connectServer(
+                                    "leaderboard", "", obj);
+                                List<String> userScores = [];
+                                for (var group in result) {
+                                  userScores.add(group['name']);
+                                  userScores.add(group['score']);
+                                }
+                                game.leaderboard = userScores;
+                              } catch (e) {
+                                print(e);
+                              }
                               FlameAudio.audioCache.play('sfx/button_click.mp3',
                                   mode: PlayerMode.LOW_LATENCY);
                               game.overlays.add("leaderboard");

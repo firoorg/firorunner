@@ -45,12 +45,12 @@ const FIREWORK_COLOR = Color(0xFFDDC0A3);
 const int LOADING_TIME = 2000000;
 
 // Variables that determine the score cutoff when each new level starts.
-const LEVEL2 = 25000000;
-const LEVEL3 = 50000000;
-const LEVEL4 = 75000000;
-const LEVEL5 = 100000000;
-const LEVEL6 = 125000000;
-const LEVEL7 = 150000000;
+const LEVEL2 = 125;
+const LEVEL3 = 250;
+const LEVEL4 = 375;
+const LEVEL5 = 500;
+const LEVEL6 = 625;
+const LEVEL7 = 750;
 
 // Variables that determine when to use the new robot animations.
 const COINS_ROBOT_UPGRADE1 = 50;
@@ -147,7 +147,7 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     style: const TextStyle(fontSize: 16.0, color: FIREWORK_COLOR),
   );
 
-  String leaderboard = "";
+  List<String> leaderboard = [];
   String address = "";
   String username = "";
   int tries = 0;
@@ -193,12 +193,17 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
       final prefs = await SharedPreferences.getInstance();
       username = prefs.getString('username') ?? "";
       tries = prefs.getInt('tries') ?? 0;
-      String result = await connectServer("gettries", "user=$username");
-      try {
-        tries = int.parse(result);
-        prefs.setInt('tries', tries);
-      } catch (e) {
-        print(e);
+      final Map<String, dynamic> obj = {
+        "user": username,
+      };
+      var result = await connectServer("gettries", "", obj);
+      if (result['error'] == null) {
+        try {
+          tries = int.parse(result['Tries']);
+          prefs.setInt('tries', tries);
+        } catch (e) {
+          print(e);
+        }
       }
     }
     FlameAudio.bgm.initialize();
@@ -360,18 +365,21 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
 
   // Connect to the server in online mode to get information and to participate
   // in the weekly tournament.
-  Future<String> connectServer(String command, String arguments) async {
+  Future<dynamic> connectServer(
+      String command, String arguments, Map<String, dynamic> args) async {
     try {
       final response = await http.post(
-        Uri.parse("$SERVER:$PORT/$command?$arguments"),
+        Uri.parse("$SERVER:$PORT/$command"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
+        body: jsonEncode(args),
       );
       if (response.statusCode == 200) {
         // If the server did return a 200,
         // then parse the JSON.
-        return response.body;
+        print(response.body);
+        return json.decode(response.body);
       } else {
         // If the server did not return a 201 CREATED response,
         // then throw an exception.
@@ -405,16 +413,18 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
   }
 
   // reset the game.
-  void reset() {
+  Future<void> reset() async {
     runner.sprite.animation!.reset();
     overlays.remove('gameOver');
     overlays.remove('mainMenu');
     shouldReset = false;
     children.clear();
     if (competitive) {
-      // TODO get random integer from server and set seed
-      int seed = 10;
-      setUp(seed);
+      final Map<String, dynamic> obj = {
+        "user": username,
+      };
+      var result = await connectServer("getseed", "", obj);
+      setUp(result['seed']);
     } else {
       setUp(random.nextInt(100000));
     }
@@ -423,25 +433,33 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
   // process after a death.
   Future<void> die() async {
     Map m = Map();
-    m['distance'] = runnerColumn;
-    m['coins'] = gameState.numCoins;
     m['moves'] = this.moveSet;
-    // print(json.encode(m));
+    String jsonMoves = json.encode(m);
     gameState.setPaused();
     // if in a tournament mode update information.
     if (!NO_TOURNAMENT) {
       final prefs = await SharedPreferences.getInstance();
       if (username != "" && competitive) {
-        await connectServer(
-            "newscore", "user=$username&score=${gameState.getPlayerScore()}");
+        final Map<String, dynamic> obj = {
+          "user": username,
+          "score": gameState.getScore(),
+          "coins": gameState.numCoins,
+          "moves": jsonMoves,
+        };
+        await connectServer("newscore", "", obj);
       }
       tries = prefs.getInt('tries') ?? 0;
-      String result = await connectServer("gettries", "user=$username");
-      try {
-        tries = int.parse(result);
-        prefs.setInt('tries', tries);
-      } catch (e) {
-        print(e);
+      final Map<String, dynamic> obj = {
+        "user": username,
+      };
+      var result = await connectServer("gettries", "", obj);
+      if (result['error'] == null) {
+        try {
+          tries = int.parse(result['Tries']);
+          prefs.setInt('tries', tries);
+        } catch (e) {
+          print(e);
+        }
       }
     }
     shouldReset = true;
@@ -627,8 +645,6 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     runner.control("center");
   }
 
-  // Keyboard controls.
-  var keyboardKey;
   @override
   KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> set) {
     if (!playingMusic && kIsWeb) {
@@ -636,7 +652,6 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     }
     if (event is RawKeyDownEvent) {
       action = true;
-      keyboardKey = null;
       switch (event.data.logicalKey.keyId) {
         case 4294968068:
         case 119:
@@ -670,6 +685,6 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     if (event is RawKeyUpEvent) {
       action = false;
     }
-    return KeyEventResult.handled;
+    return KeyEventResult.ignored;
   }
 }

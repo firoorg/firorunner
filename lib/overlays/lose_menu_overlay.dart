@@ -32,7 +32,7 @@ class LoseMenuOverlay extends StatelessWidget {
             Material(
               type: MaterialType.transparency,
               child: Text(
-                'Score: ${game.gameState.getPlayerScore()}',
+                'Score: ${game.gameState.getScore()}',
                 style: TextStyle(
                   color: textColor,
                   fontSize: width * 0.05,

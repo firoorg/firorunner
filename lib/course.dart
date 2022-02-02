@@ -4,7 +4,7 @@ import 'dart:math';
 const int ROW = 9;
 // How many platforms to allow in the game. 100000 is approximately
 // about 5 hours of playtime.
-const int COL = 100000;
+const int COL = 50000;
 // How many columns ahead of runner should be loaded.
 const int BUFFER = 20;
 
