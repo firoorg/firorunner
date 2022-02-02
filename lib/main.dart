@@ -85,6 +85,7 @@ void main() async {
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   final myGame = MyGame();
+  FocusNode node = FocusNode();
   runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       home: GameWidget<MyGame>(
@@ -92,6 +93,7 @@ void main() async {
           return const LoadingOverlay();
         },
         game: myGame,
+        focusNode: node,
         overlayBuilderMap: {
           // Should be used once before all overlays are called. Flame has a slight
           // delay when constructing the overlay widgets, so to make the text and
@@ -114,7 +116,7 @@ void main() async {
             return DepositOverlay(game: myGame);
           },
           'signin': (_, myGame) {
-            return SignInOverlay(game: myGame);
+            return SignInOverlay(game: myGame, node: node);
           },
           'mainMenu': (_, myGame) {
             return MainMenuOverlay(game: myGame);

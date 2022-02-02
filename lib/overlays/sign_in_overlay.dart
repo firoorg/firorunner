@@ -10,9 +10,11 @@ class SignInOverlay extends StatefulWidget {
   const SignInOverlay({
     Key? key,
     required this.game,
+    required this.node,
   }) : super(key: key);
 
   final MyGame game;
+  final FocusNode node;
 
   @override
   State<SignInOverlay> createState() => _MyStatefulWidgetState();
@@ -27,6 +29,9 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    // if (!widget.game.gameState.isPaused) {
+    //   return Material();
+    // }
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -138,6 +143,7 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
                                 } catch (e) {
                                   print(e);
                                 }
+                                widget.node.requestFocus();
                               },
                               child: const Text('Sign In'),
                             ),
@@ -153,6 +159,7 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
         ),
         onTap: () {
           widget.game.overlays.remove('signin');
+          widget.node.requestFocus();
         },
       ),
     );
