@@ -45,6 +45,7 @@ class Holder {
 
   // Update every object that this holder holds.
   void update(double dt) {
+    if (gameRef.gameState.isPaused) return;
     for (List<MovingObject> objectLevel in objects) {
       for (MovingObject p in objectLevel) {
         p.update(dt);

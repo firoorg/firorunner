@@ -29,6 +29,7 @@ import 'package:flutter/services.dart';
 import 'package:firo_runner/runner.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
+import 'dart:collection' if (kIsWeb) 'dart:html';
 
 import 'package:firo_runner/overlays/lose_menu_overlay.dart';
 import 'package:firo_runner/overlays/main_menu_overlay.dart';
@@ -126,6 +127,13 @@ void main() async {
           },
         },
       )));
+  // exploit poor typing in flutter to import dart:html and use document, and
+  // still have one codebase in stead of having to separate for mobile.
+  var document;
+  if (kIsWeb) {
+    document = document;
+    document.addEventListener("visibilitychange", myGame.onVisibilityChange);
+  }
 }
 
 // Grab the nearest platform.
@@ -154,6 +162,21 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
   String username = "";
   int tries = 0;
   bool competitive = false;
+
+  // Special function for browsers to pause the game.
+  void onVisibilityChange(dynamic e) {
+    // do something
+    if (e.type == "visibilitychange") {
+      print(gameState.inMatch);
+      if (gameState.inMatch) {
+        if (gameState.isPaused) {
+          gameState.isPaused = false;
+        } else {
+          gameState.isPaused = true;
+        }
+      }
+    }
+  }
 
   late CircuitBackground circuitBackground;
   late PlatformHolder platformHolder;
@@ -185,6 +208,7 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
 
   MyGame() : super() {
     camera.viewport.resize(Vector2(1920, 1080));
+    // camera.viewport = FixedResolutionViewport(Vector2(1920, 1080));
   }
 
   // Load the game and all of its assets, may take a couple of seconds.
@@ -428,10 +452,12 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
     } else {
       setUp(random.nextInt(100000));
     }
+    gameState.inMatch = true;
   }
 
   // process after a death.
   Future<void> die() async {
+    gameState.inMatch = false;
     Map m = Map();
     m['moves'] = this.moveSet;
     String jsonMoves = json.encode(m);
@@ -532,6 +558,8 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
 
   @override
   void update(double dt) {
+    // removes stutter and fixes pausing bug on browsers.
+    if (dt > 1) return;
     if (overlays.isActive('loading') &&
         (DateTime.now().microsecondsSinceEpoch - startLoading) > LOADING_TIME) {
       overlays.remove('loading');
@@ -569,6 +597,13 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
   @override
   void onGameResize(Vector2 canvasSize) {
     Vector2? oldSize = camera.viewport.canvasSize;
+    double oldRation = oldSize!.x / oldSize!.y;
+    double newRatio = canvasSize.x / canvasSize.y;
+    if (newRatio != oldRation) {
+      // Resizing messes up with the game logic and can cause inaccurate speed
+      // calculations.
+      die();
+    }
     super.onGameResize(canvasSize);
     blockSize = canvasSize.y / 9;
     if (loaded) {

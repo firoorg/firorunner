@@ -26,6 +26,7 @@ class MovingObject {
   }
 
   void update(double dt) {
+    if (gameRef.gameState.isPaused) return;
     double velocity = gameRef.gameState.getVelocity();
     sprite.position = sprite.position - Vector2(velocity * dt, 0);
   }

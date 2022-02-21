@@ -1,3 +1,4 @@
+import 'package:firo_runner/course.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
@@ -6,6 +7,7 @@ import 'package:flame/components.dart';
 class GameState extends Component {
   int start = 0;
   bool isPaused = false;
+  bool inMatch = false;
   int numCoins = 0;
   int time = 0;
   late MyGame gameRef;
@@ -108,19 +110,19 @@ class GameState extends Component {
     if (!isPaused) {
       switch (getLevel()) {
         case 7:
-          return gameRef.camera.viewport.canvasSize!.x * 0.30;
+          return gameRef.size.x * (0.30 + ((2.0 * gameRef.runnerColumn) / COL));
         case 6:
-          return gameRef.camera.viewport.canvasSize!.x * 0.28;
+          return gameRef.size.x * 0.28;
         case 5:
-          return gameRef.camera.viewport.canvasSize!.x * 0.26;
+          return gameRef.size.x * 0.26;
         case 4:
-          return gameRef.camera.viewport.canvasSize!.x * 0.24;
+          return gameRef.size.x * 0.24;
         case 3:
-          return gameRef.camera.viewport.canvasSize!.x * 0.22;
+          return gameRef.size.x * 0.22;
         case 2:
-          return gameRef.camera.viewport.canvasSize!.x * 0.20;
+          return gameRef.size.x * 0.20;
         default:
-          return gameRef.camera.viewport.canvasSize!.x * 0.18;
+          return gameRef.size.x * 0.18;
       }
     } else {
       return 0;
