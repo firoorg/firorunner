@@ -524,9 +524,9 @@ class MyGame extends FlameGame with PanDetector, TapDetector, KeyboardEvents {
 
     var twoDList = makeCourse(seed);
     // Print out list to watch
-    for (var i = 0; i < 9; i++) {
-      print(twoDList[i]);
-    }
+    // for (var i = 0; i < 9; i++) {
+    //   print(twoDList[i]);
+    // }
     course = twoDList;
     offset = 0;
     runnerColumn = 3;

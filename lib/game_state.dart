@@ -10,6 +10,9 @@ class GameState extends Component {
   bool inMatch = false;
   int numCoins = 0;
   int time = 0;
+  final double desiredPlatSize = 14;
+  double platSize = 14;
+  double mult = 1.0;
   late MyGame gameRef;
   int previousLevel = 1;
 
@@ -31,6 +34,11 @@ class GameState extends Component {
 
   void setUp(MyGame gameRef) {
     this.gameRef = gameRef;
+    platSize = gameRef.camera.viewport.canvasSize!.x /
+        (gameRef.blockSize *
+            (gameRef.platformHolder.l1[0].srcSize.x /
+                gameRef.platformHolder.l1[0].srcSize.y));
+    mult = desiredPlatSize / platSize;
     numCoins = 0;
     time = 0;
     previousLevel = 1;
@@ -110,19 +118,21 @@ class GameState extends Component {
     if (!isPaused) {
       switch (getLevel()) {
         case 7:
-          return gameRef.size.x * (0.30 + ((2.0 * gameRef.runnerColumn) / COL));
+          return gameRef.size.x *
+              (0.30 + ((2.0 * gameRef.runnerColumn) / COL)) *
+              mult;
         case 6:
-          return gameRef.size.x * 0.28;
+          return gameRef.size.x * 0.28 * mult;
         case 5:
-          return gameRef.size.x * 0.26;
+          return gameRef.size.x * 0.26 * mult;
         case 4:
-          return gameRef.size.x * 0.24;
+          return gameRef.size.x * 0.24 * mult;
         case 3:
-          return gameRef.size.x * 0.22;
+          return gameRef.size.x * 0.22 * mult;
         case 2:
-          return gameRef.size.x * 0.20;
+          return gameRef.size.x * 0.20 * mult;
         default:
-          return gameRef.size.x * 0.18;
+          return gameRef.size.x * 0.18 * mult;
       }
     } else {
       return 0;
