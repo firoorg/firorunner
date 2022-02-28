@@ -1,6 +1,23 @@
 # firo_runner
 
-An infinite runner game powered by Firo.
+An infinite runner game powered by Firo. Live version available on [firorunner.com](firorunner.com)
+
+# About Tournament Mode
+Leaderboard resets and payouts are made every Sunday UTC 0:00.
+
+Top 5 scores every week will share the pot in the following proportions:
+1st: 50%
+2nd: 25%
+3rd: 15%
+4th: 5%
+5th: 5%
+
+Firo that is deposited to play in tournament mode are distributed as follows:
+50% Winners' Pot
+25% Firo Development Fund
+25% Cypherstack
+
+We welcome community contributions!
 
 ## Getting Started
 
