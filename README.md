@@ -1,3 +1,7 @@
+<a href="https://play.google.com/store/apps/details?id=com.cypherstack.firorunner" target="_blank">
+  <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="80"/>
+</a>
+
 # firo_runner
 
 An infitite runner game powered by Firo.
