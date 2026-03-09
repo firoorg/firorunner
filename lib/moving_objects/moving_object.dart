@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:firo_runner/biome.dart';
+import 'package:firo_runner/biome_tinted_component.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
 
@@ -27,6 +29,29 @@ class MovingObject {
   void update(double dt) {
     double velocity = gameRef.gameState.getVelocity();
     sprite.position = sprite.position - Vector2(velocity * dt, 0);
+
+    // Update biome tint if this is a tinted component.
+    updateBiomeTint();
+  }
+
+  /// Updates the biome tint paint on tinted components based on current biome.
+  void updateBiomeTint() {
+    if (sprite is BiomeTintedSpriteAnimationGroupComponent) {
+      BiomeConfig config = gameRef.gameState.getCurrentBiomeConfig();
+      Color tintColor = getTintColorForObject(config);
+      if (tintColor == const Color(0xFFFFFFFF)) {
+        (sprite as BiomeTintedSpriteAnimationGroupComponent).biomePaint = null;
+      } else {
+        (sprite as BiomeTintedSpriteAnimationGroupComponent).biomePaint =
+            biomeTintPaint(tintColor);
+      }
+    }
+  }
+
+  /// Override this in subclasses to return the correct tint color for this
+  /// object type. Default returns white (no tint).
+  Color getTintColorForObject(BiomeConfig config) {
+    return const Color(0xFFFFFFFF);
   }
 
   // Get the rightmost pixel position of this sprite.

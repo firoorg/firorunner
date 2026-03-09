@@ -1,8 +1,11 @@
 import 'dart:math';
 
+import 'package:firo_runner/biome.dart';
+import 'package:firo_runner/biome_tinted_component.dart';
 import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 
 enum PlatformState {
   left,
@@ -37,7 +40,7 @@ class Platform extends MovingObject {
         version == 0 ? gameRef.platformHolder.o1 : gameRef.platformHolder.o2,
         stepTime: 0.12);
 
-    sprite = SpriteAnimationGroupComponent(
+    sprite = BiomeTintedSpriteAnimationGroupComponent<PlatformState>(
       animations: {
         PlatformState.left: left,
         PlatformState.mid: mid,
@@ -55,6 +58,11 @@ class Platform extends MovingObject {
               gameRef.platformHolder.l1[0].image.height),
       gameRef.blockSize,
     );
+  }
+
+  @override
+  Color getTintColorForObject(BiomeConfig config) {
+    return config.platformTint;
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:firo_runner/biome.dart';
 import 'package:firo_runner/holders/holder.dart';
 import 'package:firo_runner/moving_objects/platform.dart';
 import 'package:flame/components.dart';
@@ -31,7 +32,9 @@ class BugHolder extends Holder {
       return false;
     }
 
-    if (random.nextInt(100) > 25) {
+    // Higher spawn chance in later biomes.
+    int spawnThreshold = _getSpawnThreshold(gameRef);
+    if (random.nextInt(100) > spawnThreshold) {
       return true;
     } else {
       int nearestPlatform = getNearestPlatform(level);
@@ -67,6 +70,25 @@ class BugHolder extends Holder {
         });
       }
       return false;
+    }
+  }
+
+  // Returns the spawn threshold percentage based on current biome.
+  // Higher value = more likely to spawn.
+  int _getSpawnThreshold(MyGame gameRef) {
+    switch (gameRef.gameState.currentBiome) {
+      case Biome.city:
+        return 25;
+      case Biome.grassland:
+        return 35;
+      case Biome.forest:
+        return 40;
+      case Biome.desert:
+        return 45;
+      case Biome.tundra:
+        return 50;
+      case Biome.utopia:
+        return 55;
     }
   }
 }

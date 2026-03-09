@@ -1,3 +1,4 @@
+import 'package:firo_runner/biome.dart';
 import 'package:firo_runner/holders/holder.dart';
 import 'package:firo_runner/moving_objects/platform.dart';
 import 'package:flame/components.dart';
@@ -23,7 +24,10 @@ class WireHolder extends Holder {
       return false;
     }
 
-    if (random.nextInt(100) > 100) {
+    // In city biome, wires have 0% base spawn (controlled by dangerLevel in fillScreen).
+    // In later biomes, spawn chance increases progressively.
+    int spawnThreshold = _getSpawnThreshold(gameRef);
+    if (random.nextInt(100) > spawnThreshold) {
       return true;
     } else {
       int nearestPlatform = getNearestPlatform(level);
@@ -67,6 +71,24 @@ class WireHolder extends Holder {
         });
       }
       return false;
+    }
+  }
+
+  // Returns the spawn threshold percentage based on current biome.
+  int _getSpawnThreshold(MyGame gameRef) {
+    switch (gameRef.gameState.currentBiome) {
+      case Biome.city:
+        return 100; // Original: always spawns when called (controlled by fillScreen)
+      case Biome.grassland:
+        return 30;
+      case Biome.forest:
+        return 40;
+      case Biome.desert:
+        return 45;
+      case Biome.tundra:
+        return 50;
+      case Biome.utopia:
+        return 55;
     }
   }
 }

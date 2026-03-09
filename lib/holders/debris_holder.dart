@@ -1,3 +1,4 @@
+import 'package:firo_runner/biome.dart';
 import 'package:firo_runner/holders/holder.dart';
 import 'package:firo_runner/moving_objects/platform.dart';
 import 'package:flame/components.dart';
@@ -25,7 +26,9 @@ class DebrisHolder extends Holder {
       return false;
     }
 
-    if (random.nextInt(100) > 25) {
+    // Higher spawn chance in later biomes.
+    int spawnThreshold = _getSpawnThreshold(gameRef);
+    if (random.nextInt(100) > spawnThreshold) {
       return true;
     } else {
       int nearestPlatform = getNearestPlatform(level);
@@ -62,6 +65,24 @@ class DebrisHolder extends Holder {
         });
       }
       return false;
+    }
+  }
+
+  // Returns the spawn threshold percentage based on current biome.
+  int _getSpawnThreshold(MyGame gameRef) {
+    switch (gameRef.gameState.currentBiome) {
+      case Biome.city:
+        return 25;
+      case Biome.grassland:
+        return 30;
+      case Biome.forest:
+        return 40;
+      case Biome.desert:
+        return 50; // Tumbleweeds everywhere
+      case Biome.tundra:
+        return 45;
+      case Biome.utopia:
+        return 50;
     }
   }
 }

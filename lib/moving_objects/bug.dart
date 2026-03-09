@@ -1,6 +1,9 @@
+import 'package:firo_runner/biome.dart';
+import 'package:firo_runner/biome_tinted_component.dart';
 import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 
 enum BugState { normal, breaking }
 
@@ -13,7 +16,7 @@ class Bug extends MovingObject {
     SpriteAnimation breaking =
         SpriteAnimation.spriteList(breakingImage, stepTime: 0.01, loop: false);
 
-    sprite = SpriteAnimationGroupComponent(
+    sprite = BiomeTintedSpriteAnimationGroupComponent<BugState>(
       animations: {
         BugState.normal: normal,
         BugState.breaking: breaking,
@@ -27,5 +30,10 @@ class Bug extends MovingObject {
       gameRef.blockSize,
       gameRef.blockSize,
     );
+  }
+
+  @override
+  Color getTintColorForObject(BiomeConfig config) {
+    return config.bugTint;
   }
 }

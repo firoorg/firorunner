@@ -1,6 +1,9 @@
+import 'package:firo_runner/biome.dart';
+import 'package:firo_runner/biome_tinted_component.dart';
 import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 
 enum WallState { normal }
 
@@ -11,7 +14,7 @@ class Wall extends MovingObject {
     List<Sprite> wall = gameRef.wallHolder.getWall();
     SpriteAnimation normal = SpriteAnimation.spriteList(wall, stepTime: 0.1);
 
-    sprite = SpriteAnimationGroupComponent(
+    sprite = BiomeTintedSpriteAnimationGroupComponent<WallState>(
       animations: {
         WallState.normal: normal,
       },
@@ -27,6 +30,11 @@ class Wall extends MovingObject {
           2.0,
       gameRef.blockSize * 0.35,
     );
+  }
+
+  @override
+  Color getTintColorForObject(BiomeConfig config) {
+    return config.wallTint;
   }
 
   // Override the update method so that this object can also move vertically

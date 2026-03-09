@@ -16,6 +16,7 @@ import 'package:firo_runner/overlays/sign_in_overlay.dart';
 import 'package:firo_runner/holders/wall_holder.dart';
 import 'package:firo_runner/moving_objects/wire.dart';
 import 'package:firo_runner/holders/wire_holder.dart';
+import 'package:firo_runner/biome.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
@@ -49,6 +50,17 @@ const LEVEL4 = 75000000;
 const LEVEL5 = 100000000;
 const LEVEL6 = 125000000;
 const LEVEL7 = 150000000;
+
+// Extended biome levels — progressively harder biomes beyond the city.
+const LEVEL8 = 200000000; // Grassland begins
+const LEVEL9 = 250000000;
+const LEVEL10 = 325000000; // Forest begins
+const LEVEL11 = 400000000;
+const LEVEL12 = 500000000; // Desert begins
+const LEVEL13 = 600000000;
+const LEVEL14 = 725000000; // Tundra begins
+const LEVEL15 = 850000000;
+const LEVEL16 = 1000000000; // Utopia Garden begins
 
 // Variables that determine when to use the new robot animations.
 const COINS_ROBOT_UPGRADE1 = 50;
@@ -168,6 +180,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   late Wire wire;
   late TextComponent _distance;
   late TextComponent _coins;
+  late TextComponent _biomeName;
   int startLoading = 0;
 
   MyGame() : super() {
@@ -245,6 +258,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
         position: Vector2(size.x - 20, 10), textRenderer: scoresPaint)
       ..anchor = Anchor.topRight;
     _coins.changePriorityWithoutResorting(OVERLAY_PRIORITY);
+    _biomeName = TextComponent("",
+        position: Vector2(10, 10), textRenderer: scoresPaint)
+      ..anchor = Anchor.topLeft;
+    _biomeName.changePriorityWithoutResorting(OVERLAY_PRIORITY);
 
     // add all overlays first since the first time they are added there is a
     // delay, so calling it earlier makes a smoother experience.
@@ -277,47 +294,86 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   }
 
   // Fill the screen with platforms and all of the obstacles.
+  // Obstacle density and variety scale with biome progression.
   void fillScreen() {
     if (shouldReset) {
       return;
     }
     int dangerLevel = gameState.getDangerLevel();
+    Biome currentBiome = gameState.currentBiome;
 
     platformHolder.generatePlatforms(this);
 
-    if (dangerLevel > 2) {
-      int wireChosenRegion = random.nextInt(9);
-      if (wireChosenRegion % 3 != 2 &&
-          wireChosenRegion != 6 &&
-          wireChosenRegion != 7) {
-        wireHolder.generateWire(this, wireChosenRegion);
+    // Determine extra spawn passes for harder biomes.
+    int extraSpawnPasses = _getExtraSpawnPasses(currentBiome);
+
+    // Wire spawning: unlocked at dangerLevel > 2, always available in post-city biomes.
+    if (dangerLevel > 2 || currentBiome != Biome.city) {
+      for (int pass = 0; pass <= extraSpawnPasses; pass++) {
+        int wireChosenRegion = random.nextInt(9);
+        if (wireChosenRegion % 3 != 2 &&
+            wireChosenRegion != 6 &&
+            wireChosenRegion != 7) {
+          wireHolder.generateWire(this, wireChosenRegion);
+        }
       }
     }
 
-    if (dangerLevel > 0) {
-      int bugChosenRegion = random.nextInt(9);
-      if (bugChosenRegion % 3 != 2 && bugChosenRegion % 3 != 0) {
-        bugHolder.generateBug(this, bugChosenRegion);
+    // Bug spawning: unlocked at dangerLevel > 0, always available in post-city biomes.
+    if (dangerLevel > 0 || currentBiome != Biome.city) {
+      for (int pass = 0; pass <= extraSpawnPasses; pass++) {
+        int bugChosenRegion = random.nextInt(9);
+        if (bugChosenRegion % 3 != 2 && bugChosenRegion % 3 != 0) {
+          bugHolder.generateBug(this, bugChosenRegion);
+        }
       }
     }
 
-    if (dangerLevel > 1) {
-      int debrisChosenRegion = random.nextInt(9);
-      if (debrisChosenRegion % 3 == 0 && debrisChosenRegion != 6) {
-        debrisHolder.generateDebris(this, debrisChosenRegion);
+    // Debris spawning: unlocked at dangerLevel > 1, always available in post-city biomes.
+    if (dangerLevel > 1 || currentBiome != Biome.city) {
+      for (int pass = 0; pass <= extraSpawnPasses; pass++) {
+        int debrisChosenRegion = random.nextInt(9);
+        if (debrisChosenRegion % 3 == 0 && debrisChosenRegion != 6) {
+          debrisHolder.generateDebris(this, debrisChosenRegion);
+        }
       }
     }
 
-    int choseCoinLevel = random.nextInt(9);
-    if (choseCoinLevel % 3 != 2 && choseCoinLevel != 6) {
-      coinHolder.generateCoin(this, choseCoinLevel);
+    // Coins: always spawn, slightly more generous in later biomes.
+    int coinPasses = currentBiome != Biome.city ? 2 : 1;
+    for (int pass = 0; pass < coinPasses; pass++) {
+      int choseCoinLevel = random.nextInt(9);
+      if (choseCoinLevel % 3 != 2 && choseCoinLevel != 6) {
+        coinHolder.generateCoin(this, choseCoinLevel);
+      }
     }
 
-    if (dangerLevel > 4) {
-      int wallChosenRegion = random.nextInt(9);
-      if (wallChosenRegion % 3 == 1 && wallChosenRegion != 7) {
-        wallHolder.generateWall(this, wallChosenRegion);
+    // Wall spawning: unlocked at dangerLevel > 4, always available in post-city biomes.
+    if (dangerLevel > 4 || currentBiome != Biome.city) {
+      for (int pass = 0; pass <= extraSpawnPasses; pass++) {
+        int wallChosenRegion = random.nextInt(9);
+        if (wallChosenRegion % 3 == 1 && wallChosenRegion != 7) {
+          wallHolder.generateWall(this, wallChosenRegion);
+        }
       }
+    }
+  }
+
+  // Returns extra obstacle spawn passes based on biome difficulty.
+  int _getExtraSpawnPasses(Biome biome) {
+    switch (biome) {
+      case Biome.city:
+        return 0;
+      case Biome.grassland:
+        return 0;
+      case Biome.forest:
+        return 1;
+      case Biome.desert:
+        return 1;
+      case Biome.tundra:
+        return 2;
+      case Biome.utopia:
+        return 2;
     }
   }
 
@@ -471,6 +527,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
     runner.setUp();
     add(_coins);
     add(_distance);
+    add(_biomeName);
 
     fillScreen();
     platformHolder.objects[2][0].sprite.current = PlatformState.left;
@@ -516,6 +573,10 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
 
     _distance.text = "Time: ${gameState.getPlayerTime()}";
     _coins.text = " ${gameState.numCoins}";
+    // Show biome name when not in city (since city is the starting default).
+    BiomeConfig biomeConfig = gameState.getCurrentBiomeConfig();
+    _biomeName.text =
+        gameState.currentBiome != Biome.city ? biomeConfig.name : "";
     if (shouldReset &&
         !overlays.isActive('gameOver') &&
         !overlays.isActive('mainMenu')) {

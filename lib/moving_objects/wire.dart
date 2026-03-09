@@ -1,3 +1,5 @@
+import 'package:firo_runner/biome.dart';
+import 'package:firo_runner/biome_tinted_component.dart';
 import 'package:firo_runner/moving_objects/moving_object.dart';
 import 'package:firo_runner/main.dart';
 import 'package:flame/components.dart';
@@ -10,7 +12,7 @@ class Wire extends MovingObject {
     List<Sprite> wire = gameRef.wireHolder.getWire();
     SpriteAnimation normal = SpriteAnimation.spriteList(wire, stepTime: 0.05);
 
-    sprite = SpriteAnimationGroupComponent(
+    sprite = BiomeTintedSpriteAnimationGroupComponent<WireState>(
       animations: {
         WireState.normal: normal,
       },
@@ -23,6 +25,11 @@ class Wire extends MovingObject {
       gameRef.blockSize,
       gameRef.blockSize,
     );
+  }
+
+  @override
+  Color getTintColorForObject(BiomeConfig config) {
+    return config.wireTint;
   }
 
   // Override the intersect method so that the hitbox is smaller for the wires,
