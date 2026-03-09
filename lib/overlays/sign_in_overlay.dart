@@ -69,14 +69,15 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
                           ),
                           TextFormField(
                             decoration: const InputDecoration(
-                              hintText: 'Enter your receiving Firo address.',
+                              hintText: 'Enter your Spark address.',
                             ),
                             validator: (String? value) {
                               if (value == null || value.isEmpty) {
                                 print("logging in instead of signing up.");
                                 return null;
-                              } else if (value.length != 34) {
-                                return 'Not a valid receiving Firo address.';
+                              } else if (!value.startsWith('sm1') ||
+                                  value.length < 100) {
+                                return 'Not a valid Spark address. Must start with sm1.';
                               }
                               return null;
                             },
@@ -101,7 +102,7 @@ class _MyStatefulWidgetState extends State<SignInOverlay> {
 
                                 String username = await widget.game.connectServer(
                                     "newuser",
-                                    "user=$account&receive=${key == "" ? "dud" : key}");
+                                    "user=$account&sparkaddress=${key == "" ? "dud" : key}");
 
                                 if (username.toLowerCase().contains("error")) {
                                   print("There was an error");

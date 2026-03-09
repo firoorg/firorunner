@@ -13,7 +13,7 @@ class DepositOverlay extends StatelessWidget {
 
   List<Widget> getDepositAddress(double width) {
     List<Widget> list = [];
-    if (game.address.length != 34) {}
+    if (!game.address.startsWith('sm1') || game.address.length < 100) {}
     list.add(QrImage(
       data: game.address,
       version: QrVersions.auto,
@@ -33,7 +33,7 @@ class DepositOverlay extends StatelessWidget {
             game.address,
             style: TextStyle(
               color: textColor,
-              fontSize: width * 0.03,
+              fontSize: width * 0.015,
             ),
           ),
         ),

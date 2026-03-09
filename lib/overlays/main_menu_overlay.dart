@@ -117,7 +117,7 @@ class MainMenuOverlay extends StatelessWidget {
                                 ? null
                                 : () async {
                                     game.address = await game.connectServer(
-                                        "deposit", "user=${game.username}");
+                                        "sparkdeposit", "user=${game.username}");
                                     FlameAudio.audioCache.play(
                                         'sfx/button_click.mp3',
                                         mode: PlayerMode.LOW_LATENCY);
