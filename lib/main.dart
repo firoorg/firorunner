@@ -145,6 +145,7 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
   String leaderboard = "";
   String address = "";
   String username = "";
+  String pot = "0";
   int tries = 0;
   bool competitive = false;
 
@@ -186,6 +187,11 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       try {
         tries = int.parse(result);
         prefs.setInt('tries', tries);
+      } catch (e) {
+        print(e);
+      }
+      try {
+        pot = await connectServer("sparkpot", "");
       } catch (e) {
         print(e);
       }
@@ -438,13 +444,18 @@ class MyGame extends BaseGame with PanDetector, TapDetector, KeyboardEvents {
       final prefs = await SharedPreferences.getInstance();
       if (username != "" && competitive) {
         await connectServer(
-            "newscore", "user=$username&score=${gameState.getPlayerScore()}");
+            "sparknewscore", "user=$username&score=${gameState.getPlayerScore()}");
       }
       tries = prefs.getInt('tries') ?? 0;
       String result = await connectServer("gettries", "user=$username");
       try {
         tries = int.parse(result);
         prefs.setInt('tries', tries);
+      } catch (e) {
+        print(e);
+      }
+      try {
+        pot = await connectServer("sparkpot", "");
       } catch (e) {
         print(e);
       }

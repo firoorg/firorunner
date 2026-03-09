@@ -14,12 +14,36 @@ class LeaderBoardOverlay extends StatelessWidget {
     List<Card> leaders = [];
     List<String> list = game.leaderboard.split("\n");
 
+    // Show Spark pot balance at the top.
+    leaders.add(
+      Card(
+        color: cardColor,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(color: titleColor, width: 3),
+            borderRadius: BorderRadius.circular(10.0)),
+        child: FractionallySizedBox(
+          widthFactor: 0.5,
+          child: Padding(
+            padding: EdgeInsets.all(width * 0.01),
+            child: Text(
+              "Spark Prize Pool: ${game.pot} FIRO",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: titleColor,
+                fontSize: width * 0.025,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
     if (list.isEmpty || list.length % 2 != 1 || list.length == 1) {
       leaders.add(
         Card(
           color: cardColor,
           shape: RoundedRectangleBorder(
-              side: BorderSide(color: titleColor, width: 3),
+              side: const BorderSide(color: titleColor, width: 3),
               borderRadius: BorderRadius.circular(10.0)),
           child: FractionallySizedBox(
             widthFactor: 0.5,
@@ -49,7 +73,7 @@ class LeaderBoardOverlay extends StatelessWidget {
       Card(
         color: cardColor,
         shape: RoundedRectangleBorder(
-            side: BorderSide(color: titleColor, width: 3),
+            side: const BorderSide(color: titleColor, width: 3),
             borderRadius: BorderRadius.circular(10.0)),
         child: FractionallySizedBox(
           widthFactor: 0.4,
@@ -148,11 +172,13 @@ class LeaderBoardOverlay extends StatelessWidget {
                 fit: BoxFit.fill,
               ),
             ),
-            child: SizedBox(
-              width: width / 3,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: getLeaderboard(width),
+            child: SingleChildScrollView(
+              child: SizedBox(
+                width: width / 3,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: getLeaderboard(width),
+                ),
               ),
             ),
           ),

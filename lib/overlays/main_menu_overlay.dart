@@ -223,7 +223,13 @@ class MainMenuOverlay extends StatelessWidget {
                             ),
                             onPressed: () async {
                               game.leaderboard = await game.connectServer(
-                                  "leaderboard", "user=value");
+                                  "sparkleaderboard", "user=value");
+                              try {
+                                game.pot = await game.connectServer(
+                                    "sparkpot", "");
+                              } catch (e) {
+                                print(e);
+                              }
                               FlameAudio.audioCache.play('sfx/button_click.mp3',
                                   mode: PlayerMode.LOW_LATENCY);
                               game.overlays.add("leaderboard");
